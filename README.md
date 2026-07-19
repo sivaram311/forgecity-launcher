@@ -16,8 +16,18 @@ Prerelease debug build (sideload for testing on Realme P2 Pro / Android 8.0+):
 - Releases page: https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.1.0-mvp
 
 This is a **debug-signed prerelease** for testing only. On-device Realme E2E is
-still pending, and no production (upload-key) signing has been applied. Verify
-the hash before installing:
+still pending, and no production (upload-key) signing has been applied.
+
+> The repo is **private**, so the download links require a signed-in GitHub
+> account with access. With the `gh` CLI:
+>
+> ```powershell
+> gh release download v0.1.0-mvp --repo sivaram311/forgecity-launcher --pattern "*.apk"
+> ```
+>
+> For anonymous public downloads, the repo must be made public first.
+
+Verify the hash before installing:
 
 ```powershell
 Get-FileHash .\forgecity-0.1.0-mvp-debug.apk -Algorithm SHA256
