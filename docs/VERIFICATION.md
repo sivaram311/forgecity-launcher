@@ -40,3 +40,18 @@ APK SHA-256: `073C495949BD52BB1FD9AD09ACBF1A65339F80F6F150B2B3F282960B86C2209A`
 Build is **debug-signed** and marked **prerelease**. It has not run on a
 physical Realme P2 Pro, so #16 device E2E is a documented waiver (no device on
 the build host), not a pass. No production upload key applied.
+
+## 2026-07-19 — Phase 2 Wave 1 (Awakening foundations)
+
+Branch: `feature/phase-2-awakening` · versionName `0.2.0-awakening-dev`  
+Parallel plan: `docs/PARALLEL-EXECUTION.md`
+
+| Check | Result | Notes |
+|------|--------|-------|
+| Day/night + stars + night glows | LANDED | `DayNightCycle` + Canvas ambient (power-gated) |
+| Camera fly-in / double-tap recenter | LANDED | Compose `Animatable` |
+| UsageStats harvest + WorkManager | LANDED | Grant UX + 6h periodic worker |
+| Building levels from launches | LANDED | `LaunchTracker` + XP level map |
+| Unit tests (XP + day/night) | PASS | `testDebugUnitTest` green on Wave 1 |
+| `assembleDebug` | PASS | `0.2.0-awakening-dev` APK built |
+| Device E2E (#16) | PENDING | Blocks annotated `v0.2.0` tag |

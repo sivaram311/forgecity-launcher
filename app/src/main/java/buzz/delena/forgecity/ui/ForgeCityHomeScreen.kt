@@ -1,6 +1,8 @@
 package buzz.delena.forgecity.ui
 
+import android.content.Intent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,31 +29,38 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import buzz.delena.forgecity.city.CityBuilding
 import buzz.delena.forgecity.city.CityState
-import androidx.compose.material3.Text
+import buzz.delena.forgecity.city.DayNightCycle
 
 @Composable
 fun ForgeCityHomeScreen(
     state: CityState,
     buildings: List<CityBuilding>,
     query: String,
+    hourOfDay: Int,
+    ambientEnabled: Boolean,
+    hasUsageAccess: Boolean,
     onQueryChange: (String) -> Unit,
     onBuildingTap: (CityBuilding) -> Unit,
+    onOpenUsageAccess: () -> Unit,
 ) {
     val filtered = buildings.filter {
         query.isBlank() || it.label.contains(query, ignoreCase = true)
     }
+    val (top, mid, bottom) = DayNightCycle.skyColors(hourOfDay)
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    listOf(Color(0xFF1B1624), Color(0xFF0E0C12), Color(0xFF24180F)),
+                    listOf(Color(top), Color(mid), Color(bottom)),
                 ),
             ),
     ) {
         CityCanvas(
             buildings = filtered,
+            hourOfDay = hourOfDay,
+            ambientEnabled = ambientEnabled,
             onBuildingTap = onBuildingTap,
             modifier = Modifier.fillMaxSize(),
         )
@@ -82,6 +92,19 @@ fun ForgeCityHomeScreen(
             )
             Spacer(modifier = Modifier.height(12.dp))
             ResourceStrip(state)
+            if (!hasUsageAccess) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Grant Usage Access to awaken Power / Focus / Gold from real habits →",
+                    color = Color(0xFFE8A15A),
+                    fontSize = 12.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color(0x66302A38), RoundedCornerShape(12.dp))
+                        .clickable(onClick = onOpenUsageAccess)
+                        .padding(horizontal = 12.dp, vertical = 10.dp),
+                )
+            }
             Spacer(modifier = Modifier.height(10.dp))
             SearchBar(query = query, onQueryChange = onQueryChange)
         }
@@ -95,7 +118,7 @@ fun ForgeCityHomeScreen(
         }
 
         Text(
-            text = "Pinch to zoom · drag to pan · tap a building to enter",
+            text = "Pinch zoom · drag pan · double-tap recenter · tap fly-in",
             color = Color(0x99FFF6F0),
             fontSize = 12.sp,
             modifier = Modifier

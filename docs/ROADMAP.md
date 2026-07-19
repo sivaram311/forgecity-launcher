@@ -6,7 +6,7 @@ story — while staying performant on Snapdragon 7s Gen 2 + Adreno 710 + 120 Hz.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher  
 **Device SoT:** `E:\MyAgent\workflow\devices\REALME-P2-PRO.md`  
-**Last updated:** 2026-07-19
+**Last updated:** 2026-07-19 (Phase 2 Wave 1 landed on `feature/phase-2-awakening`)
 
 ---
 
@@ -107,13 +107,21 @@ gate.
 - Deliverable: Working isometric launcher with basic visuals
 - Release: https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.1.0-mvp
 
-### Phase 2 — Living City & Progression — v0.2.0 “Awakening” (next, ~2–3 weeks)
+### Phase 2 — Living City & Progression — v0.2.0 “Awakening” (in progress)
 
-- Parallax + day/night backgrounds
-- Camera fly-in + building level-up visuals
-- UsageStats XP → resources
-- Building upgrade visuals
-- Battery-aware animation gating
+**Branch:** `feature/phase-2-awakening` · versionName `0.2.0-awakening-dev`  
+**Parallel plan:** [PARALLEL-EXECUTION.md](PARALLEL-EXECUTION.md) (Wave 1)
+
+| Wave 1 item | Status |
+|-------------|--------|
+| Day/night parallax sky + night glows | Landed (dev) |
+| Camera fly-in + double-tap recenter | Landed (dev) |
+| AnimationBudget (power-save gate) | Landed (dev) |
+| UsageStats XP → resources + WorkManager | Landed (dev) |
+| Building levels from launches | Landed (dev) |
+| Realme P2 Pro E2E | **PENDING** — blocks `v0.2.0` tag |
+
+- Deliverable: v0.2.0 “Awakening” — City feels alive and responsive to habits
 - **Gate:** Realme P2 Pro E2E + crew SIGN-OFF
 
 ### Phase 3 — Story & World Depth — v0.3.0 (~4–6 weeks)

@@ -28,4 +28,16 @@ interface CityDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertQuest(quest: StoryProgressEntity)
+
+    @Query(
+        """
+        UPDATE city_meta SET
+          scrap = scrap + :scrap,
+          power = power + :power,
+          focus = focus + :focus,
+          goldDust = goldDust + :goldDust
+        WHERE id = 1
+        """,
+    )
+    suspend fun addResources(scrap: Int, power: Int, focus: Int, goldDust: Int)
 }

@@ -20,12 +20,16 @@
 ```text
 buzz.delena.forgecity
 ├── MainActivity / ForgeCityApp
-├── city/          Districts, IsoMath, classifier, state models
+├── city/          Districts, IsoMath, DayNightCycle, classifier, state
 ├── launcher/      AppCatalog (query + launch + grid placement)
 ├── data/          Room entities, DAO, DB, repository
+├── usage/         UsageStats harvest, XP math, LaunchTracker, WorkManager
+├── power/         AnimationBudget (PowerManager gate)
 ├── story/         Chapter briefings + starter quests
 └── ui/            Compose home screen, city canvas, ViewModel
 ```
+
+Parallel streams: [PARALLEL-EXECUTION.md](PARALLEL-EXECUTION.md).
 
 ## Districts
 

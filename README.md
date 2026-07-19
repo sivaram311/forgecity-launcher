@@ -5,7 +5,8 @@ Apps become buildings. Habits rebuild districts. Chapter 1 (**Embers**) ships as
 the MVP city shell.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher (public)  
-**Branch:** `feature/mvp-city-shell` · version `0.1.0-mvp`
+**Branch:** `feature/phase-2-awakening` · version `0.2.0-awakening-dev` (Phase 2 in progress)  
+**Stable MVP tag:** `v0.1.0-mvp` on `main`
 
 ## Download
 
@@ -28,7 +29,17 @@ Get-FileHash .\forgecity-0.1.0-mvp-debug.apk -Algorithm SHA256
 adb install -r .\forgecity-0.1.0-mvp-debug.apk
 ```
 
-## What works in 0.1.0-mvp
+## What works in 0.2.0-awakening-dev (Phase 2 wave 1)
+
+- Everything from 0.1.0-mvp, plus:
+- Real-clock day/night sky + night building glows + stars (battery-gated)
+- Camera fly-in on tap before launch; double-tap recenter
+- UsageStats → Power / Focus / Gold / Scrap (needs Usage Access grant)
+- Periodic WorkManager harvest (6h)
+- Building levels from launch counts
+- Parallel execution plan: [docs/PARALLEL-EXECUTION.md](docs/PARALLEL-EXECUTION.md)
+
+## What worked in 0.1.0-mvp
 
 - Registers as Android `HOME` + `DEFAULT` (+ app-drawer `LAUNCHER` entry).
 - Jetpack Compose isometric city canvas with pan/zoom.
@@ -73,6 +84,7 @@ Accept the home-role prompt, or Settings → Default apps → Home app.
 |-----|---------|
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Technical architecture |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Phased roadmap (vision → v1.0) |
+| [docs/PARALLEL-EXECUTION.md](docs/PARALLEL-EXECUTION.md) | Parallel streams / waves (CONSCIOUS) |
 | [docs/STORY-BIBLE.md](docs/STORY-BIBLE.md) | Campaign outline |
 | [docs/OPS.md](docs/OPS.md) | Build / device ops |
 | [docs/VERIFICATION.md](docs/VERIFICATION.md) | Evidence record |

@@ -27,13 +27,12 @@ Detailed prompts: `agents/roles/`.
 
 ## Next pipeline (Phase 2 — Awakening)
 
-SoT: `docs/ROADMAP.md`. Suggested kickoff task: camera fly-in + building
-level-up with battery-aware animation gating, then UsageStats → resources.
+SoT: `docs/ROADMAP.md` + `docs/PARALLEL-EXECUTION.md`.
 
-1. UI/Animation — parallax day/night + fly-in + level-up particles  
-2. Android Systems — UsageStats + PowerManager gates + WorkManager  
-3. Data — building levels + resource ledger migrations  
-4. QA — Realme P2 Pro 120 Hz + battery baseline  
+**Wave 1 (landed on `feature/phase-2-awakening`):** A+B+C in parallel —
+day/night + fly-in, UsageStats/WorkManager, launch levels.
+
+**Wave 2 (next):** particles, animated counters, persist buildings, **device E2E**.
 
 ## In-launcher living agents (Phase 4+)
 
