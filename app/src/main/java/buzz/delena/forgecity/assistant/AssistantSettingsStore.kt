@@ -25,6 +25,16 @@ class AssistantSettingsStore(context: Context) {
         get() = prefs.getInt(KEY_QUIET_END, 7 * 60)
         set(value) = prefs.edit().putInt(KEY_QUIET_END, value).apply()
 
+    var backgroundVideoEnabled: Boolean
+        get() = prefs.getBoolean(KEY_BACKGROUND_VIDEO, true)
+        set(value) = prefs.edit().putBoolean(KEY_BACKGROUND_VIDEO, value).apply()
+
+    var backgroundVideoOpacity: Float
+        get() = prefs.getFloat(KEY_BACKGROUND_OPACITY, 0.80f).coerceIn(0.4f, 1f)
+        set(value) = prefs.edit()
+            .putFloat(KEY_BACKGROUND_OPACITY, value.coerceIn(0.4f, 1f))
+            .apply()
+
     fun allowedPackages(): Set<String> =
         prefs.getStringSet(KEY_ALLOW, emptySet())?.toSet().orEmpty()
 
@@ -45,5 +55,7 @@ class AssistantSettingsStore(context: Context) {
         private const val KEY_ALLOW = "allowed_packages"
         private const val KEY_QUIET_START = "quiet_start"
         private const val KEY_QUIET_END = "quiet_end"
+        private const val KEY_BACKGROUND_VIDEO = "background_video_enabled"
+        private const val KEY_BACKGROUND_OPACITY = "background_video_opacity"
     }
 }

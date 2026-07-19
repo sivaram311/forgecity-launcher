@@ -37,6 +37,7 @@ import buzz.delena.forgecity.assistant.AssistantUiEvent
 import buzz.delena.forgecity.city.CityBuilding
 import buzz.delena.forgecity.city.CityState
 import buzz.delena.forgecity.city.DayNightCycle
+import buzz.delena.forgecity.ui.background.CityBackgroundVideo
 import kotlinx.coroutines.delay
 
 @Composable
@@ -52,6 +53,8 @@ fun ForgeCityHomeScreen(
     ttsEnabled: Boolean,
     allowCount: Int,
     quietLabel: String,
+    backgroundVideoEnabled: Boolean,
+    backgroundVideoOpacity: Float,
     showAllowlist: Boolean,
     dockMessage: String?,
     levelUpBuildingId: String?,
@@ -64,6 +67,8 @@ fun ForgeCityHomeScreen(
     onOpenNotificationAccess: () -> Unit,
     onToggleAssistant: () -> Unit,
     onToggleTts: () -> Unit,
+    onToggleBackgroundVideo: () -> Unit,
+    onBackgroundVideoOpacityChange: (Float) -> Unit,
     onQuietStartEarlier: () -> Unit,
     onQuietStartLater: () -> Unit,
     onQuietEndEarlier: () -> Unit,
@@ -98,6 +103,26 @@ fun ForgeCityHomeScreen(
                 ),
             ),
     ) {
+        CityBackgroundVideo(
+            enabled = ambientEnabled && backgroundVideoEnabled,
+            opacity = backgroundVideoOpacity,
+            modifier = Modifier.fillMaxSize(),
+        )
+        if (ambientEnabled && backgroundVideoEnabled) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(
+                                Color(0xA60A0A12),
+                                Color(0x660A0A12),
+                                Color(0xB30A0A12),
+                            ),
+                        ),
+                    ),
+            )
+        }
         CityCanvas(
             buildings = filtered,
             hourOfDay = hourOfDay,
@@ -136,11 +161,15 @@ fun ForgeCityHomeScreen(
                 hasNotificationAccess = hasNotificationAccess,
                 assistantEnabled = assistantEnabled,
                 ttsEnabled = ttsEnabled,
+                backgroundVideoEnabled = backgroundVideoEnabled,
+                backgroundVideoOpacity = backgroundVideoOpacity,
                 quietLabel = quietLabel,
                 allowCount = allowCount,
                 onOpenNotificationAccess = onOpenNotificationAccess,
                 onToggleAssistant = onToggleAssistant,
                 onToggleTts = onToggleTts,
+                onToggleBackgroundVideo = onToggleBackgroundVideo,
+                onBackgroundVideoOpacityChange = onBackgroundVideoOpacityChange,
                 onQuietStartEarlier = onQuietStartEarlier,
                 onQuietStartLater = onQuietStartLater,
                 onQuietEndEarlier = onQuietEndEarlier,

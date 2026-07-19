@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
 import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -28,6 +29,12 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private val powerReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            viewModel.refreshEnvironment()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -43,6 +50,8 @@ class MainActivity : ComponentActivity() {
             val tts by viewModel.ttsEnabled.collectAsState()
             val allowCount by viewModel.allowCount.collectAsState()
             val quietLabel by viewModel.quietLabel.collectAsState()
+            val backgroundVideoEnabled by viewModel.backgroundVideoEnabled.collectAsState()
+            val backgroundVideoOpacity by viewModel.backgroundVideoOpacity.collectAsState()
             val showAllowlist by viewModel.showAllowlist.collectAsState()
             val dockMessage by viewModel.dockMessage.collectAsState()
             val levelUp by viewModel.levelUpEvent.collectAsState()
@@ -59,6 +68,8 @@ class MainActivity : ComponentActivity() {
                 ttsEnabled = tts,
                 allowCount = allowCount,
                 quietLabel = quietLabel,
+                backgroundVideoEnabled = backgroundVideoEnabled,
+                backgroundVideoOpacity = backgroundVideoOpacity,
                 showAllowlist = showAllowlist,
                 dockMessage = dockMessage,
                 levelUpBuildingId = levelUp,
@@ -71,6 +82,8 @@ class MainActivity : ComponentActivity() {
                 onOpenNotificationAccess = { startActivity(viewModel.notificationAccessIntent()) },
                 onToggleAssistant = viewModel::toggleAssistant,
                 onToggleTts = viewModel::toggleTts,
+                onToggleBackgroundVideo = viewModel::toggleBackgroundVideo,
+                onBackgroundVideoOpacityChange = viewModel::setBackgroundVideoOpacity,
                 onQuietStartEarlier = { viewModel.shiftQuietStart(-30) },
                 onQuietStartLater = { viewModel.shiftQuietStart(30) },
                 onQuietEndEarlier = { viewModel.shiftQuietEnd(-30) },
@@ -109,6 +122,13 @@ class MainActivity : ComponentActivity() {
                 @Suppress("DEPRECATION")
                 registerReceiver(packageReceiver, filter)
             }
+            val powerFilter = IntentFilter(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                registerReceiver(powerReceiver, powerFilter, Context.RECEIVER_NOT_EXPORTED)
+            } else {
+                @Suppress("DEPRECATION")
+                registerReceiver(powerReceiver, powerFilter)
+            }
             receiverRegistered = true
         }
     }
@@ -116,6 +136,7 @@ class MainActivity : ComponentActivity() {
     override fun onStop() {
         if (receiverRegistered) {
             unregisterReceiver(packageReceiver)
+            unregisterReceiver(powerReceiver)
             receiverRegistered = false
         }
         super.onStop()

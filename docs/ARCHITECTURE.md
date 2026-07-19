@@ -1,6 +1,6 @@
 # ForgeCity architecture
 
-**Status:** Phase 2 Awakening (`0.2.0-awakening-dev`) · PR #1 open  
+**Status:** Forge Assistant + Background Video (`0.3.2-background-video-dev`)
 **Primary device:** Realme P2 Pro 5G — Snapdragon 7s Gen 2 / Adreno 710 / 120 Hz  
 **Auth / ports / DB env:** none (on-device Android app; no CSS, no host port)
 
@@ -10,10 +10,11 @@
 |-------|--------|
 | UI | Kotlin + Jetpack Compose |
 | City render | Custom `Canvas` isometric projection |
+| Video background | Media3 ExoPlayer + `PlayerView`, local raw resource |
 | App discovery | `PackageManager` launcher intents + `<queries>` |
-| Persistence | Room v2 (`city_meta`, `buildings`, `building_stats`, `story_progress`) + `Migration(1,2)` |
+| Persistence | Room v3 + migrations 1→2→3; SharedPreferences for assistant/atmosphere |
 | Background | WorkManager + UsageStats (Phase 2) |
-| AI (planned) | Hybrid local/VPS agent layer — Phase 4 |
+| Assistant | NotificationListenerService + local TTS; hybrid AI remains future |
 
 ## Package map
 
@@ -25,8 +26,10 @@ buzz.delena.forgecity
 ├── data/          Room entities, DAO, DB, Migrations(1→2), repository
 ├── usage/         UsageStats harvest, XP math, LaunchTracker, WorkManager
 ├── power/         AnimationBudget (PowerManager gate)
+├── assistant/     Notification listener, TTS, settings, quiet hours
 ├── story/         Chapter briefings + starter quests
 └── ui/            Compose home screen, city canvas, ViewModel
+    └── background/ Media3 player + lifecycle-aware video composable
 ```
 
 Parallel streams: [PARALLEL-EXECUTION.md](PARALLEL-EXECUTION.md).
@@ -49,6 +52,9 @@ MVP classifier uses package/label heuristics; user overrides come later.
 
 - Keep building primitives to simple extruded diamonds (no heavy meshes).
 - Pause ambient animation when `PowerManager.isPowerSaveMode` or screen off (Phase 2).
+- Video exists only while enabled/resumed; muted local decode, low local buffer,
+  repeat-all, max target source 1080×1920/30fps.
+- Missing/failed video resource falls back to the day/night gradient.
 - Prefer `graphicsLayer` / transform gestures over layout thrash.
 - Cap simultaneous particle emitters; profile on device before Filament upgrade.
 
@@ -59,7 +65,7 @@ MVP classifier uses package/label heuristics; user overrides come later.
 | Launcher `<queries>` | Yes | Sufficient for home-screen app listing |
 | `PACKAGE_USAGE_STATS` | Declared | Used in Phase 2 XP; requires Settings grant |
 | `QUERY_ALL_PACKAGES` | No | Sideload-only option later; Play-restricted |
-| Notification listener | No | Optional badges later |
+| Notification listener | Yes | User-granted; deny-by-default allowlist, TTS off by default |
 
 ## Phase plan
 
