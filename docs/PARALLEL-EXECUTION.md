@@ -82,6 +82,16 @@ Run **A + B + C** in the same branch tip:
 | W2-D1 | D | Chapter 2–3 quest stubs seeded (pulled forward) | ✅ landed (dev) |
 | W2-F1 | F | Realme P2 Pro baseline (120 Hz / battery) — **blocks v0.2.0 tag** | ⏳ pending device |
 
+### Wave 2.5 — Background video framework (done on `main`)
+
+| ID | Stream | Deliverable | Status |
+|----|--------|-------------|--------|
+| W25-A1 | A | Media3 ExoPlayer layer under CityCanvas | ✅ `v0.3.2` |
+| W25-B1 | B | Lifecycle + AnimationBudget + power-save receiver | ✅ |
+| W25-F1 | F | Missing-asset fallback + debug prerelease | ✅ PR #4 |
+| W25-A2 | A | Final `city_background.mp4` + seamless loop | ⏳ pending asset |
+| W25-F2 | F | Realme decoder/thermal/battery E2E | ⏳ pending device |
+
 ### Wave 3 — Phase 3 (parallel design + scaffold)
 
 | ID | Stream | Deliverable |
@@ -131,8 +141,9 @@ Lead merges when unit tests + Reviewer #17 GO; device E2E is a separate hire wit
 |-------|---------|------------------|--------------|
 | 1 Embers | `v0.1.0-mvp` | — | ✅ shipped (debug prerelease) |
 | 2 Awakening | `v0.2.0-awakening-dev` | A+B+C+D+F | ✅ Waves 1–2 + debug prerelease; **device E2E** for annotated `v0.2.0` |
+| 2.5 Video | `v0.3.2-background-video-dev` | A+B+F | ✅ framework on `main`; MP4 + Realme still open |
 | 3 Narrative | `v0.3.0` | A+D(+E0)+F | Device E2E required |
 | 4 Symphony | `v0.4.0` | E+A+B+F | Device E2E required |
 | 5 Stable | `v1.0.0` | all | Promote evidence if distributed beyond sideload |
 
-**Current hire focus:** Stream F (P2 Pro E2E when device available). Stream C Migration(1,2) ✅.
+**Current hire focus:** drop final MP4 (Stream A) + Stream F (P2 Pro E2E) in parallel.

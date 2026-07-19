@@ -40,6 +40,17 @@ Branch: merged to `main` via PR #1 · Prerelease: `v0.2.0-awakening-dev`
 
 **Hire next:** QA & Optimization (P2 Pro lab) when device is available.
 
+## Experimental 0.3.x train (on `main`)
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Forge Assistant `v0.3.0` / `v0.3.1` | ✅ published | favorites, NLS/TTS, quiet hours, contentIntent |
+| Background Video `v0.3.2` | ✅ published | Media3 layer, toggle/opacity, fallback; **no MP4 yet** |
+| PR #4 merge | ✅ MERGED | `2bd8868` |
+| Final MP4 + Realme video E2E | ⏳ **NEXT** | blocks annotated production tags |
+
+**Hire next:** UI/Animation (drop MP4) + QA (P2 Pro loop/thermal/battery) in parallel.
+
 ## In-launcher living agents (Phase 4+)
 
 Mayor · Story Weaver · Architect · Scout · Guardian · Chronicler — see

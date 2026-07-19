@@ -4,9 +4,9 @@ A story-driven isometric city home screen for Realme P2 / P2 Pro (ColorOS).
 Apps become buildings. Habits rebuild districts. A neon city assistant can read
 notifications aloud when you opt in.
 
-**Repo:** https://github.com/sivaram311/forgecity-launcher (public)  
-**Branch:** `feature/background-video` · version `0.3.2-background-video-dev`
-**Previous prerelease:** `v0.3.1-forge-assistant-dev`
+**Repo:** https://github.com/sivaram311/forgecity-launcher (public)
+**Branch:** `main` Â· version `0.3.2-background-video-dev`
+**Latest prerelease:** [`v0.3.2-background-video-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.3.2-background-video-dev) (PR #4 merged)
 
 ## Download
 
@@ -28,7 +28,7 @@ adb install -r .\forgecity-0.3.2-background-video-dev-debug.apk
 ## What works in 0.3.2-background-video-dev
 
 - Media3 ExoPlayer full-screen looping video layer beneath `CityCanvas`
-- Persisted Background Video toggle and 40–100% opacity slider
+- Persisted Background Video toggle and 40â€“100% opacity slider
 - Lifecycle pause/resume, mute, local-media low buffer, power-save/screen-off gating
 - Runtime `city_background` lookup with safe day/night-gradient fallback when MP4 is absent
 - Sparse isometric city + depth-sorted AABB hit testing + press glow
@@ -36,7 +36,7 @@ adb install -r .\forgecity-0.3.2-background-video-dev-debug.apk
 - Neon assistant bubble + NotificationListenerService
 - Privacy-first TTS (off by default, empty allowlist, editable quiet hours, never persists bodies)
 - Assistant bubble invokes the notification's exact `contentIntent`, with app-launch fallback
-- Dusk purple→orange sky, power-grid lines, chapter card, level growth animation
+- Dusk purpleâ†’orange sky, power-grid lines, chapter card, level growth animation
 - Phase 2: UsageStats XP, day/night, fly-in, harvest debounce, Migration(1,2)+`(2,3)`
 
 ## Spec

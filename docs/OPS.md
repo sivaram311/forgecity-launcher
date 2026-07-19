@@ -29,7 +29,7 @@ adb install -r .\forgecity-0.3.2-background-video-dev-debug.apk
 
 Also grant: Home role, Usage Access, Notification Access (allowlist apps before TTS).
 
-Older: `v0.3.1-forge-assistant-dev` (SHA `F1FF7111…`).
+Older: `v0.3.1-forge-assistant-dev` (SHA `F1FF7111â€¦`).
 
 Debug-signed, prerelease. Device E2E (#16) pending; do not treat as production.
 
@@ -48,10 +48,10 @@ Debug-signed, prerelease. Device E2E (#16) pending; do not treat as production.
    .\gradlew.bat test lint assembleDebug
    ```
 
-## Realme P2 Pro checklist (CONSCIOUS #16 — **current gate**)
+## Realme P2 Pro checklist (CONSCIOUS #16 â€” **current gate**)
 
-Honor `E:\MyAgent\workflow\devices\REALME-P2-PRO.md` (360×780 logical, curved
-sides, center punch-hole, ≥44 dp targets).
+Honor `E:\MyAgent\workflow\devices\REALME-P2-PRO.md` (360Ã—780 logical, curved
+sides, center punch-hole, â‰¥44 dp targets).
 
 Use build **`v0.3.2-background-video-dev`** (or local `assembleDebug` matching tip).
 
@@ -61,7 +61,7 @@ Use build **`v0.3.2-background-video-dev`** (or local `assembleDebug` matching t
 - [ ] Install debug APK (hash matches SHA above)
 - [ ] Accept home role / set default home
 - [ ] City canvas pans/zooms at 120 Hz without thermal throttling in 5 minutes
-- [ ] Tap building → fly-in → launches correct app; Home returns to city
+- [ ] Tap building â†’ fly-in â†’ launches correct app; Home returns to city
 - [ ] Double-tap recenters camera
 - [ ] Search filters buildings
 - [ ] Package install/remove refreshes buildings
@@ -74,13 +74,13 @@ Use build **`v0.3.2-background-video-dev`** (or local `assembleDebug` matching t
 - [ ] Grant Usage Access; Power / Focus / Gold update after harvest (1h debounce)
 - [ ] Launch apps until a building levels up; particle burst + taller prism
 - [ ] Force-stop + reopen: resources / quest progress / building levels survive
-- [ ] Chapter briefing still shows; Chapter 2–3 quests remain locked stubs
+- [ ] Chapter briefing still shows; Chapter 2â€“3 quests remain locked stubs
 
 ### Background video
 
 - [ ] Place final H.264 MP4 at `app/src/main/res/raw/city_background.mp4`
 - [ ] Video renders below city/UI and loops without a visible seam
-- [ ] Toggle persists; opacity slider remains between 40–100%
+- [ ] Toggle persists; opacity slider remains between 40â€“100%
 - [ ] Home/background lifecycle pauses/resumes playback
 - [ ] Power Save, idle, and screen-off stop video and ambient animation
 - [ ] Missing/invalid MP4 falls back to day/night gradient without a crash
@@ -98,7 +98,8 @@ adb shell am start -a android.settings.HOME_SETTINGS
 
 ## Release boundary
 
-Sandbox DEV only. No host ports / Postgres / CSS for this APK.  
-**Debug prereleases** are published for sideload.
+Sandbox DEV only. No host ports / Postgres / CSS for this APK.
+**Debug prereleases** are published for sideload (latest:
+`v0.3.2-background-video-dev` on `main` tip `2bd8868`).
 **Annotated production tags** require: final MP4 + Realme device E2E GO +
 Reviewer #17.

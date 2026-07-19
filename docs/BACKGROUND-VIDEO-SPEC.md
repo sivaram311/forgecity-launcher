@@ -26,9 +26,13 @@ The City Assistant card includes an Atmosphere section:
 
 Preferences are local SharedPreferences. No media or user content is uploaded.
 
-## Release limitation
+## Release status
 
-The repository intentionally does not ship a generated MP4 in this wave.
-Builds exercise the missing-asset fallback. Real video loop quality, hardware
-decode, thermal behavior, and battery impact require the final MP4 plus a
-physical Realme P2 Pro E2E run.
+- Framework shipped on `main` via PR #4 as debug prerelease
+  `v0.3.2-background-video-dev`.
+- The repository intentionally does not ship a generated MP4 in this wave.
+  Builds exercise the missing-asset fallback.
+- Real video loop quality, hardware decode, thermal behavior, and battery
+  impact require the final MP4 plus a physical Realme P2 Pro E2E run.
+- Place the asset at `app/src/main/res/raw/city_background.mp4`, then rebuild
+  and re-verify hash/docs before the next prerelease.
