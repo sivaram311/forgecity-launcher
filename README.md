@@ -6,7 +6,7 @@ notifications aloud when you opt in.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher (public)
 **Branch:** `main` · version `0.4.1-tts-diagnostics-dev`
-**Latest prerelease:** `v0.4.1-tts-diagnostics-dev` (publishing)
+**Latest prerelease:** [`v0.4.1-tts-diagnostics-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.4.1-tts-diagnostics-dev)
 
 ## Download
 
