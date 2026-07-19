@@ -12,6 +12,7 @@ data class CityMetaEntity(
     val power: Int = 0,
     val focus: Int = 0,
     val goldDust: Int = 0,
+    val lastHarvestEpoch: Long = 0,
 )
 
 @Entity(tableName = "buildings")
@@ -23,6 +24,14 @@ data class BuildingEntity(
     val district: String,
     val col: Int,
     val row: Int,
+    val level: Int = 1,
+)
+
+/** Durable per-building progression (Stream C SoT for levels). */
+@Entity(tableName = "building_stats")
+data class BuildingStatEntity(
+    @PrimaryKey val id: String,
+    val launchCount: Int = 0,
     val level: Int = 1,
 )
 

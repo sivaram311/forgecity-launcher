@@ -28,4 +28,63 @@ object StoryCatalog {
             goal = 1,
         ),
     )
+
+    /** Chapter 2-3 quest stubs, seeded locked; unlocked by later waves' progression rules. */
+    fun chapterTwoQuests(): List<StoryProgressEntity> = listOf(
+        StoryProgressEntity(
+            questId = "foundations-focus-blocks",
+            chapterId = 2,
+            title = "Complete 5 focus blocks",
+            status = "locked",
+            progress = 0,
+            goal = 5,
+        ),
+        StoryProgressEntity(
+            questId = "foundations-raise-tower",
+            chapterId = 2,
+            title = "Upgrade a building to level 4",
+            status = "locked",
+            progress = 0,
+            goal = 1,
+        ),
+        StoryProgressEntity(
+            questId = "foundations-unlock-district",
+            chapterId = 2,
+            title = "Unlock a second district",
+            status = "locked",
+            progress = 0,
+            goal = 1,
+        ),
+    )
+
+    fun chapterThreeQuests(): List<StoryProgressEntity> = listOf(
+        StoryProgressEntity(
+            questId = "specialize-choose-path",
+            chapterId = 3,
+            title = "Choose a specialization path",
+            status = "locked",
+            progress = 0,
+            goal = 1,
+        ),
+        StoryProgressEntity(
+            questId = "specialize-vault-empire",
+            chapterId = 3,
+            title = "Vault route: bank 300 Gold Dust",
+            status = "locked",
+            progress = 0,
+            goal = 300,
+        ),
+        StoryProgressEntity(
+            questId = "specialize-tech-spire",
+            chapterId = 3,
+            title = "Spire route: bank 300 Focus",
+            status = "locked",
+            progress = 0,
+            goal = 300,
+        ),
+    )
+
+    /** Full quest set seeded on first run (idempotent inserts). */
+    fun seededQuests(): List<StoryProgressEntity> =
+        starterQuests() + chapterTwoQuests() + chapterThreeQuests()
 }

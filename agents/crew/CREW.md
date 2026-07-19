@@ -17,7 +17,7 @@ VPS. Product code stays under `E:\MyWorkspace\sandbox\forgecity-launcher`.
 
 Detailed prompts: `agents/roles/`.
 
-## First pipeline (MVP shell — done locally)
+## First pipeline (MVP shell — done)
 
 1. Android Systems — HOME manifest + app catalog  
 2. UI/Animation — isometric canvas + gestures  
@@ -25,17 +25,22 @@ Detailed prompts: `agents/roles/`.
 4. Narrative — Chapter 1 quest stubs  
 5. QA — OPS checklist once SDK/device available  
 
-## Next pipeline (Phase 2 — Awakening)
+## Phase 2 pipeline (Awakening)
 
-SoT: `docs/ROADMAP.md`. Suggested kickoff task: camera fly-in + building
-level-up with battery-aware animation gating, then UsageStats → resources.
+SoT: `docs/ROADMAP.md` + `docs/PARALLEL-EXECUTION.md`.  
+Branch: `feature/phase-2-awakening` · PR: https://github.com/sivaram311/forgecity-launcher/pull/1  
+Prerelease: `v0.2.0-awakening-dev`
 
-1. UI/Animation — parallax day/night + fly-in + level-up particles  
-2. Android Systems — UsageStats + PowerManager gates + WorkManager  
-3. Data — building levels + resource ledger migrations  
-4. QA — Realme P2 Pro 120 Hz + battery baseline  
+| Wave | Status | Notes |
+|------|--------|-------|
+| Wave 1 | ✅ landed | day/night, fly-in, UsageStats/WorkManager, launch levels |
+| Wave 2 | ✅ landed | particles, animated counters, Room levels, quest stubs, debounce |
+| Device E2E (#16) | ⏳ **NEXT** | blocks merge + annotated `v0.2.0` (no phone on build host) |
+| Room Migration(1,2) | ✅ landed | destructive fallback removed |
+
+**Hire next:** QA & Optimization (P2 Pro lab) when device is available.
 
 ## In-launcher living agents (Phase 4+)
 
 Mayor · Story Weaver · Architect · Scout · Guardian · Chronicler — see
-`docs/ARCHITECTURE.md` and `docs/ROADMAP.md`. Not implemented in MVP.
+`docs/ARCHITECTURE.md` and `docs/ROADMAP.md`. Not implemented yet.

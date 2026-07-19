@@ -5,30 +5,46 @@ Apps become buildings. Habits rebuild districts. Chapter 1 (**Embers**) ships as
 the MVP city shell.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher (public)  
-**Branch:** `feature/mvp-city-shell` · version `0.1.0-mvp`
+**Branch:** `feature/phase-2-awakening` · version `0.2.0-awakening-dev` (Phase 2 Waves 1–2)  
+**PR:** https://github.com/sivaram311/forgecity-launcher/pull/1  
+**Stable MVP tag:** `v0.1.0-mvp` on `main`
 
 ## Download
 
-Prerelease debug build (sideload for testing on Realme P2 Pro / Android 8.0+):
+Latest Phase 2 debug prerelease (sideload for testing on Realme P2 Pro / Android 8.0+):
 
-- APK: https://github.com/sivaram311/forgecity-launcher/releases/download/v0.1.0-mvp/forgecity-0.1.0-mvp-debug.apk
-- SHA-256: https://github.com/sivaram311/forgecity-launcher/releases/download/v0.1.0-mvp/forgecity-0.1.0-mvp-debug.apk.sha256
-- Releases page: https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.1.0-mvp
+- APK: https://github.com/sivaram311/forgecity-launcher/releases/download/v0.2.0-awakening-dev/forgecity-0.2.0-awakening-dev-debug.apk
+- SHA-256: https://github.com/sivaram311/forgecity-launcher/releases/download/v0.2.0-awakening-dev/forgecity-0.2.0-awakening-dev-debug.apk.sha256
+- Releases page: https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.2.0-awakening-dev
 
-This is a **debug-signed prerelease** for testing only. On-device Realme E2E is
+This is a **debug-signed prerelease** for testing only. On-device Realme E2E (#16) is
 still pending, and no production (upload-key) signing has been applied.
 
 Verify the hash before installing:
 
 ```powershell
-curl.exe -L -o forgecity-0.1.0-mvp-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.1.0-mvp/forgecity-0.1.0-mvp-debug.apk
-Get-FileHash .\forgecity-0.1.0-mvp-debug.apk -Algorithm SHA256
-# expect 073C495949BD52BB1FD9AD09ACBF1A65339F80F6F150B2B3F282960B86C2209A
-adb install -r .\forgecity-0.1.0-mvp-debug.apk
+curl.exe -L -o forgecity-0.2.0-awakening-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.2.0-awakening-dev/forgecity-0.2.0-awakening-dev-debug.apk
+Get-FileHash .\forgecity-0.2.0-awakening-dev-debug.apk -Algorithm SHA256
+# expect 885182F9A12671BE1E68E3DF6819518FE20A308A3D6748FCAF2C440345E89B11
+adb install -r .\forgecity-0.2.0-awakening-dev-debug.apk
 ```
 
-## What works in 0.1.0-mvp
+Older MVP debug build remains at tag [`v0.1.0-mvp`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.1.0-mvp).
+
+## What works in 0.2.0-awakening-dev (Phase 2 Waves 1–2)
+
+- Everything from 0.1.0-mvp, plus:
+- Real-clock day/night sky + night building glows + stars (battery-gated)
+- Camera fly-in on tap before launch; double-tap recenter
+- UsageStats → Power / Focus / Gold / Scrap (needs Usage Access grant)
+- Periodic WorkManager harvest (6h) with 1h debounce
+- Building levels from launches (Room `building_stats`)
+- Level-up particle burst + animated resource counters
+- Chapter 2–3 quest stubs (seeded locked)
+- Parallel execution plan: [docs/PARALLEL-EXECUTION.md](docs/PARALLEL-EXECUTION.md)
+
+## What worked in 0.1.0-mvp
 
 - Registers as Android `HOME` + `DEFAULT` (+ app-drawer `LAUNCHER` entry).
 - Jetpack Compose isometric city canvas with pan/zoom.
@@ -39,11 +55,18 @@ adb install -r .\forgecity-0.1.0-mvp-debug.apk
 - Story briefing + resource strip (scrap / power / focus / gold dust).
 - Package install/remove refresh.
 
-## Explicitly not in MVP
+## Explicitly not yet
 
-Living AI agents, UsageStats XP loop, weather API, Filament, widgets, icon
-packs, notification badges, cloud sync, and `QUERY_ALL_PACKAGES`. App discovery
-uses launcher-intent `<queries>` only.
+Living AI agents, weather API, Filament, widgets, icon packs, notification
+badges, cloud sync, and `QUERY_ALL_PACKAGES`. App discovery uses launcher-intent
+`<queries>` only. UsageStats XP is in **0.2.0-awakening-dev** (needs Usage Access).
+
+## Next (blocks annotated `v0.2.0`)
+
+1. Realme P2 Pro device E2E — checklist in [docs/OPS.md](docs/OPS.md) (`adb devices` empty on build host as of 2026-07-19)
+2. Merge [PR #1](https://github.com/sivaram311/forgecity-launcher/pull/1) after E2E GO
+
+Room `Migration(1,2)` is landed (destructive fallback removed).
 
 ## Requirements
 
@@ -73,6 +96,7 @@ Accept the home-role prompt, or Settings → Default apps → Home app.
 |-----|---------|
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Technical architecture |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Phased roadmap (vision → v1.0) |
+| [docs/PARALLEL-EXECUTION.md](docs/PARALLEL-EXECUTION.md) | Parallel streams / waves (CONSCIOUS) |
 | [docs/STORY-BIBLE.md](docs/STORY-BIBLE.md) | Campaign outline |
 | [docs/OPS.md](docs/OPS.md) | Build / device ops |
 | [docs/VERIFICATION.md](docs/VERIFICATION.md) | Evidence record |

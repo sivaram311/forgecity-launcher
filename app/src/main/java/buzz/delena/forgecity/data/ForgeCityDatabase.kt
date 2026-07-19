@@ -9,9 +9,10 @@ import androidx.room.RoomDatabase
     entities = [
         CityMetaEntity::class,
         BuildingEntity::class,
+        BuildingStatEntity::class,
         StoryProgressEntity::class,
     ],
-    version = 1,
+    version = 2,
     exportSchema = false,
 )
 abstract class ForgeCityDatabase : RoomDatabase() {
@@ -27,7 +28,8 @@ abstract class ForgeCityDatabase : RoomDatabase() {
                     context.applicationContext,
                     ForgeCityDatabase::class.java,
                     "forgecity.db",
-                ).fallbackToDestructiveMigration(dropAllTables = true)
+                )
+                    .addMigrations(ForgeCityMigrations.MIGRATION_1_2)
                     .build()
                     .also { instance = it }
             }

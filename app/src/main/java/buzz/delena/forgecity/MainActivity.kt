@@ -35,15 +35,33 @@ class MainActivity : ComponentActivity() {
             val state by viewModel.cityState.collectAsState()
             val buildings by viewModel.buildings.collectAsState()
             val query by viewModel.query.collectAsState()
+            val hour by viewModel.hourOfDay.collectAsState()
+            val ambient by viewModel.ambientEnabled.collectAsState()
+            val usage by viewModel.hasUsageAccess.collectAsState()
+            val levelUp by viewModel.levelUpEvent.collectAsState()
             ForgeCityHomeScreen(
                 state = state,
                 buildings = buildings,
                 query = query,
+                hourOfDay = hour,
+                ambientEnabled = ambient,
+                hasUsageAccess = usage,
+                levelUpBuildingId = levelUp,
                 onQueryChange = viewModel::onQueryChange,
                 onBuildingTap = viewModel::launch,
+                onOpenUsageAccess = {
+                    startActivity(viewModel.usageAccessIntent())
+                },
+                onLevelUpConsumed = viewModel::consumeLevelUpEvent,
             )
         }
         maybeRequestHomeRole()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshEnvironment()
+        viewModel.harvestNow()
     }
 
     override fun onStart() {

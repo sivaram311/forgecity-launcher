@@ -6,7 +6,7 @@ story — while staying performant on Snapdragon 7s Gen 2 + Adreno 710 + 120 Hz.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher  
 **Device SoT:** `E:\MyAgent\workflow\devices\REALME-P2-PRO.md`  
-**Last updated:** 2026-07-19
+**Last updated:** 2026-07-19 (Waves 1–2 landed · PR #1 open · `v0.2.0-awakening-dev` prerelease · device E2E next)
 
 ---
 
@@ -107,13 +107,32 @@ gate.
 - Deliverable: Working isometric launcher with basic visuals
 - Release: https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.1.0-mvp
 
-### Phase 2 — Living City & Progression — v0.2.0 “Awakening” (next, ~2–3 weeks)
+### Phase 2 — Living City & Progression — v0.2.0 “Awakening” (in progress)
 
-- Parallax + day/night backgrounds
-- Camera fly-in + building level-up visuals
-- UsageStats XP → resources
-- Building upgrade visuals
-- Battery-aware animation gating
+**Branch:** `feature/phase-2-awakening` · versionName `0.2.0-awakening-dev`  
+**PR:** https://github.com/sivaram311/forgecity-launcher/pull/1  
+**Prerelease:** https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.2.0-awakening-dev  
+**Parallel plan:** [PARALLEL-EXECUTION.md](PARALLEL-EXECUTION.md)
+
+| Wave 1 item | Status |
+|-------------|--------|
+| Day/night parallax sky + night glows | Landed (dev) |
+| Camera fly-in + double-tap recenter | Landed (dev) |
+| AnimationBudget (power-save gate) | Landed (dev) |
+| UsageStats XP → resources + WorkManager | Landed (dev) |
+| Building levels from launches | Landed (dev) |
+| Realme P2 Pro E2E | **PENDING** — blocks `v0.2.0` tag |
+
+| Wave 2 item | Status |
+|-------------|--------|
+| Level-up particle burst | Landed (dev) |
+| Animated resource counters | Landed (dev) |
+| Harvest debounce (1h gate) | Landed (dev) |
+| Room-backed building levels (`building_stats`, DB v2) | Landed (dev) |
+| Seed-reset bug fix (idempotent seeding) | Landed (dev) |
+| Chapter 2–3 quest stubs | Landed (dev) |
+
+- Deliverable: v0.2.0 “Awakening” — City feels alive and responsive to habits
 - **Gate:** Realme P2 Pro E2E + crew SIGN-OFF
 
 ### Phase 3 — Story & World Depth — v0.3.0 (~4–6 weeks)
@@ -162,8 +181,8 @@ See `agents/crew/CREW.md` and `agents/roles/`.
 | Data & Persistence | Room, migrations, backup |
 | QA & Optimization | Battery/thermal/a11y gates |
 
-**Suggested next crew task:** Implement Phase 2 camera fly-in + building
-level-up animation system with battery awareness.
+**Suggested next crew task:** Realme P2 Pro device E2E (#16) against
+`v0.2.0-awakening-dev` / tip APK; then merge PR #1.
 
 ---
 
@@ -190,12 +209,12 @@ level-up animation system with battery awareness.
 
 ## 9. Immediate next actions
 
-1. Keep `docs/ROADMAP.md` as SoT (this file) and link from README.
-2. Merge `feature/mvp-city-shell` → `main` after Reviewer GO (polish complete).
-3. Kick Phase 2 with UI/Animation + Android Systems roles.
-4. Prototype parallax background on a Phase 2 branch.
-5. Establish on-device Canvas performance baseline on Realme P2 Pro.
-6. Implement first UsageStats → resource generation path.
+1. **Device lab:** connect Realme P2 Pro (`adb devices`), install `v0.2.0-awakening-dev` (or tip APK), run [OPS.md](OPS.md) checklist (CONSCIOUS #16). *Build host had no device attached 2026-07-19.*
+2. **Merge:** land [PR #1](https://github.com/sivaram311/forgecity-launcher/pull/1) after E2E GO + Reviewer #17.
+3. **Tag:** annotated `v0.2.0` only after device GO (not another debug-only tag).
+4. **Wave 3 / Phase 3:** weather emitter + quest map markers + chapter JSON packs (after Awakening gate).
+
+**Done this turn:** Room `Migration(1,2)` + removed `fallbackToDestructiveMigration`.
 
 ---
 
