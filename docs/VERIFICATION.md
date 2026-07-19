@@ -83,3 +83,17 @@ Parallel plan: `docs/PARALLEL-EXECUTION.md`
 | APK asset | PUBLISHED | `forgecity-0.2.0-awakening-dev-debug.apk` (11.0 MB) |
 | APK SHA-256 | `885182F9A12671BE1E68E3DF6819518FE20A308A3D6748FCAF2C440345E89B11` | |
 | Device E2E (#16) | PENDING | Blocks annotated non-debug `v0.2.0` |
+
+## Status snapshot — 2026-07-19 (post-prerelease)
+
+| Item | State |
+|------|--------|
+| Code waves 1–2 | Landed on `feature/phase-2-awakening` |
+| Unit tests / debug assemble | PASS |
+| PR #1 → `main` | OPEN |
+| Tag `v0.2.0-awakening-dev` | PUBLISHED (prerelease, debug-signed) |
+| Realme P2 Pro E2E (#16) | **PENDING — next gate** |
+| Room `Migration(1,2)` | **PENDING** (destructive fallback still OK for debug only) |
+| Annotated `v0.2.0` | BLOCKED until E2E + migration + Reviewer GO |
+
+Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.

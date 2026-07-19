@@ -57,7 +57,7 @@ Merge order still respects phase **product** gates (no v0.3 story ship until v0.
 - [x] This PARALLEL-EXECUTION.md
 - [x] Crew roles under `agents/roles/`
 
-### Wave 1 — Phase 2 foundations (current code wave)
+### Wave 1 — Phase 2 foundations (done)
 
 Run **A + B + C** in the same branch tip:
 
@@ -130,7 +130,9 @@ Lead merges when unit tests + Reviewer #17 GO; device E2E is a separate hire wit
 | Phase | Version | Parallel streams | Release gate |
 |-------|---------|------------------|--------------|
 | 1 Embers | `v0.1.0-mvp` | — | ✅ shipped (debug prerelease) |
-| 2 Awakening | `v0.2.0` | A+B+C+F | Device E2E required |
+| 2 Awakening | `v0.2.0-awakening-dev` | A+B+C+D+F | ✅ Waves 1–2 + debug prerelease; **device E2E** for annotated `v0.2.0` |
 | 3 Narrative | `v0.3.0` | A+D(+E0)+F | Device E2E required |
 | 4 Symphony | `v0.4.0` | E+A+B+F | Device E2E required |
 | 5 Stable | `v1.0.0` | all | Promote evidence if distributed beyond sideload |
+
+**Current hire focus:** Stream F (P2 Pro E2E) + Stream C (`Migration(1,2)`).

@@ -55,11 +55,17 @@ Older MVP debug build remains at tag [`v0.1.0-mvp`](https://github.com/sivaram31
 - Story briefing + resource strip (scrap / power / focus / gold dust).
 - Package install/remove refresh.
 
-## Explicitly not in MVP
+## Explicitly not yet
 
-Living AI agents, UsageStats XP loop, weather API, Filament, widgets, icon
-packs, notification badges, cloud sync, and `QUERY_ALL_PACKAGES`. App discovery
-uses launcher-intent `<queries>` only.
+Living AI agents, weather API, Filament, widgets, icon packs, notification
+badges, cloud sync, and `QUERY_ALL_PACKAGES`. App discovery uses launcher-intent
+`<queries>` only. UsageStats XP is in **0.2.0-awakening-dev** (needs Usage Access).
+
+## Next (blocks annotated `v0.2.0`)
+
+1. Realme P2 Pro device E2E — checklist in [docs/OPS.md](docs/OPS.md)
+2. Proper Room `Migration(1,2)` (replace destructive fallback before non-debug)
+3. Merge [PR #1](https://github.com/sivaram311/forgecity-launcher/pull/1) after E2E GO
 
 ## Requirements
 

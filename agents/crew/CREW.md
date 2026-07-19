@@ -17,7 +17,7 @@ VPS. Product code stays under `E:\MyWorkspace\sandbox\forgecity-launcher`.
 
 Detailed prompts: `agents/roles/`.
 
-## First pipeline (MVP shell — done locally)
+## First pipeline (MVP shell — done)
 
 1. Android Systems — HOME manifest + app catalog  
 2. UI/Animation — isometric canvas + gestures  
@@ -25,16 +25,22 @@ Detailed prompts: `agents/roles/`.
 4. Narrative — Chapter 1 quest stubs  
 5. QA — OPS checklist once SDK/device available  
 
-## Next pipeline (Phase 2 — Awakening)
+## Phase 2 pipeline (Awakening)
 
-SoT: `docs/ROADMAP.md` + `docs/PARALLEL-EXECUTION.md`.
+SoT: `docs/ROADMAP.md` + `docs/PARALLEL-EXECUTION.md`.  
+Branch: `feature/phase-2-awakening` · PR: https://github.com/sivaram311/forgecity-launcher/pull/1  
+Prerelease: `v0.2.0-awakening-dev`
 
-**Wave 1 (landed on `feature/phase-2-awakening`):** A+B+C in parallel —
-day/night + fly-in, UsageStats/WorkManager, launch levels.
+| Wave | Status | Notes |
+|------|--------|-------|
+| Wave 1 | ✅ landed | day/night, fly-in, UsageStats/WorkManager, launch levels |
+| Wave 2 | ✅ landed | particles, animated counters, Room levels, quest stubs, debounce |
+| Device E2E (#16) | ⏳ **NEXT** | blocks merge + annotated `v0.2.0` |
+| Room Migration(1,2) | ⏳ next | replace destructive fallback before non-debug |
 
-**Wave 2 (next):** particles, animated counters, persist buildings, **device E2E**.
+**Hire next:** QA & Optimization (P2 Pro lab) in parallel with Data (Migration 1→2).
 
 ## In-launcher living agents (Phase 4+)
 
 Mayor · Story Weaver · Architect · Scout · Guardian · Chronicler — see
-`docs/ARCHITECTURE.md` and `docs/ROADMAP.md`. Not implemented in MVP.
+`docs/ARCHITECTURE.md` and `docs/ROADMAP.md`. Not implemented yet.

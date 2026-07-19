@@ -46,19 +46,36 @@ Debug-signed, prerelease. Device E2E (#16) pending; do not treat as production.
    .\gradlew.bat test lint assembleDebug
    ```
 
-## Realme P2 Pro checklist
+## Realme P2 Pro checklist (CONSCIOUS #16 — **current gate**)
 
 Honor `E:\MyAgent\workflow\devices\REALME-P2-PRO.md` (360×780 logical, curved
 sides, center punch-hole, ≥44 dp targets).
 
+Use build **`v0.2.0-awakening-dev`** (or local `assembleDebug` matching tip).
+
+### Baseline launcher
+
 - [ ] `adb devices` sees the phone
-- [ ] Install debug APK
+- [ ] Install debug APK (hash matches SHA above)
 - [ ] Accept home role / set default home
 - [ ] City canvas pans/zooms at 120 Hz without thermal throttling in 5 minutes
-- [ ] Tap building launches correct app; Home returns to city
+- [ ] Tap building → fly-in → launches correct app; Home returns to city
+- [ ] Double-tap recenters camera
 - [ ] Search filters buildings
 - [ ] Package install/remove refreshes buildings
 - [ ] Portrait cutout/safe-area chrome stays clear
+
+### Phase 2 Awakening
+
+- [ ] Day/night sky matches device clock; night glows/stars when not in power-save
+- [ ] Power-save: ambient stars/glows gated off
+- [ ] Grant Usage Access; Power / Focus / Gold update after harvest (1h debounce)
+- [ ] Launch apps until a building levels up; particle burst + taller prism
+- [ ] Force-stop + reopen: resources / quest progress / building levels survive
+- [ ] Chapter briefing still shows; Chapter 2–3 quests remain locked stubs
+
+Record results in `docs/VERIFICATION.md` (PASS / FAIL / notes). Device GO is
+required before merging PR #1 as annotated `v0.2.0`.
 
 ## Reset home app
 
@@ -68,5 +85,7 @@ adb shell am start -a android.settings.HOME_SETTINGS
 
 ## Release boundary
 
-Sandbox DEV only. No port/DB/CSS. Signed release + device E2E + Reviewer GO
-required before any public distribution.
+Sandbox DEV only. No host ports / Postgres / CSS for this APK.  
+**Debug prerelease** (`v0.2.0-awakening-dev`) is published for sideload.  
+**Annotated `v0.2.0` / non-debug** requires: device E2E GO + Room Migration(1,2)
++ Reviewer #17.

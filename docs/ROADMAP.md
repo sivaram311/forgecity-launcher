@@ -6,7 +6,7 @@ story — while staying performant on Snapdragon 7s Gen 2 + Adreno 710 + 120 Hz.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher  
 **Device SoT:** `E:\MyAgent\workflow\devices\REALME-P2-PRO.md`  
-**Last updated:** 2026-07-19 (Phase 2 Waves 1–2 landed on `feature/phase-2-awakening`)
+**Last updated:** 2026-07-19 (Waves 1–2 landed · PR #1 open · `v0.2.0-awakening-dev` prerelease · device E2E next)
 
 ---
 
@@ -110,7 +110,9 @@ gate.
 ### Phase 2 — Living City & Progression — v0.2.0 “Awakening” (in progress)
 
 **Branch:** `feature/phase-2-awakening` · versionName `0.2.0-awakening-dev`  
-**Parallel plan:** [PARALLEL-EXECUTION.md](PARALLEL-EXECUTION.md) (Wave 1)
+**PR:** https://github.com/sivaram311/forgecity-launcher/pull/1  
+**Prerelease:** https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.2.0-awakening-dev  
+**Parallel plan:** [PARALLEL-EXECUTION.md](PARALLEL-EXECUTION.md)
 
 | Wave 1 item | Status |
 |-------------|--------|
@@ -179,8 +181,8 @@ See `agents/crew/CREW.md` and `agents/roles/`.
 | Data & Persistence | Room, migrations, backup |
 | QA & Optimization | Battery/thermal/a11y gates |
 
-**Suggested next crew task:** Implement Phase 2 camera fly-in + building
-level-up animation system with battery awareness.
+**Suggested next crew task:** Realme P2 Pro device E2E (#16) against
+`v0.2.0-awakening-dev`, then Room `Migration(1,2)` before merge / annotated tag.
 
 ---
 
@@ -207,12 +209,11 @@ level-up animation system with battery awareness.
 
 ## 9. Immediate next actions
 
-1. Keep `docs/ROADMAP.md` as SoT (this file) and link from README.
-2. Merge `feature/mvp-city-shell` → `main` after Reviewer GO (polish complete).
-3. Kick Phase 2 with UI/Animation + Android Systems roles.
-4. Prototype parallax background on a Phase 2 branch.
-5. Establish on-device Canvas performance baseline on Realme P2 Pro.
-6. Implement first UsageStats → resource generation path.
+1. **Device lab:** install `v0.2.0-awakening-dev` on Realme P2 Pro; run [OPS.md](OPS.md) checklist (CONSCIOUS #16).
+2. **Data:** replace `fallbackToDestructiveMigration` with Room `Migration(1,2)` for `building_stats` + `lastHarvestEpoch`.
+3. **Merge:** land [PR #1](https://github.com/sivaram311/forgecity-launcher/pull/1) after E2E GO + Reviewer #17.
+4. **Tag:** annotated `v0.2.0` only after device GO (not another debug-only tag).
+5. **Wave 3 / Phase 3:** weather emitter + quest map markers + chapter JSON packs (after Awakening gate).
 
 ---
 
