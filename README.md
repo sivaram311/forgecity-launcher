@@ -7,6 +7,23 @@ the MVP city shell.
 **Repo:** https://github.com/sivaram311/forgecity-launcher (private)  
 **Branch:** `feature/mvp-city-shell` · version `0.1.0-mvp`
 
+## Download
+
+Prerelease debug build (sideload for testing on Realme P2 Pro / Android 8.0+):
+
+- APK: https://github.com/sivaram311/forgecity-launcher/releases/download/v0.1.0-mvp/forgecity-0.1.0-mvp-debug.apk
+- SHA-256: https://github.com/sivaram311/forgecity-launcher/releases/download/v0.1.0-mvp/forgecity-0.1.0-mvp-debug.apk.sha256
+- Releases page: https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.1.0-mvp
+
+This is a **debug-signed prerelease** for testing only. On-device Realme E2E is
+still pending, and no production (upload-key) signing has been applied. Verify
+the hash before installing:
+
+```powershell
+Get-FileHash .\forgecity-0.1.0-mvp-debug.apk -Algorithm SHA256
+adb install -r .\forgecity-0.1.0-mvp-debug.apk
+```
+
 ## What works in 0.1.0-mvp
 
 - Registers as Android `HOME` + `DEFAULT` (+ app-drawer `LAUNCHER` entry).

@@ -14,9 +14,20 @@ cd forgecity-launcher
 git checkout feature/mvp-city-shell
 ```
 
+## Download (prerelease debug APK)
+
+```powershell
+curl.exe -L -o forgecity-0.1.0-mvp-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.1.0-mvp/forgecity-0.1.0-mvp-debug.apk
+Get-FileHash .\forgecity-0.1.0-mvp-debug.apk -Algorithm SHA256   # expect 073C4959...86C2209A
+adb install -r .\forgecity-0.1.0-mvp-debug.apk
+```
+
+Debug-signed, prerelease. Device E2E pending; do not treat as production.
+
 ## Build
 
-1. Install Android SDK Platform 35 + Build-Tools.
+1. Install Android SDK Platform 35 + Build-Tools (this host uses `C:\Android\Sdk`).
 2. Create `local.properties` (gitignored):
 
    ```properties

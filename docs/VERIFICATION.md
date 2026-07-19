@@ -8,11 +8,32 @@
 | XML / source present | PASS | Manifest HOME filters, Room, Compose UI |
 | Reviewer SIGN-OFF (#17) | GO | `agents/hires/SIGN-OFF-mvp-city-shell-push.md` for tip `9bd418b` |
 | GitHub publish | PASS | https://github.com/sivaram311/forgecity-launcher · `feature/mvp-city-shell` |
-| Gradle APK/unit/lint | BLOCKED | Android SDK not configured on this machine |
-| Realme device E2E | PENDING | Needs SDK + P2 Pro |
+| Realme device E2E | PENDING | No physical P2 Pro attached to build host |
 
-Attempted pattern (will work once SDK is set):
+## 2026-07-19 — 0.1.0-mvp build + APK publish
+
+Android SDK installed on the build host (`C:\Android\Sdk`: cmdline-tools,
+platform 35, build-tools 35.0.0, platform-tools).
+
+| Check | Result | Notes |
+|------|--------|-------|
+| `testDebugUnitTest` | PASS | `IsoMathTest` + `DistrictClassifierTest` green |
+| `assembleDebug` | PASS | `app-debug.apk` produced |
+| APK badging | PASS | pkg `buzz.delena.forgecity` · v `0.1.0-mvp` · label ForgeCity · HOME launchable |
+| Release asset | PUBLISHED | `forgecity-0.1.0-mvp-debug.apk` (~10.4 MB) on tag `v0.1.0-mvp` (prerelease) |
+| Realme device E2E (#14–#16) | PENDING | Debug prerelease; device run required before any non-debug release |
+
+Build command:
 
 ```powershell
-.\gradlew.bat test lint assembleDebug
+$env:ANDROID_HOME="C:\Android\Sdk"
+.\gradlew.bat testDebugUnitTest assembleDebug
 ```
+
+APK SHA-256: `073C495949BD52BB1FD9AD09ACBF1A65339F80F6F150B2B3F282960B86C2209A`
+
+### Caveat
+
+Build is **debug-signed** and marked **prerelease**. It has not run on a
+physical Realme P2 Pro, so #16 device E2E is a documented waiver (no device on
+the build host), not a pass. No production upload key applied.
