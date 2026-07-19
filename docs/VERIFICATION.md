@@ -228,3 +228,28 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | Debug prerelease | PASS | https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.4.0-tamil-agent-dev |
 | APK SHA-256 | `E4C3E161D464D2AC15994AE91F5880FB160B7D99F775743A98A81F9224497AD8` | |
 | Realme E2E (#16) | PENDING | Blocks annotated production tags |
+
+## 2026-07-20 — Agent Portal DEV live rewrite smoke
+
+| Check | Result | Notes |
+|------|--------|-------|
+| Portal jar rebuild | PASS | Stale DEV jar (2026-07-18) rebuilt with ForgeCity classes |
+| `FORGECITY_REWRITE_ENABLED` | PASS | Local `.env` only (not committed); DEV restarted on `:8080` |
+| Wrong key | PASS | HTTP 401 |
+| Loopback rewrite | PASS | `schemaVersion:1` `status:ok` Tamil present; `Cache-Control: no-store` |
+| Public HTTPS rewrite | PASS | `https://delena.buzz/api/integrations/forgecity/tamil-rewrite` → 200 + Tamil |
+| Realme device E2E (#16) | PENDING | `adb devices` empty — USB Realme P2 Pro required |
+
+## 2026-07-20 — 0.4.1 TTS test + diagnostics
+
+| Check | Result | Notes |
+|------|--------|-------|
+| Version | PASS | `0.4.1-tts-diagnostics-dev` / versionCode 8 |
+| Mode-aware test | SOURCE PASS | OFF diagnosis; DIRECT fixed local line; PORTAL fixed synthetic rewrite → Tamil TTS |
+| API key visibility | PASS | decrypted into config field on demand; remains Android-Keystore encrypted at rest |
+| Safe Logcat | SOURCE PASS | tag `ForgeCityTTS`; route/HTTP/TTS diagnostics; no keys, notification bodies, or rewrite text |
+| `testDebugUnitTest` | PASS | |
+| `lintDebug` | PASS | |
+| `assembleDebug` | PASS | |
+| APK SHA-256 | `2CBFABC5BB4942719EAAC04A60BAAA9E0DC7A4F67413FE8EB9696C992855FAAF` | `dist/forgecity-0.4.1-tts-diagnostics-dev-debug.apk` |
+| Physical TEST TTS | PENDING | No adb device attached; debug prerelease only |

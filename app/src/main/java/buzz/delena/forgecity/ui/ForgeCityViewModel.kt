@@ -9,6 +9,7 @@ import buzz.delena.forgecity.assistant.AssistantSpeechMode
 import buzz.delena.forgecity.assistant.AssistantSettingsStore
 import buzz.delena.forgecity.assistant.AssistantUiEvent
 import buzz.delena.forgecity.assistant.NotificationAccess
+import buzz.delena.forgecity.assistant.SpeechModeTestRunner
 import buzz.delena.forgecity.city.CityBuilding
 import buzz.delena.forgecity.city.CityState
 import buzz.delena.forgecity.data.CityRepository
@@ -34,6 +35,7 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
     private val harvester = UsageStatsHarvester(application)
     private val animationBudget = AnimationBudget(application)
     private val assistantSettings = AssistantSettingsStore(application)
+    private val speechModeTestRunner = SpeechModeTestRunner(application)
 
     private val _buildings = MutableStateFlow<List<CityBuilding>>(emptyList())
     val buildings: StateFlow<List<CityBuilding>> = _buildings.asStateFlow()
@@ -64,6 +66,12 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
 
     private val _apiKeyConfigured = MutableStateFlow(assistantSettings.hasApiKey)
     val apiKeyConfigured: StateFlow<Boolean> = _apiKeyConfigured.asStateFlow()
+
+    private val _apiKey = MutableStateFlow(assistantSettings.apiKey().orEmpty())
+    val apiKey: StateFlow<String> = _apiKey.asStateFlow()
+
+    private val _speechTestStatus = MutableStateFlow<String?>(null)
+    val speechTestStatus: StateFlow<String?> = _speechTestStatus.asStateFlow()
 
     private val _allowCount = MutableStateFlow(assistantSettings.allowedPackages().size)
     val allowCount: StateFlow<Int> = _allowCount.asStateFlow()
@@ -138,6 +146,7 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
         _speechMode.value = assistantSettings.speechMode
         _rewriteEndpoint.value = assistantSettings.rewriteEndpoint
         _apiKeyConfigured.value = assistantSettings.hasApiKey
+        _apiKey.value = assistantSettings.apiKey().orEmpty()
         _allowCount.value = assistantSettings.allowedPackages().size
         _quietLabel.value = formatQuietLabel()
         _backgroundVideoEnabled.value = assistantSettings.backgroundVideoEnabled
@@ -200,6 +209,20 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
     fun saveApiKey(value: String) {
         assistantSettings.saveApiKey(value)
         _apiKeyConfigured.value = assistantSettings.hasApiKey
+        _apiKey.value = assistantSettings.apiKey().orEmpty()
+    }
+
+    fun testSpeechMode() {
+        speechModeTestRunner.run(
+            mode = assistantSettings.speechMode,
+            endpoint = assistantSettings.rewriteEndpoint,
+            apiKey = assistantSettings.apiKey(),
+            onStatus = { _speechTestStatus.value = it },
+        )
+    }
+
+    fun clearSpeechTestStatus() {
+        _speechTestStatus.value = null
     }
 
     fun toggleBackgroundVideo() {
@@ -278,6 +301,11 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
             }
             refreshApps()
         }
+    }
+
+    override fun onCleared() {
+        speechModeTestRunner.close()
+        super.onCleared()
     }
 
     private companion object {

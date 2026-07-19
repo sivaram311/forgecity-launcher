@@ -72,15 +72,22 @@ class AssistantTtsEngine(context: Context) {
     ) {
         val line = text.trim()
         if (line.isEmpty()) {
+            ForgeCityTtsDiagnostics.warn("tts_blocked", "reason=empty")
             callback?.invoke(SpeakResult.EMPTY)
             return
         }
         ensureReady { state ->
             if (state != Readiness.READY) {
+                ForgeCityTtsDiagnostics.warn("tts_blocked", "reason=engine_$state")
                 callback?.invoke(SpeakResult.UNAVAILABLE)
                 return@ensureReady
             }
-            callback?.invoke(speakWithLocale(line, locales, speechRate))
+            val result = speakWithLocale(line, locales, speechRate)
+            ForgeCityTtsDiagnostics.info(
+                "tts_speak_result",
+                "localeCandidates=${locales.joinToString { it.toLanguageTag() }} result=$result",
+            )
+            callback?.invoke(result)
         }
     }
 

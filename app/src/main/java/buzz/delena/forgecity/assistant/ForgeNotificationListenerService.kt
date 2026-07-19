@@ -17,6 +17,7 @@ class ForgeNotificationListenerService : NotificationListenerService() {
 
     override fun onListenerConnected() {
         super.onListenerConnected()
+        ForgeCityTtsDiagnostics.info("listener_connected")
         val engine = AssistantTtsEngine(this)
         tts = engine
         rewritePipeline = NotificationRewritePipeline(
@@ -47,14 +48,25 @@ class ForgeNotificationListenerService : NotificationListenerService() {
 
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
         val notification = sbn ?: return
-        if (!settings.assistantEnabled) return
-        if (!speechBudget.allowsSpeech) return
+        ForgeCityTtsDiagnostics.info("notification_received", "package=${notification.packageName}")
+        if (!settings.assistantEnabled) {
+            ForgeCityTtsDiagnostics.warn("notification_skipped", "reason=assistant_disabled")
+            return
+        }
+        if (!speechBudget.allowsSpeech) {
+            ForgeCityTtsDiagnostics.warn("notification_skipped", "reason=speech_budget")
+            return
+        }
         val now = Calendar.getInstance()
         val minutes = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE)
         if (QuietHours.isQuiet(minutes, settings.quietStartMinutes, settings.quietEndMinutes)) {
+            ForgeCityTtsDiagnostics.warn("notification_skipped", "reason=quiet_hours")
             return
         }
-        if (!dedupe.shouldProcess(notification.key)) return
+        if (!dedupe.shouldProcess(notification.key)) {
+            ForgeCityTtsDiagnostics.warn("notification_skipped", "reason=dedupe")
+            return
+        }
 
         val n = notification.notification
         val extras = n.extras
@@ -76,6 +88,10 @@ class ForgeNotificationListenerService : NotificationListenerService() {
                 isForegroundService = fgs,
             )
         ) {
+            ForgeCityTtsDiagnostics.warn(
+                "notification_skipped",
+                "reason=filter_or_allowlist package=${notification.packageName}",
+            )
             return
         }
 
@@ -95,12 +111,12 @@ class ForgeNotificationListenerService : NotificationListenerService() {
         )
         AssistantEventBridge.emit(event)
 
-        when (
-            NotificationSpeechRoute.resolve(
+        val route = NotificationSpeechRoute.resolve(
                 mode = settings.speechMode,
                 portalConfigured = settings.isRemoteRewriteConfigured,
             )
-        ) {
+        ForgeCityTtsDiagnostics.info("notification_route", "mode=${settings.speechMode} route=$route")
+        when (route) {
             NotificationSpeechRoute.NONE -> Unit
             NotificationSpeechRoute.DIRECT -> {
                 tts?.speakDirect(NotificationSpeechFilter.spokenLine(label, title, text))

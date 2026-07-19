@@ -38,7 +38,6 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import buzz.delena.forgecity.assistant.AssistantSpeechMode
@@ -134,6 +133,8 @@ fun AssistantSettingsCard(
     speechMode: AssistantSpeechMode,
     rewriteEndpoint: String,
     apiKeyConfigured: Boolean,
+    apiKey: String,
+    speechTestStatus: String?,
     backgroundVideoEnabled: Boolean,
     backgroundVideoOpacity: Float,
     quietLabel: String,
@@ -143,6 +144,8 @@ fun AssistantSettingsCard(
     onCycleSpeechMode: () -> Unit,
     onRewriteEndpointChange: (String) -> Unit,
     onSaveApiKey: (String) -> Unit,
+    onTestSpeechMode: () -> Unit,
+    onClearSpeechTestStatus: () -> Unit,
     onToggleBackgroundVideo: () -> Unit,
     onBackgroundVideoOpacityChange: (Float) -> Unit,
     onQuietStartEarlier: () -> Unit,
@@ -152,7 +155,12 @@ fun AssistantSettingsCard(
     onOpenAllowlist: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var apiKeyDraft by remember { mutableStateOf("") }
+    var apiKeyDraft by remember(apiKey) { mutableStateOf(apiKey) }
+    LaunchedEffect(speechTestStatus) {
+        if (speechTestStatus == null) return@LaunchedEffect
+        delay(8_000)
+        onClearSpeechTestStatus()
+    }
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -209,7 +217,6 @@ fun AssistantSettingsCard(
             value = apiKeyDraft,
             onValueChange = { apiKeyDraft = it },
             placeholder = "X-ForgeCity-Key",
-            secret = true,
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -228,14 +235,45 @@ fun AssistantSettingsCard(
                 modifier = Modifier
                     .clickable {
                         onSaveApiKey(apiKeyDraft)
-                        apiKeyDraft = ""
                     }
                     .padding(8.dp),
             )
         }
         Text(
-            "Saved keys are encrypted by Android Keystore and are never displayed. " +
-                "Saving an empty field clears the key.",
+            "Saved key is visible here for setup and encrypted at rest by Android Keystore. " +
+                "Do not share screenshots. Saving an empty field clears it.",
+            color = Color(0x77FFF6F0),
+            fontSize = 9.sp,
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(
+                text = "Test current speech mode",
+                color = Color(0xFFFFF6F0),
+                fontSize = 11.sp,
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = "TEST TTS",
+                color = Color(0xFF4FD1C5),
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .clickable(onClick = onTestSpeechMode)
+                    .padding(8.dp),
+            )
+        }
+        if (speechTestStatus != null) {
+            Text(
+                text = speechTestStatus,
+                color = Color(0xFFE8A15A),
+                fontSize = 10.sp,
+            )
+        }
+        Text(
+            "Diagnosis: adb logcat -s ForgeCityTTS",
             color = Color(0x77FFF6F0),
             fontSize = 9.sp,
         )
@@ -305,7 +343,6 @@ private fun RemoteTextField(
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String,
-    secret: Boolean = false,
 ) {
     BasicTextField(
         value = value,
@@ -313,9 +350,6 @@ private fun RemoteTextField(
         singleLine = true,
         textStyle = TextStyle(color = Color(0xFFFFF6F0), fontSize = 10.sp),
         cursorBrush = SolidColor(Color(0xFFE8A15A)),
-        visualTransformation = if (secret) PasswordVisualTransformation() else {
-            androidx.compose.ui.text.input.VisualTransformation.None
-        },
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 4.dp)

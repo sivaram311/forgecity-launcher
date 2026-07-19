@@ -50,6 +50,8 @@ class MainActivity : ComponentActivity() {
             val speechMode by viewModel.speechMode.collectAsState()
             val rewriteEndpoint by viewModel.rewriteEndpoint.collectAsState()
             val apiKeyConfigured by viewModel.apiKeyConfigured.collectAsState()
+            val apiKey by viewModel.apiKey.collectAsState()
+            val speechTestStatus by viewModel.speechTestStatus.collectAsState()
             val allowCount by viewModel.allowCount.collectAsState()
             val quietLabel by viewModel.quietLabel.collectAsState()
             val backgroundVideoEnabled by viewModel.backgroundVideoEnabled.collectAsState()
@@ -71,6 +73,8 @@ class MainActivity : ComponentActivity() {
                 speechMode = speechMode,
                 rewriteEndpoint = rewriteEndpoint,
                 apiKeyConfigured = apiKeyConfigured,
+                apiKey = apiKey,
+                speechTestStatus = speechTestStatus,
                 allowCount = allowCount,
                 quietLabel = quietLabel,
                 backgroundVideoEnabled = backgroundVideoEnabled,
@@ -90,6 +94,8 @@ class MainActivity : ComponentActivity() {
                 onCycleSpeechMode = viewModel::cycleSpeechMode,
                 onRewriteEndpointChange = viewModel::setRewriteEndpoint,
                 onSaveApiKey = viewModel::saveApiKey,
+                onTestSpeechMode = viewModel::testSpeechMode,
+                onClearSpeechTestStatus = viewModel::clearSpeechTestStatus,
                 onToggleBackgroundVideo = viewModel::toggleBackgroundVideo,
                 onBackgroundVideoOpacityChange = viewModel::setBackgroundVideoOpacity,
                 onToggleLauncherChrome = viewModel::toggleLauncherChrome,

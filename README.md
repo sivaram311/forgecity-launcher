@@ -5,28 +5,33 @@ Apps become buildings. Habits rebuild districts. A neon city assistant can read
 notifications aloud when you opt in.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher (public)
-**Branch:** `main` · version `0.4.0-tamil-agent-dev`
-**Latest prerelease:** [`v0.4.0-tamil-agent-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.4.0-tamil-agent-dev) (PR #6 merged)
+**Branch:** `main` · version `0.4.1-tts-diagnostics-dev`
+**Latest prerelease:** `v0.4.1-tts-diagnostics-dev` (publishing)
 
 ## Download
 
 Latest debug prerelease (sideload):
 
 - Releases: https://github.com/sivaram311/forgecity-launcher/releases
-- Tag target: `v0.4.0-tamil-agent-dev`
+- Tag target: `v0.4.1-tts-diagnostics-dev`
 
 This is **debug-signed**. Realme P2 Pro E2E (#16) is still pending for any annotated production tag.
 
 ```powershell
-curl.exe -L -o forgecity-0.4.0-tamil-agent-dev-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.4.0-tamil-agent-dev/forgecity-0.4.0-tamil-agent-dev-debug.apk
-Get-FileHash .\forgecity-0.4.0-tamil-agent-dev-debug.apk -Algorithm SHA256
-# expect E4C3E161D464D2AC15994AE91F5880FB160B7D99F775743A98A81F9224497AD8
-adb install -r .\forgecity-0.4.0-tamil-agent-dev-debug.apk
+curl.exe -L -o forgecity-0.4.1-tts-diagnostics-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.4.1-tts-diagnostics-dev/forgecity-0.4.1-tts-diagnostics-dev-debug.apk
+Get-FileHash .\forgecity-0.4.1-tts-diagnostics-dev-debug.apk -Algorithm SHA256
+# expect 2CBFABC5BB4942719EAAC04A60BAAA9E0DC7A4F67413FE8EB9696C992855FAAF
+adb install -r .\forgecity-0.4.1-tts-diagnostics-dev-debug.apk
 ```
 
-## What works in 0.4.0-tamil-agent-dev
+## What works in 0.4.1-tts-diagnostics-dev
 
+- `TEST TTS` runs the selected mode: OFF diagnosis, direct device TTS, or
+  PROD-compatible Agent Portal rewrite followed by Tamil TTS
+- Saved API key is visible in config for device setup (still encrypted at rest)
+- Safe terminal diagnostics via `adb logcat -s ForgeCityTTS`; keys and message
+  content are never logged
 - Immersive city-first launcher: chrome is hidden by default and a persistent
   48 dp safe-area `UI +` / `UI −` chip restores or hides controls
 - Persisted speech mode: `OFF` (default), device-locale `DIRECT_TTS`, or

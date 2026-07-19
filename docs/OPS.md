@@ -17,26 +17,52 @@ git checkout main
 
 ## Download (prerelease debug APK)
 
-Latest Tamil Agent + immersive chrome build:
+Latest Tamil Agent + TTS diagnostics build:
 
 ```powershell
-curl.exe -L -o forgecity-0.4.0-tamil-agent-dev-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.4.0-tamil-agent-dev/forgecity-0.4.0-tamil-agent-dev-debug.apk
-Get-FileHash .\forgecity-0.4.0-tamil-agent-dev-debug.apk -Algorithm SHA256
-# expect E4C3E161D464D2AC15994AE91F5880FB160B7D99F775743A98A81F9224497AD8
-adb install -r .\forgecity-0.4.0-tamil-agent-dev-debug.apk
+curl.exe -L -o forgecity-0.4.1-tts-diagnostics-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.4.1-tts-diagnostics-dev/forgecity-0.4.1-tts-diagnostics-dev-debug.apk
+Get-FileHash .\forgecity-0.4.1-tts-diagnostics-dev-debug.apk -Algorithm SHA256
+# expect 2CBFABC5BB4942719EAAC04A60BAAA9E0DC7A4F67413FE8EB9696C992855FAAF
+adb install -r .\forgecity-0.4.1-tts-diagnostics-dev-debug.apk
 ```
 
 Also grant: Home role, Usage Access, Notification Access (allowlist apps before speech).
 
 ### Tamil Agent Portal rewrite (0.4.0)
 
-1. On Agent Portal host, set `FORGECITY_REWRITE_ENABLED=true` and `FORGECITY_REWRITE_API_KEY=<secret>` (never commit).
+1. Portal **0.1.14+** has rewrite enabled on DEV / PREPROD / PROD (keys in each
+   env `.env` only — never commit).
 2. Tap the persistent `UI +` chip. In City Assistant, cycle Speech mode to
-   `PORTAL தமிழ்`; set HTTPS endpoint to
-   `https://<portal-host>/api/integrations/forgecity/tamil-rewrite`; save key (encrypted on device).
+   `PORTAL தமிழ்`; set HTTPS endpoint to one of:
+   - **PROD:** `https://agent-portal.delena.buzz/api/integrations/forgecity/tamil-rewrite`
+   - **Staging:** `https://agent-portal-staging.delena.buzz/api/integrations/forgecity/tamil-rewrite`
+   - **DEV:** `https://delena.buzz/api/integrations/forgecity/tamil-rewrite`
+   Save the matching env’s `FORGECITY_REWRITE_API_KEY` (encrypted on device).
 3. Allowlist at least one messaging app; send a test notification.
 4. Expect Tamil TTS only; portal down / bad key / missing Tamil voice → silent.
+
+### Built-in speech test + terminal diagnostics (0.4.1)
+
+1. Select `DIRECT` or `PORTAL தமிழ்`, then tap **TEST TTS**.
+2. DIRECT speaks a fixed local English test line. PORTAL sends a fixed synthetic
+   test sentence (never notification content), validates the Tamil response, and
+   speaks it using `ta-IN` / `ta`.
+3. The status line reports rewrite/TTS success or failure. `OFF` explains that a
+   speech mode must be selected.
+4. Saved API keys remain Android-Keystore encrypted at rest but are intentionally
+   visible in the config field for setup. Do not share screenshots.
+
+Terminal diagnosis:
+
+```powershell
+adb logcat -c
+adb logcat -s ForgeCityTTS
+```
+
+Logs include listener gates, selected route, endpoint host/HTTP status, elapsed
+time, and TTS result. They never include API keys, notification title/body, or
+Tamil response text.
 
 For local-only speech, select `DIRECT`: ForgeCity uses the device default
 locale and makes no Agent Portal request. `OFF` is the fresh-install default.
@@ -129,5 +155,5 @@ adb shell am start -a android.settings.HOME_SETTINGS
 
 Sandbox DEV only. No host ports / Postgres / CSS for this APK.
 **Debug prereleases** are published for sideload (latest:
-`v0.4.0-tamil-agent-dev` on `main` tip `351e8a9`).
+`v0.4.1-tts-diagnostics-dev`; Realme E2E remains pending).
 **Annotated production tags** require: Realme device E2E GO + Reviewer #17.

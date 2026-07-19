@@ -1,5 +1,6 @@
 package buzz.delena.forgecity.assistant.rewrite
 
+import buzz.delena.forgecity.assistant.ForgeCityTtsDiagnostics
 import java.io.ByteArrayOutputStream
 import java.io.InterruptedIOException
 import java.net.HttpURLConnection
@@ -19,9 +20,18 @@ class AgentPortalRewriteClient(
     private var closed = false
 
     fun rewrite(endpoint: String, apiKey: String, request: RewriteRequest): RewriteResult {
-        if (closed || apiKey.isBlank()) return RewriteResult.Unavailable
-        val url = validatedEndpoint(endpoint) ?: return RewriteResult.Unavailable
+        if (closed || apiKey.isBlank()) {
+            ForgeCityTtsDiagnostics.warn("rewrite_blocked", "reason=closed_or_key_missing")
+            return RewriteResult.Unavailable
+        }
+        val url = validatedEndpoint(endpoint)
+        if (url == null) {
+            ForgeCityTtsDiagnostics.warn("rewrite_blocked", "reason=invalid_endpoint")
+            return RewriteResult.Unavailable
+        }
         var connection: HttpsURLConnection? = null
+        val startedAt = System.currentTimeMillis()
+        ForgeCityTtsDiagnostics.info("rewrite_start", "host=${url.host}")
         return try {
             connection = (url.openConnection() as? HttpsURLConnection)
                 ?: return RewriteResult.Unavailable
@@ -44,7 +54,12 @@ class AgentPortalRewriteClient(
             connection.setFixedLengthStreamingMode(payload.size)
             connection.outputStream.use { it.write(payload) }
 
-            when (connection.responseCode) {
+            val status = connection.responseCode
+            ForgeCityTtsDiagnostics.info(
+                "rewrite_http",
+                "host=${url.host} status=$status elapsedMs=${System.currentTimeMillis() - startedAt}",
+            )
+            when (status) {
                 HttpURLConnection.HTTP_OK -> {
                     if (!connection.contentType.orEmpty().substringBefore(';')
                             .equals("application/json", ignoreCase = true)
@@ -62,10 +77,13 @@ class AgentPortalRewriteClient(
                 else -> RewriteResult.Unavailable
             }
         } catch (_: SocketTimeoutException) {
+            ForgeCityTtsDiagnostics.warn("rewrite_timeout", "host=${url.host}")
             RewriteResult.Timeout
         } catch (_: InterruptedIOException) {
+            ForgeCityTtsDiagnostics.warn("rewrite_interrupted", "host=${url.host}")
             if (closed) RewriteResult.Cancelled else RewriteResult.Timeout
         } catch (_: Exception) {
+            ForgeCityTtsDiagnostics.warn("rewrite_unavailable", "host=${url.host}")
             if (closed) RewriteResult.Cancelled else RewriteResult.Unavailable
         } finally {
             synchronized(connectionLock) {
