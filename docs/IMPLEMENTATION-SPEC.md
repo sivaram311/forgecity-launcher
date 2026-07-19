@@ -2,13 +2,14 @@
 
 **Goal:** Upgrade the current ForgeCity launcher (isometric city home screen) based on the approved prototype style. Focus on usability, favorites, game-like feel, and a notification-reading AI assistant.
 
-**Branch:** `feature/forge-assistant` · **Version target:** `0.3.0-forge-assistant-dev`
+**Branch:** `feature/assistant-handoff-gaps` · **Version target:** `0.3.1-forge-assistant-dev`
 
 ## Defaults (product decisions)
 
 - TTS **off** by default; app allowlist **empty** until user opts in (privacy-first).
-- Screenshots via Android emulator (no Realme attached on build host).
-- Never persist notification title/body; DataStore holds toggles/packages/quiet hours only.
+- Screenshots requested via Android emulator; tooling/image installed, but this host has
+  virtualization disabled and cannot boot x86_64 AVDs. Realme is also absent.
+- Never persist notification title/body; SharedPreferences holds toggles/packages/quiet hours only.
 
 ## Features
 
