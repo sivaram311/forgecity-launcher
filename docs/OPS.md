@@ -1,5 +1,19 @@
 # ForgeCity ops
 
+## Source
+
+| Item | Value |
+|------|-------|
+| GitHub | https://github.com/sivaram311/forgecity-launcher |
+| Default working branch | `feature/mvp-city-shell` |
+| Local path | `E:\MyWorkspace\sandbox\forgecity-launcher` |
+
+```powershell
+git clone https://github.com/sivaram311/forgecity-launcher.git
+cd forgecity-launcher
+git checkout feature/mvp-city-shell
+```
+
 ## Build
 
 1. Install Android SDK Platform 35 + Build-Tools.

@@ -4,6 +4,9 @@ A story-driven isometric city home screen for Realme P2 / P2 Pro (ColorOS).
 Apps become buildings. Habits rebuild districts. Chapter 1 (**Embers**) ships as
 the MVP city shell.
 
+**Repo:** https://github.com/sivaram311/forgecity-launcher (private)  
+**Branch:** `feature/mvp-city-shell` · version `0.1.0-mvp`
+
 ## What works in 0.1.0-mvp
 
 - Registers as Android `HOME` + `DEFAULT` (+ app-drawer `LAUNCHER` entry).
