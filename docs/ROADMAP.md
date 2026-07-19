@@ -6,7 +6,7 @@ story — while staying performant on Snapdragon 7s Gen 2 + Adreno 710 + 120 Hz.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher  
 **Device SoT:** `E:\MyAgent\workflow\devices\REALME-P2-PRO.md`  
-**Last updated:** 2026-07-19 (Waves 1–2 landed · PR #1 open · `v0.2.0-awakening-dev` prerelease · device E2E next)
+**Last updated:** 2026-07-19 (PR #1 merged to `main` · user E2E waiver for merge · device E2E still next for `v0.2.0`)
 
 ---
 
@@ -107,12 +107,12 @@ gate.
 - Deliverable: Working isometric launcher with basic visuals
 - Release: https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.1.0-mvp
 
-### Phase 2 — Living City & Progression — v0.2.0 “Awakening” (in progress)
+### Phase 2 — Living City & Progression — v0.2.0 “Awakening” (merged to main · device gate open)
 
-**Branch:** `feature/phase-2-awakening` · versionName `0.2.0-awakening-dev`  
-**PR:** https://github.com/sivaram311/forgecity-launcher/pull/1  
-**Prerelease:** https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.2.0-awakening-dev  
-**Parallel plan:** [PARALLEL-EXECUTION.md](PARALLEL-EXECUTION.md)
+**Branch:** merged via [PR #1](https://github.com/sivaram311/forgecity-launcher/pull/1) → `main` (`d1f8b09`)  
+**versionName:** `0.2.0-awakening-dev` · **Prerelease:** `v0.2.0-awakening-dev`  
+**Parallel plan:** [PARALLEL-EXECUTION.md](PARALLEL-EXECUTION.md)  
+**Merge note:** User-directed waiver of #16 E2E for merge only — annotated `v0.2.0` still requires device GO.
 
 | Wave 1 item | Status |
 |-------------|--------|
@@ -209,12 +209,11 @@ See `agents/crew/CREW.md` and `agents/roles/`.
 
 ## 9. Immediate next actions
 
-1. **Device lab:** connect Realme P2 Pro (`adb devices`), install `v0.2.0-awakening-dev` (or tip APK), run [OPS.md](OPS.md) checklist (CONSCIOUS #16). *Build host had no device attached 2026-07-19.*
-2. **Merge:** land [PR #1](https://github.com/sivaram311/forgecity-launcher/pull/1) after E2E GO + Reviewer #17.
-3. **Tag:** annotated `v0.2.0` only after device GO (not another debug-only tag).
-4. **Wave 3 / Phase 3:** weather emitter + quest map markers + chapter JSON packs (after Awakening gate).
+1. **Device lab:** connect Realme P2 Pro (`adb devices`), install `v0.2.0-awakening-dev` (or `main` tip APK), run [OPS.md](OPS.md) checklist (CONSCIOUS #16).
+2. **Tag:** annotated `v0.2.0` only after device GO (debug prerelease already shipped).
+3. **Wave 3 / Phase 3:** weather emitter + quest map markers + chapter JSON packs (after Awakening device gate).
 
-**Done this turn:** Room `Migration(1,2)` + removed `fallbackToDestructiveMigration`.
+**Done:** Waves 1–2 + Migration(1,2) + PR #1 → `main` (merge commit `d1f8b09`, user E2E waiver).
 
 ---
 

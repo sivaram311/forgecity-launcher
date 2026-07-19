@@ -28,15 +28,15 @@ Detailed prompts: `agents/roles/`.
 ## Phase 2 pipeline (Awakening)
 
 SoT: `docs/ROADMAP.md` + `docs/PARALLEL-EXECUTION.md`.  
-Branch: `feature/phase-2-awakening` · PR: https://github.com/sivaram311/forgecity-launcher/pull/1  
-Prerelease: `v0.2.0-awakening-dev`
+Branch: merged to `main` via PR #1 · Prerelease: `v0.2.0-awakening-dev`
 
 | Wave | Status | Notes |
 |------|--------|-------|
-| Wave 1 | ✅ landed | day/night, fly-in, UsageStats/WorkManager, launch levels |
-| Wave 2 | ✅ landed | particles, animated counters, Room levels, quest stubs, debounce |
-| Device E2E (#16) | ⏳ **NEXT** | blocks merge + annotated `v0.2.0` (no phone on build host) |
-| Room Migration(1,2) | ✅ landed | destructive fallback removed |
+| Wave 1 | ✅ on `main` | day/night, fly-in, UsageStats/WorkManager, launch levels |
+| Wave 2 | ✅ on `main` | particles, animated counters, Room levels, quest stubs, debounce |
+| Room Migration(1,2) | ✅ on `main` | destructive fallback removed |
+| PR #1 merge | ✅ MERGED | user E2E waiver for merge; not E2E PASS |
+| Device E2E (#16) | ⏳ **NEXT** | blocks annotated `v0.2.0` |
 
 **Hire next:** QA & Optimization (P2 Pro lab) when device is available.
 

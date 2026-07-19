@@ -5,9 +5,9 @@ Apps become buildings. Habits rebuild districts. Chapter 1 (**Embers**) ships as
 the MVP city shell.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher (public)  
-**Branch:** `feature/phase-2-awakening` · version `0.2.0-awakening-dev` (Phase 2 Waves 1–2)  
-**PR:** https://github.com/sivaram311/forgecity-launcher/pull/1  
-**Stable MVP tag:** `v0.1.0-mvp` on `main`
+**Branch:** `main` · version `0.2.0-awakening-dev` (Phase 2 Waves 1–2 merged)  
+**Merged PR:** https://github.com/sivaram311/forgecity-launcher/pull/1  
+**Stable MVP tag:** `v0.1.0-mvp` · Phase 2 prerelease: `v0.2.0-awakening-dev`
 
 ## Download
 
@@ -64,9 +64,9 @@ badges, cloud sync, and `QUERY_ALL_PACKAGES`. App discovery uses launcher-intent
 ## Next (blocks annotated `v0.2.0`)
 
 1. Realme P2 Pro device E2E — checklist in [docs/OPS.md](docs/OPS.md) (`adb devices` empty on build host as of 2026-07-19)
-2. Merge [PR #1](https://github.com/sivaram311/forgecity-launcher/pull/1) after E2E GO
+2. Annotated `v0.2.0` tag only after device GO
 
-Room `Migration(1,2)` is landed (destructive fallback removed).
+PR #1 is **merged** to `main` (2026-07-19) under an explicit user waiver of the device E2E gate for merge — not an E2E PASS. Room `Migration(1,2)` is on `main`.
 
 ## Requirements
 

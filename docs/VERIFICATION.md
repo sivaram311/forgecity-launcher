@@ -90,10 +90,10 @@ Parallel plan: `docs/PARALLEL-EXECUTION.md`
 |------|--------|
 | Code waves 1–2 | Landed on `feature/phase-2-awakening` |
 | Unit tests / debug assemble | PASS |
-| PR #1 → `main` | OPEN |
+| PR #1 → `main` | **MERGED** 2026-07-19 (`d1f8b09`) — user-directed E2E waiver for merge only |
 | Tag `v0.2.0-awakening-dev` | PUBLISHED (prerelease, debug-signed) |
 | Realme P2 Pro E2E (#16) | **PENDING — next gate** (no adb device) |
-| Room Migration(1,2) | ✅ landed (destructive fallback removed) |
+| Room Migration(1,2) | ✅ on `main` |
 | Annotated `v0.2.0` | BLOCKED until E2E + Reviewer GO |
 
 Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
@@ -107,3 +107,13 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | Unit tests | PASS | `ForgeCityMigrationsTest` + full `testDebugUnitTest` |
 | `assembleDebug` | PASS | Tip after migration |
 | `adb devices` | EMPTY | No Realme attached — #16 still PENDING |
+
+## 2026-07-19 — PR #1 merged to main
+
+| Check | Result | Notes |
+|------|--------|-------|
+| Reviewer #17 merge | GO | `agents/hires/SIGN-OFF-merge-pr1-main.md` |
+| Merge commit | `d1f8b09` | merge commit (history preserved) |
+| User E2E waiver | RECORDED | Merge authorized without device lab; **not** E2E PASS |
+| `feature/mvp-city-shell` | N/A | Already equal to pre-merge `main` — nothing unique |
+| Annotated `v0.2.0` | STILL BLOCKED | Needs real device GO |

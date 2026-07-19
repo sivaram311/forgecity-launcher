@@ -5,14 +5,14 @@
 | Item | Value |
 |------|-------|
 | GitHub | https://github.com/sivaram311/forgecity-launcher |
-| Default working branch | `feature/phase-2-awakening` |
-| PR | https://github.com/sivaram311/forgecity-launcher/pull/1 |
+| Default working branch | `main` |
+| Merged PR | https://github.com/sivaram311/forgecity-launcher/pull/1 (MERGED) |
 | Local path | `E:\MyWorkspace\sandbox\forgecity-launcher` |
 
 ```powershell
 git clone https://github.com/sivaram311/forgecity-launcher.git
 cd forgecity-launcher
-git checkout feature/phase-2-awakening
+git checkout main
 ```
 
 ## Download (prerelease debug APK)
