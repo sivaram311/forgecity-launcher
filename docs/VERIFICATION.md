@@ -174,3 +174,17 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | Release assets | PASS | APK + `.sha256`; download round-trip hash matched |
 | Final MP4 shipped | NO | intentional; gradient fallback only in this APK |
 | Realme E2E (#16) | PENDING | Blocks annotated production tags |
+
+## 2026-07-19 — Background Video asset 0.3.3-dev
+
+| Check | Result | Notes |
+|------|--------|-------|
+| Procedural MP4 generated | PASS | `tools_gen_city_bg.py` + FFmpeg; no third-party footage |
+| Media probe | PASS | H.264 / yuv420p / 1080×1920 / 30fps / 10.000s / no audio / 3164693 bytes |
+| Video SHA-256 | `1AC2A4AB2B18F16B201C1F6A59C45CC87C355DEB1D402F46B385C781ED6FA798` | |
+| Loop seam (first vs last) | MEASURED | SSIM ≈ 0.915, PSNR ≈ 31.4 dB (periodic motion; not bit-identical) |
+| `testDebugUnitTest` | PASS | |
+| `lintDebug` | PASS | |
+| `assembleDebug` | PASS | `0.3.3-background-video-asset-dev` (versionCode 6) |
+| APK SHA-256 | `B0B9EBC58D2AFB0AD47626790CBEBA98DD0335C0C87D7E7D7AF0E70D6018B7D4` | |
+| Realme decoder/thermal/battery | PENDING | Physical device absent |

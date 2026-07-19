@@ -11,3 +11,7 @@ app/build/
 *.aab
 *.keystore
 dist/
+
+__pycache__/
+tools_gen_city_bg.log
+
