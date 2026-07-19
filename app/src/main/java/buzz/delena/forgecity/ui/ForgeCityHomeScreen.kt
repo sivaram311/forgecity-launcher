@@ -1,6 +1,5 @@
 package buzz.delena.forgecity.ui
 
-import android.content.Intent
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -13,13 +12,17 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,9 +33,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import buzz.delena.forgecity.assistant.AssistantUiEvent
 import buzz.delena.forgecity.city.CityBuilding
 import buzz.delena.forgecity.city.CityState
 import buzz.delena.forgecity.city.DayNightCycle
+import kotlinx.coroutines.delay
 
 @Composable
 fun ForgeCityHomeScreen(
@@ -42,16 +47,43 @@ fun ForgeCityHomeScreen(
     hourOfDay: Int,
     ambientEnabled: Boolean,
     hasUsageAccess: Boolean,
+    hasNotificationAccess: Boolean,
+    assistantEnabled: Boolean,
+    ttsEnabled: Boolean,
+    allowCount: Int,
+    quietLabel: String,
+    showAllowlist: Boolean,
+    dockMessage: String?,
     levelUpBuildingId: String?,
+    assistantEvent: AssistantUiEvent?,
     onQueryChange: (String) -> Unit,
     onBuildingTap: (CityBuilding) -> Unit,
+    onBuildingLongPress: (CityBuilding) -> Unit,
+    onFavoriteTap: (CityBuilding) -> Unit,
     onOpenUsageAccess: () -> Unit,
+    onOpenNotificationAccess: () -> Unit,
+    onToggleAssistant: () -> Unit,
+    onToggleTts: () -> Unit,
+    onOpenAllowlist: () -> Unit,
+    onCloseAllowlist: () -> Unit,
+    onToggleAllowedPackage: (String) -> Unit,
+    isPackageAllowed: (String) -> Boolean,
     onLevelUpConsumed: () -> Unit,
+    onAssistantOpen: (AssistantUiEvent) -> Unit,
+    onAssistantDismiss: () -> Unit,
+    onClearDockMessage: () -> Unit,
 ) {
     val filtered = buildings.filter {
         query.isBlank() || it.label.contains(query, ignoreCase = true)
     }
+    val favorites = buildings.filter { it.isFavorite }.take(6)
     val (top, mid, bottom) = DayNightCycle.skyColors(hourOfDay)
+
+    LaunchedEffect(dockMessage) {
+        if (dockMessage == null) return@LaunchedEffect
+        delay(2_200)
+        onClearDockMessage()
+    }
 
     Box(
         modifier = Modifier
@@ -68,6 +100,7 @@ fun ForgeCityHomeScreen(
             ambientEnabled = ambientEnabled,
             levelUpBuildingId = levelUpBuildingId,
             onBuildingTap = onBuildingTap,
+            onBuildingLongPress = onBuildingLongPress,
             onLevelUpConsumed = onLevelUpConsumed,
             modifier = Modifier.fillMaxSize(),
         )
@@ -76,28 +109,10 @@ fun ForgeCityHomeScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .statusBarsPadding()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = 16.dp, vertical = 10.dp),
         ) {
-            Text(
-                text = "ForgeCity",
-                color = Color(0xFFFFF6F0),
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-            )
-            Text(
-                text = "Chapter ${state.chapterId} · ${state.chapterTitle}",
-                color = Color(0xFFE8A15A),
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = state.briefing,
-                color = Color(0xD9FFF6F0),
-                fontSize = 13.sp,
-                lineHeight = 18.sp,
-            )
-            Spacer(modifier = Modifier.height(12.dp))
+            ChapterCard(state)
+            Spacer(modifier = Modifier.height(10.dp))
             ResourceStrip(state)
             if (!hasUsageAccess) {
                 Spacer(modifier = Modifier.height(8.dp))
@@ -112,27 +127,166 @@ fun ForgeCityHomeScreen(
                         .padding(horizontal = 12.dp, vertical = 10.dp),
                 )
             }
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+            AssistantSettingsCard(
+                hasNotificationAccess = hasNotificationAccess,
+                assistantEnabled = assistantEnabled,
+                ttsEnabled = ttsEnabled,
+                quietLabel = quietLabel,
+                allowCount = allowCount,
+                onOpenNotificationAccess = onOpenNotificationAccess,
+                onToggleAssistant = onToggleAssistant,
+                onToggleTts = onToggleTts,
+                onOpenAllowlist = onOpenAllowlist,
+            )
+            Spacer(modifier = Modifier.height(8.dp))
             SearchBar(query = query, onQueryChange = onQueryChange)
         }
 
-        if (filtered.isEmpty()) {
-            Text(
-                text = "No buildings match",
-                color = Color(0xFFFFF6F0),
-                modifier = Modifier.align(Alignment.Center),
-            )
-        }
-
-        Text(
-            text = "Pinch zoom · drag pan · double-tap recenter · tap fly-in",
-            color = Color(0x99FFF6F0),
-            fontSize = 12.sp,
+        CityAssistantOverlay(
+            event = assistantEvent,
+            onOpen = onAssistantOpen,
+            onDismiss = onAssistantDismiss,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .navigationBarsPadding()
-                .padding(bottom = 18.dp),
+                .padding(bottom = 100.dp),
         )
+
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+        ) {
+            if (dockMessage != null) {
+                Text(
+                    text = dockMessage,
+                    color = Color(0xFFFFF6F0),
+                    fontSize = 12.sp,
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .background(Color(0xAA302A38), RoundedCornerShape(12.dp))
+                        .padding(horizontal = 12.dp, vertical = 6.dp),
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+            }
+            FavoritesDock(
+                favorites = favorites,
+                onFavoriteTap = onFavoriteTap,
+            )
+            Text(
+                text = "Long-press building to pin · pinch / drag city · double-tap recenter",
+                color = Color(0x88FFF6F0),
+                fontSize = 11.sp,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(top = 6.dp),
+            )
+        }
+
+        if (showAllowlist) {
+            AllowlistSheet(
+                buildings = buildings.distinctBy { it.packageName },
+                isPackageAllowed = isPackageAllowed,
+                onToggle = onToggleAllowedPackage,
+                onClose = onCloseAllowlist,
+            )
+        }
+    }
+}
+
+@Composable
+private fun ChapterCard(state: CityState) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                brush = Brush.horizontalGradient(
+                    listOf(Color(0xCC2A1838), Color(0xCC301820)),
+                ),
+                shape = RoundedCornerShape(18.dp),
+            )
+            .padding(horizontal = 14.dp, vertical = 12.dp),
+    ) {
+        Text(
+            text = "ForgeCity",
+            color = Color(0xFFFFF6F0),
+            fontSize = 26.sp,
+            fontWeight = FontWeight.Bold,
+        )
+        Text(
+            text = "Chapter ${state.chapterId} · ${state.chapterTitle}",
+            color = Color(0xFFE8A15A),
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+        )
+        Spacer(modifier = Modifier.height(6.dp))
+        Text(
+            text = state.briefing,
+            color = Color(0xD9FFF6F0),
+            fontSize = 13.sp,
+            lineHeight = 18.sp,
+            maxLines = 3,
+        )
+    }
+}
+
+@Composable
+private fun AllowlistSheet(
+    buildings: List<CityBuilding>,
+    isPackageAllowed: (String) -> Boolean,
+    onToggle: (String) -> Unit,
+    onClose: () -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0x99000000))
+            .clickable(onClick = onClose),
+    ) {
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .heightIn(max = 420.dp)
+                .background(Color(0xFF1A1224), RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp))
+                .clickable(enabled = false) {}
+                .navigationBarsPadding()
+                .padding(16.dp),
+        ) {
+            Text("Apps the assistant may read", color = Color(0xFFFFF6F0), fontWeight = FontWeight.SemiBold)
+            Text(
+                "Empty by default. Only checked apps can trigger speech/bubbles.",
+                color = Color(0x99FFF6F0),
+                fontSize = 12.sp,
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            LazyColumn {
+                items(buildings, key = { it.packageName }) { building ->
+                    val allowed = isPackageAllowed(building.packageName)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onToggle(building.packageName) }
+                            .padding(vertical = 10.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Text(building.label, color = Color(0xFFFFF6F0), fontSize = 14.sp)
+                        Text(if (allowed) "ON" else "OFF", color = Color(0xFFE8A15A), fontSize = 12.sp)
+                    }
+                }
+            }
+            Text(
+                "Done",
+                color = Color(0xFFE8A15A),
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .clickable(onClick = onClose)
+                    .padding(8.dp),
+            )
+        }
     }
 }
 

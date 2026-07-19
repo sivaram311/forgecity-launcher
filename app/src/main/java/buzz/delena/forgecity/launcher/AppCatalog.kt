@@ -58,15 +58,25 @@ class AppCatalog(private val context: Context) {
         context.startActivity(intent)
     }
 
+    fun launchPackage(packageName: String): Boolean {
+        val intent = context.packageManager.getLaunchIntentForPackage(packageName) ?: return false
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED)
+        context.startActivity(intent)
+        return true
+    }
+
     private fun placeOnGrid(apps: List<CityBuilding>): List<CityBuilding> {
         val byDistrict = apps.groupBy { it.district }
         val placed = mutableListOf<CityBuilding>()
+        val stride = buzz.delena.forgecity.city.IsoLayout.DISTRICT_STRIDE
+        val step = buzz.delena.forgecity.city.IsoLayout.CELL_STEP
+        val width = buzz.delena.forgecity.city.IsoLayout.DISTRICT_WIDTH
         byDistrict.entries.forEachIndexed { districtIndex, (_, members) ->
-            val originCol = (districtIndex % 3) * 5
-            val originRow = (districtIndex / 3) * 5
+            val originCol = (districtIndex % 3) * stride
+            val originRow = (districtIndex / 3) * stride
             members.forEachIndexed { index, building ->
-                val col = originCol + (index % 4)
-                val row = originRow + (index / 4)
+                val col = originCol + (index % width) * step
+                val row = originRow + (index / width) * step
                 placed += building.copy(col = col, row = row)
             }
         }

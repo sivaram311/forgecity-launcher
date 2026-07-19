@@ -1,17 +1,14 @@
-package buzz.delena.forgecity.power
+package buzz.delena.forgecity.assistant
 
 import android.content.Context
 import android.os.PowerManager
 
-/**
- * Gates heavy ambient animation for Realme mid-range battery/thermal budget.
- * Stream B (Android Systems) owns this API; UI only reads [allowsAmbient].
- */
-class AnimationBudget(context: Context) {
+/** Speech is stricter than ambient: requires interactive screen. */
+class SpeechBudget(context: Context) {
     private val powerManager =
         context.applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
 
-    val allowsAmbient: Boolean
+    val allowsSpeech: Boolean
         get() = powerManager.isInteractive &&
             !powerManager.isPowerSaveMode &&
             !powerManager.isDeviceIdleMode

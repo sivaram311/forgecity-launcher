@@ -38,7 +38,14 @@ class MainActivity : ComponentActivity() {
             val hour by viewModel.hourOfDay.collectAsState()
             val ambient by viewModel.ambientEnabled.collectAsState()
             val usage by viewModel.hasUsageAccess.collectAsState()
+            val notif by viewModel.hasNotificationAccess.collectAsState()
+            val assistant by viewModel.assistantEnabled.collectAsState()
+            val tts by viewModel.ttsEnabled.collectAsState()
+            val allowCount by viewModel.allowCount.collectAsState()
+            val showAllowlist by viewModel.showAllowlist.collectAsState()
+            val dockMessage by viewModel.dockMessage.collectAsState()
             val levelUp by viewModel.levelUpEvent.collectAsState()
+            val assistantEvent by viewModel.assistantEvent.collectAsState()
             ForgeCityHomeScreen(
                 state = state,
                 buildings = buildings,
@@ -46,13 +53,31 @@ class MainActivity : ComponentActivity() {
                 hourOfDay = hour,
                 ambientEnabled = ambient,
                 hasUsageAccess = usage,
+                hasNotificationAccess = notif,
+                assistantEnabled = assistant,
+                ttsEnabled = tts,
+                allowCount = allowCount,
+                quietLabel = viewModel.quietLabel,
+                showAllowlist = showAllowlist,
+                dockMessage = dockMessage,
                 levelUpBuildingId = levelUp,
+                assistantEvent = assistantEvent,
                 onQueryChange = viewModel::onQueryChange,
                 onBuildingTap = viewModel::launch,
-                onOpenUsageAccess = {
-                    startActivity(viewModel.usageAccessIntent())
-                },
+                onBuildingLongPress = viewModel::toggleFavorite,
+                onFavoriteTap = viewModel::launch,
+                onOpenUsageAccess = { startActivity(viewModel.usageAccessIntent()) },
+                onOpenNotificationAccess = { startActivity(viewModel.notificationAccessIntent()) },
+                onToggleAssistant = viewModel::toggleAssistant,
+                onToggleTts = viewModel::toggleTts,
+                onOpenAllowlist = viewModel::openAllowlist,
+                onCloseAllowlist = viewModel::closeAllowlist,
+                onToggleAllowedPackage = viewModel::toggleAllowedPackage,
+                isPackageAllowed = viewModel::isPackageAllowed,
                 onLevelUpConsumed = viewModel::consumeLevelUpEvent,
+                onAssistantOpen = viewModel::openAssistantEvent,
+                onAssistantDismiss = viewModel::dismissAssistantEvent,
+                onClearDockMessage = viewModel::clearDockMessage,
             )
         }
         maybeRequestHomeRole()
