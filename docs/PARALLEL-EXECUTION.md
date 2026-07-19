@@ -89,7 +89,7 @@ Run **A + B + C** in the same branch tip:
 | W25-A1 | A | Media3 ExoPlayer layer under CityCanvas | ✅ `v0.3.2` |
 | W25-B1 | B | Lifecycle + AnimationBudget + power-save receiver | ✅ |
 | W25-F1 | F | Missing-asset fallback + debug prerelease | ✅ PR #4 |
-| W25-A2 | A | Final `city_background.mp4` + seamless loop | ⏳ pending asset |
+| W25-A2 | A | Final `city_background.mp4` + seamless loop | ✅ `v0.3.3` procedural |
 | W25-F2 | F | Realme decoder/thermal/battery E2E | ⏳ pending device |
 
 ### Wave 3 — Phase 3 (parallel design + scaffold)
@@ -141,9 +141,9 @@ Lead merges when unit tests + Reviewer #17 GO; device E2E is a separate hire wit
 |-------|---------|------------------|--------------|
 | 1 Embers | `v0.1.0-mvp` | — | ✅ shipped (debug prerelease) |
 | 2 Awakening | `v0.2.0-awakening-dev` | A+B+C+D+F | ✅ Waves 1–2 + debug prerelease; **device E2E** for annotated `v0.2.0` |
-| 2.5 Video | `v0.3.2-background-video-dev` | A+B+F | ✅ framework on `main`; MP4 + Realme still open |
+| 2.5 Video | `v0.3.3-background-video-asset-dev` | A+B+F | ✅ framework + procedural MP4 on `main`; Realme E2E open |
 | 3 Narrative | `v0.3.0` | A+D(+E0)+F | Device E2E required |
 | 4 Symphony | `v0.4.0` | E+A+B+F | Device E2E required |
 | 5 Stable | `v1.0.0` | all | Promote evidence if distributed beyond sideload |
 
-**Current hire focus:** drop final MP4 (Stream A) + Stream F (P2 Pro E2E) in parallel.
+**Current hire focus:** Stream F (Realme P2 Pro video/decoder/thermal/battery E2E).

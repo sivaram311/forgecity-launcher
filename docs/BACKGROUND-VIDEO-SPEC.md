@@ -32,7 +32,7 @@ Preferences are local SharedPreferences. No media or user content is uploaded.
 ## Release status
 
 - Framework shipped as `v0.3.2-background-video-dev` (fallback-only APK).
-- Asset wave ships as `v0.3.3-background-video-asset-dev` with the procedural MP4
-  bundled under `res/raw/`.
+- Asset wave published as `v0.3.3-background-video-asset-dev` (PR #5 → `main`)
+  with the procedural MP4 bundled under `res/raw/`.
 - Realme decoder, thermal, 120 Hz, and <5% battery impact remain PENDING
   until physical device E2E (#16).

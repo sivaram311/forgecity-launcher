@@ -100,6 +100,6 @@ adb shell am start -a android.settings.HOME_SETTINGS
 
 Sandbox DEV only. No host ports / Postgres / CSS for this APK.
 **Debug prereleases** are published for sideload (latest:
-`v0.3.3-background-video-asset-dev` with bundled procedural MP4).
+`v0.3.3-background-video-asset-dev` on `main` tip `23d3245`).
 **Annotated production tags** require: final MP4 + Realme device E2E GO +
 Reviewer #17.

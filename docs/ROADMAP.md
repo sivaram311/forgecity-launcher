@@ -190,9 +190,8 @@ See `agents/crew/CREW.md` and `agents/roles/`.
 | Data & Persistence | Room, migrations, backup |
 | QA & Optimization | Battery/thermal/a11y gates |
 
-**Suggested next crew task:** (1) drop final `city_background.mp4` into
-`res/raw/` and rebuild; (2) Realme P2 Pro E2E (#16) against
-`v0.3.2-background-video-dev` covering loop, thermal, and battery.
+**Suggested next crew task:** Realme P2 Pro E2E (#16) against
+`v0.3.3-background-video-asset-dev` covering loop, thermal, and battery.
 
 ---
 
@@ -219,12 +218,11 @@ See `agents/crew/CREW.md` and `agents/roles/`.
 
 ## 9. Immediate next actions
 
-1. **Video asset:** place H.264 `city_background.mp4` at `app/src/main/res/raw/` (≤1080×1920, seamless loop).
-2. **Device lab:** connect Realme P2 Pro, install `v0.3.2-background-video-dev`, run [OPS.md](OPS.md) background-video + Awakening checklist (CONSCIOUS #16).
-3. **Tag:** annotated production tags only after MP4 + device GO.
-4. **Wave 3 / Phase 3:** weather emitter + quest map markers + chapter JSON packs.
+1. **Device lab:** connect Realme P2 Pro, install `v0.3.3-background-video-asset-dev`, run [OPS.md](OPS.md) background-video + Awakening checklist (CONSCIOUS #16).
+2. **Tag:** annotated production tags only after Realme device GO.
+3. **Wave 3 / Phase 3:** weather emitter + quest map markers + chapter JSON packs.
 
-**Done:** Waves 1–2 + Migrations + Forge Assistant (`v0.3.1`) + Background Video framework (`v0.3.2`, PR #4 → `2bd8868`).
+**Done:** Waves 1–2 + Migrations + Forge Assistant (`v0.3.1`) + Background Video framework (`v0.3.2`) + procedural MP4 asset (`v0.3.3`, PR #5 → `23d3245`).
 
 ---
 

@@ -5,8 +5,8 @@ Apps become buildings. Habits rebuild districts. A neon city assistant can read
 notifications aloud when you opt in.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher (public)
-**Branch:** `feature/background-video-asset` · version `0.3.3-background-video-asset-dev`
-**Latest prerelease:** [`v0.3.3-background-video-asset-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.3.3-background-video-asset-dev)
+**Branch:** `main` · version `0.3.3-background-video-asset-dev`
+**Latest prerelease:** [`v0.3.3-background-video-asset-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.3.3-background-video-asset-dev) (PR #5 merged)
 
 ## Download
 

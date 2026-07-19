@@ -188,3 +188,14 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | `assembleDebug` | PASS | `0.3.3-background-video-asset-dev` (versionCode 6) |
 | APK SHA-256 | `B0B9EBC58D2AFB0AD47626790CBEBA98DD0335C0C87D7E7D7AF0E70D6018B7D4` | |
 | Realme decoder/thermal/battery | PENDING | Physical device absent |
+
+## 2026-07-19 — PR #5 merged + v0.3.3-background-video-asset-dev published
+
+| Check | Result | Notes |
+|------|--------|-------|
+| PR #5 → `main` | MERGED | merge commit `23d3245` |
+| Reviewer GO | PASS | `agents/hires/SIGN-OFF-v0.3.3-background-video-asset-prerelease.md` |
+| Debug prerelease | PASS | https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.3.3-background-video-asset-dev |
+| Release assets | PASS | APK + `.sha256`; download round-trip hash matched |
+| Bundled MP4 | PASS | procedural `city_background.mp4` in `res/raw` |
+| Realme E2E (#16) | PENDING | Blocks annotated production tags |
