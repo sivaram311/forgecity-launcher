@@ -6,7 +6,7 @@ story — while staying performant on Snapdragon 7s Gen 2 + Adreno 710 + 120 Hz.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher  
 **Device SoT:** `E:\MyAgent\workflow\devices\REALME-P2-PRO.md`  
-**Last updated:** 2026-07-19 (PR #4 / `v0.3.2-background-video-dev` on `main` · next: MP4 asset + Realme E2E)
+**Last updated:** 2026-07-19 (`v0.3.3-background-video-asset-dev` · next: Realme video E2E)
 
 ---
 

@@ -1,6 +1,6 @@
 # ForgeCity architecture
 
-**Status:** Forge Assistant + Background Video (`0.3.2-background-video-dev`)
+**Status:** Forge Assistant + Background Video asset (`0.3.3-background-video-asset-dev`)
 **Primary device:** Realme P2 Pro 5G â€” Snapdragon 7s Gen 2 / Adreno 710 / 120 Hz
 **Auth / ports / DB env:** none (on-device Android app; no CSS, no host port)
 

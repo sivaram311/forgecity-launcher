@@ -45,9 +45,10 @@ Branch: merged to `main` via PR #1 · Prerelease: `v0.2.0-awakening-dev`
 | Item | Status | Notes |
 |------|--------|-------|
 | Forge Assistant `v0.3.0` / `v0.3.1` | ✅ published | favorites, NLS/TTS, quiet hours, contentIntent |
-| Background Video `v0.3.2` | ✅ published | Media3 layer, toggle/opacity, fallback; **no MP4 yet** |
+| Background Video `v0.3.2` | ✅ published | Media3 framework (fallback-only APK) |
+| Background Video asset `v0.3.3` | ✅ ready to publish | procedural MP4 bundled |
 | PR #4 merge | ✅ MERGED | `2bd8868` |
-| Final MP4 + Realme video E2E | ⏳ **NEXT** | blocks annotated production tags |
+| Realme video E2E | ⏳ **NEXT** | blocks annotated production tags |
 
 **Hire next:** UI/Animation (drop MP4) + QA (P2 Pro loop/thermal/battery) in parallel.
 
