@@ -5,25 +5,31 @@
 | Item | Value |
 |------|-------|
 | GitHub | https://github.com/sivaram311/forgecity-launcher |
-| Default working branch | `feature/mvp-city-shell` |
+| Default working branch | `feature/phase-2-awakening` |
+| PR | https://github.com/sivaram311/forgecity-launcher/pull/1 |
 | Local path | `E:\MyWorkspace\sandbox\forgecity-launcher` |
 
 ```powershell
 git clone https://github.com/sivaram311/forgecity-launcher.git
 cd forgecity-launcher
-git checkout feature/mvp-city-shell
+git checkout feature/phase-2-awakening
 ```
 
 ## Download (prerelease debug APK)
 
+Latest Phase 2 Awakening build:
+
 ```powershell
-curl.exe -L -o forgecity-0.1.0-mvp-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.1.0-mvp/forgecity-0.1.0-mvp-debug.apk
-Get-FileHash .\forgecity-0.1.0-mvp-debug.apk -Algorithm SHA256   # expect 073C4959...86C2209A
-adb install -r .\forgecity-0.1.0-mvp-debug.apk
+curl.exe -L -o forgecity-0.2.0-awakening-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.2.0-awakening-dev/forgecity-0.2.0-awakening-dev-debug.apk
+Get-FileHash .\forgecity-0.2.0-awakening-dev-debug.apk -Algorithm SHA256
+# expect 885182F9A12671BE1E68E3DF6819518FE20A308A3D6748FCAF2C440345E89B11
+adb install -r .\forgecity-0.2.0-awakening-dev-debug.apk
 ```
 
-Debug-signed, prerelease. Device E2E pending; do not treat as production.
+MVP shell (older): tag `v0.1.0-mvp` — SHA `073C4959...86C2209A`.
+
+Debug-signed, prerelease. Device E2E (#16) pending; do not treat as production.
 
 ## Build
 

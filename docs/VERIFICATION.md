@@ -72,3 +72,14 @@ Parallel plan: `docs/PARALLEL-EXECUTION.md`
 | Tests | `testDebugUnitTest` | PASS | + `StoryCatalogTest` (unique ids, chapter coverage) |
 | Build | `assembleDebug` | PASS | Green after `getValue` import fix |
 | Device E2E (#16) | PENDING | Still blocks annotated `v0.2.0` tag |
+
+## 2026-07-19 — PR + v0.2.0-awakening-dev prerelease APK
+
+| Check | Result | Notes |
+|------|--------|-------|
+| PR opened | PASS | https://github.com/sivaram311/forgecity-launcher/pull/1 (`feature/phase-2-awakening` → `main`) |
+| Reviewer #17 (prerelease tag) | GO | `agents/hires/SIGN-OFF-v0.2.0-awakening-dev-prerelease.md` for tip `26b9f82` |
+| Tag `v0.2.0-awakening-dev` | PUBLISHED | Prerelease, target `26b9f82` |
+| APK asset | PUBLISHED | `forgecity-0.2.0-awakening-dev-debug.apk` (11.0 MB) |
+| APK SHA-256 | `885182F9A12671BE1E68E3DF6819518FE20A308A3D6748FCAF2C440345E89B11` | |
+| Device E2E (#16) | PENDING | Blocks annotated non-debug `v0.2.0` |
