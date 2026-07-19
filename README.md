@@ -5,27 +5,27 @@ Apps become buildings. Habits rebuild districts. A neon city assistant can read
 notifications aloud when you opt in.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher (public)
-**Branch:** `main` tip still `0.3.3` published · **local tip** `0.4.0-tamil-agent-dev` (Tamil Agent Portal rewrite)
-**Latest prerelease:** [`v0.3.3-background-video-asset-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.3.3-background-video-asset-dev) (PR #5 merged)
+**Branch:** `main` · version `0.4.0-tamil-agent-dev`
+**Latest prerelease:** [`v0.4.0-tamil-agent-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.4.0-tamil-agent-dev) (PR #6 merged)
 
 ## Download
 
 Latest debug prerelease (sideload):
 
 - Releases: https://github.com/sivaram311/forgecity-launcher/releases
-- Tag target: `v0.3.3-background-video-asset-dev`
+- Tag target: `v0.4.0-tamil-agent-dev`
 
 This is **debug-signed**. Realme P2 Pro E2E (#16) is still pending for any annotated production tag.
 
 ```powershell
-curl.exe -L -o forgecity-0.3.3-background-video-asset-dev-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.3.3-background-video-asset-dev/forgecity-0.3.3-background-video-asset-dev-debug.apk
-Get-FileHash .\forgecity-0.3.3-background-video-asset-dev-debug.apk -Algorithm SHA256
-# expect B0B9EBC58D2AFB0AD47626790CBEBA98DD0335C0C87D7E7D7AF0E70D6018B7D4
-adb install -r .\forgecity-0.3.3-background-video-asset-dev-debug.apk
+curl.exe -L -o forgecity-0.4.0-tamil-agent-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.4.0-tamil-agent-dev/forgecity-0.4.0-tamil-agent-dev-debug.apk
+Get-FileHash .\forgecity-0.4.0-tamil-agent-dev-debug.apk -Algorithm SHA256
+# expect E4C3E161D464D2AC15994AE91F5880FB160B7D99F775743A98A81F9224497AD8
+adb install -r .\forgecity-0.4.0-tamil-agent-dev-debug.apk
 ```
 
-## What works in 0.4.0-tamil-agent-dev (local tip)
+## What works in 0.4.0-tamil-agent-dev
 
 - Immersive city-first launcher: chrome is hidden by default and a persistent
   48 dp safe-area `UI +` / `UI −` chip restores or hides controls

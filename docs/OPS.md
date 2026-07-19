@@ -17,19 +17,19 @@ git checkout main
 
 ## Download (prerelease debug APK)
 
-Latest Background Video asset build:
+Latest Tamil Agent + immersive chrome build:
 
 ```powershell
-curl.exe -L -o forgecity-0.3.3-background-video-asset-dev-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.3.3-background-video-asset-dev/forgecity-0.3.3-background-video-asset-dev-debug.apk
-Get-FileHash .\forgecity-0.3.3-background-video-asset-dev-debug.apk -Algorithm SHA256
-# expect B0B9EBC58D2AFB0AD47626790CBEBA98DD0335C0C87D7E7D7AF0E70D6018B7D4
-adb install -r .\forgecity-0.3.3-background-video-asset-dev-debug.apk
+curl.exe -L -o forgecity-0.4.0-tamil-agent-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.4.0-tamil-agent-dev/forgecity-0.4.0-tamil-agent-dev-debug.apk
+Get-FileHash .\forgecity-0.4.0-tamil-agent-dev-debug.apk -Algorithm SHA256
+# expect E4C3E161D464D2AC15994AE91F5880FB160B7D99F775743A98A81F9224497AD8
+adb install -r .\forgecity-0.4.0-tamil-agent-dev-debug.apk
 ```
 
 Also grant: Home role, Usage Access, Notification Access (allowlist apps before speech).
 
-### Tamil Agent Portal rewrite (0.4.0 local)
+### Tamil Agent Portal rewrite (0.4.0)
 
 1. On Agent Portal host, set `FORGECITY_REWRITE_ENABLED=true` and `FORGECITY_REWRITE_API_KEY=<secret>` (never commit).
 2. Tap the persistent `UI +` chip. In City Assistant, cycle Speech mode to
@@ -45,7 +45,7 @@ with a 48 dp touch target and persists the choice.
 
 Spec: [TAMIL-REWRITE-SPEC.md](TAMIL-REWRITE-SPEC.md).
 
-Older: `v0.3.2-background-video-dev` (SHA `5D0F8430…`, no bundled MP4).
+Older: `v0.3.3-background-video-asset-dev` (SHA `B0B9EBC5…`).
 
 Debug-signed, prerelease. Device E2E (#16) pending; do not treat as production.
 
@@ -129,6 +129,5 @@ adb shell am start -a android.settings.HOME_SETTINGS
 
 Sandbox DEV only. No host ports / Postgres / CSS for this APK.
 **Debug prereleases** are published for sideload (latest:
-`v0.3.3-background-video-asset-dev` on `main` tip `23d3245`).
-**Annotated production tags** require: final MP4 + Realme device E2E GO +
-Reviewer #17.
+`v0.4.0-tamil-agent-dev` on `main` tip `351e8a9`).
+**Annotated production tags** require: Realme device E2E GO + Reviewer #17.

@@ -217,3 +217,14 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | APK SHA-256 | `E4C3E161D464D2AC15994AE91F5880FB160B7D99F775743A98A81F9224497AD8` | local debug artifact before release publish |
 | Cloudflare Workers AI | REJECTED | product ban for launcher |
 | Realme 360×780 immersive + speech E2E | PENDING | No physical run claimed; needs device + enabled portal env |
+
+## 2026-07-20 — PR #6 merged + v0.4.0-tamil-agent-dev published
+
+| Check | Result | Notes |
+|------|--------|-------|
+| PR #6 → `main` | MERGED | merge commit `351e8a9` |
+| Agent Portal companion | MERGED | portal PR #2 @ `69e0bc7` (`feature/forgecity-tamil-rewrite`) |
+| Reviewer GO | PASS | `agents/hires/SIGN-OFF-v0.4.0-tamil-agent-immersive-prerelease.md` |
+| Debug prerelease | PASS | https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.4.0-tamil-agent-dev |
+| APK SHA-256 | `E4C3E161D464D2AC15994AE91F5880FB160B7D99F775743A98A81F9224497AD8` | |
+| Realme E2E (#16) | PENDING | Blocks annotated production tags |
