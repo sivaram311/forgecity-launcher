@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ForgeCity</string>
+    <string name="city_briefing">Embers still glow. Rebuild one district at a time.</string>
+    <string name="search_buildings">Search buildings</string>
+    <string name="no_buildings">No buildings match</string>
+    <string name="set_as_home">Set ForgeCity as your home app</string>
+    <string name="resources_label">Resources</string>
+    <string name="chapter_embers">Chapter 1 · Embers</string>
+</resources>

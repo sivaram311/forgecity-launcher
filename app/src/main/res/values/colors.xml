@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ember">#E8A15A</color>
+    <color name="forge_ink">#14121A</color>
+    <color name="forge_mist">#2A2633</color>
+    <color name="vault_gold">#D4AF37</color>
+    <color name="nexus_cyan">#4FD1C5</color>
+    <color name="arena_rose">#E5738A</color>
+    <color name="garden_leaf">#7CB342</color>
+    <color name="archive_slate">#90A4AE</color>
+    <color name="text_on_city">#FFF6F0</color>
+</resources>
