@@ -27,7 +27,23 @@ Get-FileHash .\forgecity-0.3.3-background-video-asset-dev-debug.apk -Algorithm S
 adb install -r .\forgecity-0.3.3-background-video-asset-dev-debug.apk
 ```
 
-Also grant: Home role, Usage Access, Notification Access (allowlist apps before TTS).
+Also grant: Home role, Usage Access, Notification Access (allowlist apps before speech).
+
+### Tamil Agent Portal rewrite (0.4.0 local)
+
+1. On Agent Portal host, set `FORGECITY_REWRITE_ENABLED=true` and `FORGECITY_REWRITE_API_KEY=<secret>` (never commit).
+2. Tap the persistent `UI +` chip. In City Assistant, cycle Speech mode to
+   `PORTAL தமிழ்`; set HTTPS endpoint to
+   `https://<portal-host>/api/integrations/forgecity/tamil-rewrite`; save key (encrypted on device).
+3. Allowlist at least one messaging app; send a test notification.
+4. Expect Tamil TTS only; portal down / bad key / missing Tamil voice → silent.
+
+For local-only speech, select `DIRECT`: ForgeCity uses the device default
+locale and makes no Agent Portal request. `OFF` is the fresh-install default.
+The launcher chrome is also hidden by default; `UI +` / `UI −` remains visible
+with a 48 dp touch target and persists the choice.
+
+Spec: [TAMIL-REWRITE-SPEC.md](TAMIL-REWRITE-SPEC.md).
 
 Older: `v0.3.2-background-video-dev` (SHA `5D0F8430…`, no bundled MP4).
 
@@ -60,12 +76,25 @@ Use build **`v0.3.3-background-video-asset-dev`** (or local `assembleDebug` matc
 - [ ] `adb devices` sees the phone
 - [ ] Install debug APK (hash matches SHA above)
 - [ ] Accept home role / set default home
+- [ ] Fresh install starts with only city/background + `UI +`; buildings still launch
+- [ ] Toggle chip clears status/cutout at 360×780, is reachable by TalkBack, and is at least 48 dp
+- [ ] `UI +` fades chrome in; `UI −` hides chapter/resources/settings/search/dock/hints/bubble
+- [ ] Chrome visibility survives process restart
 - [ ] City canvas pans/zooms at 120 Hz without thermal throttling in 5 minutes
 - [ ] Tap building → fly-in → launches correct app; Home returns to city
 - [ ] Double-tap recenters camera
 - [ ] Search filters buildings
 - [ ] Package install/remove refreshes buildings
 - [ ] Portrait cutout/safe-area chrome stays clear
+
+### Speech modes
+
+- [ ] Fresh install mode is `OFF`
+- [ ] Legacy TTS+rewrite migrates to Portal Tamil; TTS-only migrates to Direct
+- [ ] `DIRECT` speaks local filtered text in the device default locale with no network request
+- [ ] `PORTAL தமிழ்` uses only the configured no-store Portal endpoint and Tamil voice
+- [ ] Portal timeout/auth/malformed response/missing Tamil voice stays silent
+- [ ] Allowlist, quiet hours, budget, dedupe, and body non-persistence hold in both speech modes
 
 ### Phase 2 Awakening
 

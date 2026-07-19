@@ -6,7 +6,7 @@ story — while staying performant on Snapdragon 7s Gen 2 + Adreno 710 + 120 Hz.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher  
 **Device SoT:** `E:\MyAgent\workflow\devices\REALME-P2-PRO.md`  
-**Last updated:** 2026-07-19 (`v0.3.3-background-video-asset-dev` · next: Realme video E2E)
+**Last updated:** 2026-07-19 (`0.4.0-tamil-agent-dev` local · **P0 = Tamil Agent Portal rewrite**)
 
 ---
 
@@ -218,11 +218,19 @@ See `agents/crew/CREW.md` and `agents/roles/`.
 
 ## 9. Immediate next actions
 
-1. **Device lab:** connect Realme P2 Pro, install `v0.3.3-background-video-asset-dev`, run [OPS.md](OPS.md) background-video + Awakening checklist (CONSCIOUS #16).
-2. **Tag:** annotated production tags only after Realme device GO.
-3. **Wave 3 / Phase 3:** weather emitter + quest map markers + chapter JSON packs.
+1. **P0 — immersive/privacy + speech modes:** verify hidden-default chrome,
+   persistent safe-area toggle, legacy migration, direct device-locale TTS,
+   and fail-closed Agent Portal Tamil on Realme 360×780.
+2. **Device lab:** Realme P2 Pro E2E for immersive city use, video, direct TTS,
+   and Tamil rewrite (CONSCIOUS #16).
+3. **Tag:** annotated production tags only after Realme device GO.
+4. **Later:** weather / quest markers / in-city agents (after P0).
 
-**Done:** Waves 1–2 + Migrations + Forge Assistant (`v0.3.1`) + Background Video framework (`v0.3.2`) + procedural MP4 asset (`v0.3.3`, PR #5 → `23d3245`).
+**Rejected for launcher:** Cloudflare Workers AI / GLM remote Worker integration.
+
+**Implemented locally:** hidden-by-default immersive chrome, explicit speech
+mode/migration/routing, and Tamil rewrite pipeline (`0.4.0`); physical E2E and
+publishing remain pending.
 
 ---
 

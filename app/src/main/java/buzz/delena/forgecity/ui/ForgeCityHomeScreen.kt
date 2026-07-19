@@ -1,9 +1,14 @@
 package buzz.delena.forgecity.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -31,8 +37,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import buzz.delena.forgecity.assistant.AssistantSpeechMode
 import buzz.delena.forgecity.assistant.AssistantUiEvent
 import buzz.delena.forgecity.city.CityBuilding
 import buzz.delena.forgecity.city.CityState
@@ -50,11 +61,14 @@ fun ForgeCityHomeScreen(
     hasUsageAccess: Boolean,
     hasNotificationAccess: Boolean,
     assistantEnabled: Boolean,
-    ttsEnabled: Boolean,
+    speechMode: AssistantSpeechMode,
+    rewriteEndpoint: String,
+    apiKeyConfigured: Boolean,
     allowCount: Int,
     quietLabel: String,
     backgroundVideoEnabled: Boolean,
     backgroundVideoOpacity: Float,
+    launcherChromeVisible: Boolean,
     showAllowlist: Boolean,
     dockMessage: String?,
     levelUpBuildingId: String?,
@@ -66,9 +80,12 @@ fun ForgeCityHomeScreen(
     onOpenUsageAccess: () -> Unit,
     onOpenNotificationAccess: () -> Unit,
     onToggleAssistant: () -> Unit,
-    onToggleTts: () -> Unit,
+    onCycleSpeechMode: () -> Unit,
+    onRewriteEndpointChange: (String) -> Unit,
+    onSaveApiKey: (String) -> Unit,
     onToggleBackgroundVideo: () -> Unit,
     onBackgroundVideoOpacityChange: (Float) -> Unit,
+    onToggleLauncherChrome: () -> Unit,
     onQuietStartEarlier: () -> Unit,
     onQuietStartLater: () -> Unit,
     onQuietEndEarlier: () -> Unit,
@@ -134,101 +151,152 @@ fun ForgeCityHomeScreen(
             modifier = Modifier.fillMaxSize(),
         )
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .statusBarsPadding()
-                .padding(horizontal = 16.dp, vertical = 10.dp),
+        AnimatedVisibility(
+            visible = launcherChromeVisible,
+            enter = fadeIn(),
+            exit = fadeOut(),
         ) {
-            ChapterCard(state)
-            Spacer(modifier = Modifier.height(10.dp))
-            ResourceStrip(state)
-            if (!hasUsageAccess) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .statusBarsPadding()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp, vertical = 10.dp),
+            ) {
+                ChapterCard(state)
+                Spacer(modifier = Modifier.height(10.dp))
+                ResourceStrip(state)
+                if (!hasUsageAccess) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Grant Usage Access to awaken Power / Focus / Gold from real habits →",
+                        color = Color(0xFFE8A15A),
+                        fontSize = 12.sp,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color(0x66302A38), RoundedCornerShape(12.dp))
+                            .clickable(onClick = onOpenUsageAccess)
+                            .padding(horizontal = 12.dp, vertical = 10.dp),
+                    )
+                }
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Grant Usage Access to awaken Power / Focus / Gold from real habits →",
-                    color = Color(0xFFE8A15A),
-                    fontSize = 12.sp,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color(0x66302A38), RoundedCornerShape(12.dp))
-                        .clickable(onClick = onOpenUsageAccess)
-                        .padding(horizontal = 12.dp, vertical = 10.dp),
+                AssistantSettingsCard(
+                    hasNotificationAccess = hasNotificationAccess,
+                    assistantEnabled = assistantEnabled,
+                    speechMode = speechMode,
+                    rewriteEndpoint = rewriteEndpoint,
+                    apiKeyConfigured = apiKeyConfigured,
+                    backgroundVideoEnabled = backgroundVideoEnabled,
+                    backgroundVideoOpacity = backgroundVideoOpacity,
+                    quietLabel = quietLabel,
+                    allowCount = allowCount,
+                    onOpenNotificationAccess = onOpenNotificationAccess,
+                    onToggleAssistant = onToggleAssistant,
+                    onCycleSpeechMode = onCycleSpeechMode,
+                    onRewriteEndpointChange = onRewriteEndpointChange,
+                    onSaveApiKey = onSaveApiKey,
+                    onToggleBackgroundVideo = onToggleBackgroundVideo,
+                    onBackgroundVideoOpacityChange = onBackgroundVideoOpacityChange,
+                    onQuietStartEarlier = onQuietStartEarlier,
+                    onQuietStartLater = onQuietStartLater,
+                    onQuietEndEarlier = onQuietEndEarlier,
+                    onQuietEndLater = onQuietEndLater,
+                    onOpenAllowlist = onOpenAllowlist,
                 )
+                Spacer(modifier = Modifier.height(8.dp))
+                SearchBar(query = query, onQueryChange = onQueryChange)
             }
-            Spacer(modifier = Modifier.height(8.dp))
-            AssistantSettingsCard(
-                hasNotificationAccess = hasNotificationAccess,
-                assistantEnabled = assistantEnabled,
-                ttsEnabled = ttsEnabled,
-                backgroundVideoEnabled = backgroundVideoEnabled,
-                backgroundVideoOpacity = backgroundVideoOpacity,
-                quietLabel = quietLabel,
-                allowCount = allowCount,
-                onOpenNotificationAccess = onOpenNotificationAccess,
-                onToggleAssistant = onToggleAssistant,
-                onToggleTts = onToggleTts,
-                onToggleBackgroundVideo = onToggleBackgroundVideo,
-                onBackgroundVideoOpacityChange = onBackgroundVideoOpacityChange,
-                onQuietStartEarlier = onQuietStartEarlier,
-                onQuietStartLater = onQuietStartLater,
-                onQuietEndEarlier = onQuietEndEarlier,
-                onQuietEndLater = onQuietEndLater,
-                onOpenAllowlist = onOpenAllowlist,
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            SearchBar(query = query, onQueryChange = onQueryChange)
         }
 
-        CityAssistantOverlay(
-            event = assistantEvent,
-            onOpen = onAssistantOpen,
-            onDismiss = onAssistantDismiss,
+        AnimatedVisibility(
+            visible = launcherChromeVisible,
+            enter = fadeIn(),
+            exit = fadeOut(),
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .navigationBarsPadding()
                 .padding(bottom = 100.dp),
-        )
+        ) {
+            CityAssistantOverlay(
+                event = assistantEvent,
+                onOpen = onAssistantOpen,
+                onDismiss = onAssistantDismiss,
+            )
+        }
 
-        Column(
+        AnimatedVisibility(
+            visible = launcherChromeVisible,
+            enter = fadeIn(),
+            exit = fadeOut(),
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
                 .navigationBarsPadding()
                 .padding(horizontal = 12.dp, vertical = 10.dp),
         ) {
-            if (dockMessage != null) {
+            Column {
+                if (dockMessage != null) {
+                    Text(
+                        text = dockMessage,
+                        color = Color(0xFFFFF6F0),
+                        fontSize = 12.sp,
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .background(Color(0xAA302A38), RoundedCornerShape(12.dp))
+                            .padding(horizontal = 12.dp, vertical = 6.dp),
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                }
+                FavoritesDock(
+                    favorites = favorites,
+                    onFavoriteTap = onFavoriteTap,
+                )
                 Text(
-                    text = dockMessage,
-                    color = Color(0xFFFFF6F0),
-                    fontSize = 12.sp,
+                    text = "Long-press building to pin · pinch / drag city · double-tap recenter",
+                    color = Color(0x88FFF6F0),
+                    fontSize = 11.sp,
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
-                        .background(Color(0xAA302A38), RoundedCornerShape(12.dp))
-                        .padding(horizontal = 12.dp, vertical = 6.dp),
+                        .padding(top = 6.dp),
                 )
-                Spacer(modifier = Modifier.height(6.dp))
             }
-            FavoritesDock(
-                favorites = favorites,
-                onFavoriteTap = onFavoriteTap,
-            )
-            Text(
-                text = "Long-press building to pin · pinch / drag city · double-tap recenter",
-                color = Color(0x88FFF6F0),
-                fontSize = 11.sp,
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(top = 6.dp),
-            )
         }
 
-        if (showAllowlist) {
+        if (launcherChromeVisible && showAllowlist) {
             AllowlistSheet(
                 buildings = buildings.distinctBy { it.packageName },
                 isPackageAllowed = isPackageAllowed,
                 onToggle = onToggleAllowedPackage,
                 onClose = onCloseAllowlist,
+            )
+        }
+
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .statusBarsPadding()
+                .padding(top = 6.dp, end = 6.dp)
+                .size(48.dp)
+                .semantics {
+                    contentDescription =
+                        if (launcherChromeVisible) "Hide UI" else "Show UI"
+                    stateDescription =
+                        if (launcherChromeVisible) "Launcher UI shown" else "Launcher UI hidden"
+                }
+                .clickable(
+                    role = Role.Button,
+                    onClick = onToggleLauncherChrome,
+                ),
+        ) {
+            Text(
+                text = if (launcherChromeVisible) "UI −" else "UI +",
+                color = Color(0xFFFFF6F0),
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .background(Color(0xCC201828), RoundedCornerShape(14.dp))
+                    .padding(horizontal = 8.dp, vertical = 6.dp),
             )
         }
     }

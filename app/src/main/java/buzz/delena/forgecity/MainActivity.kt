@@ -47,11 +47,14 @@ class MainActivity : ComponentActivity() {
             val usage by viewModel.hasUsageAccess.collectAsState()
             val notif by viewModel.hasNotificationAccess.collectAsState()
             val assistant by viewModel.assistantEnabled.collectAsState()
-            val tts by viewModel.ttsEnabled.collectAsState()
+            val speechMode by viewModel.speechMode.collectAsState()
+            val rewriteEndpoint by viewModel.rewriteEndpoint.collectAsState()
+            val apiKeyConfigured by viewModel.apiKeyConfigured.collectAsState()
             val allowCount by viewModel.allowCount.collectAsState()
             val quietLabel by viewModel.quietLabel.collectAsState()
             val backgroundVideoEnabled by viewModel.backgroundVideoEnabled.collectAsState()
             val backgroundVideoOpacity by viewModel.backgroundVideoOpacity.collectAsState()
+            val launcherChromeVisible by viewModel.launcherChromeVisible.collectAsState()
             val showAllowlist by viewModel.showAllowlist.collectAsState()
             val dockMessage by viewModel.dockMessage.collectAsState()
             val levelUp by viewModel.levelUpEvent.collectAsState()
@@ -65,11 +68,14 @@ class MainActivity : ComponentActivity() {
                 hasUsageAccess = usage,
                 hasNotificationAccess = notif,
                 assistantEnabled = assistant,
-                ttsEnabled = tts,
+                speechMode = speechMode,
+                rewriteEndpoint = rewriteEndpoint,
+                apiKeyConfigured = apiKeyConfigured,
                 allowCount = allowCount,
                 quietLabel = quietLabel,
                 backgroundVideoEnabled = backgroundVideoEnabled,
                 backgroundVideoOpacity = backgroundVideoOpacity,
+                launcherChromeVisible = launcherChromeVisible,
                 showAllowlist = showAllowlist,
                 dockMessage = dockMessage,
                 levelUpBuildingId = levelUp,
@@ -81,9 +87,12 @@ class MainActivity : ComponentActivity() {
                 onOpenUsageAccess = { startActivity(viewModel.usageAccessIntent()) },
                 onOpenNotificationAccess = { startActivity(viewModel.notificationAccessIntent()) },
                 onToggleAssistant = viewModel::toggleAssistant,
-                onToggleTts = viewModel::toggleTts,
+                onCycleSpeechMode = viewModel::cycleSpeechMode,
+                onRewriteEndpointChange = viewModel::setRewriteEndpoint,
+                onSaveApiKey = viewModel::saveApiKey,
                 onToggleBackgroundVideo = viewModel::toggleBackgroundVideo,
                 onBackgroundVideoOpacityChange = viewModel::setBackgroundVideoOpacity,
+                onToggleLauncherChrome = viewModel::toggleLauncherChrome,
                 onQuietStartEarlier = { viewModel.shiftQuietStart(-30) },
                 onQuietStartLater = { viewModel.shiftQuietStart(30) },
                 onQuietEndEarlier = { viewModel.shiftQuietEnd(-30) },
