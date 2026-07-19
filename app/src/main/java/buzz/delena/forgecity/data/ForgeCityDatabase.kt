@@ -28,7 +28,8 @@ abstract class ForgeCityDatabase : RoomDatabase() {
                     context.applicationContext,
                     ForgeCityDatabase::class.java,
                     "forgecity.db",
-                ).fallbackToDestructiveMigration(dropAllTables = true)
+                )
+                    .addMigrations(ForgeCityMigrations.MIGRATION_1_2)
                     .build()
                     .also { instance = it }
             }

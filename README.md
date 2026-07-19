@@ -63,9 +63,10 @@ badges, cloud sync, and `QUERY_ALL_PACKAGES`. App discovery uses launcher-intent
 
 ## Next (blocks annotated `v0.2.0`)
 
-1. Realme P2 Pro device E2E — checklist in [docs/OPS.md](docs/OPS.md)
-2. Proper Room `Migration(1,2)` (replace destructive fallback before non-debug)
-3. Merge [PR #1](https://github.com/sivaram311/forgecity-launcher/pull/1) after E2E GO
+1. Realme P2 Pro device E2E — checklist in [docs/OPS.md](docs/OPS.md) (`adb devices` empty on build host as of 2026-07-19)
+2. Merge [PR #1](https://github.com/sivaram311/forgecity-launcher/pull/1) after E2E GO
+
+Room `Migration(1,2)` is landed (destructive fallback removed).
 
 ## Requirements
 

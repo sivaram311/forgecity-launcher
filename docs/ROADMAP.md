@@ -182,7 +182,7 @@ See `agents/crew/CREW.md` and `agents/roles/`.
 | QA & Optimization | Battery/thermal/a11y gates |
 
 **Suggested next crew task:** Realme P2 Pro device E2E (#16) against
-`v0.2.0-awakening-dev`, then Room `Migration(1,2)` before merge / annotated tag.
+`v0.2.0-awakening-dev` / tip APK; then merge PR #1.
 
 ---
 
@@ -209,11 +209,12 @@ See `agents/crew/CREW.md` and `agents/roles/`.
 
 ## 9. Immediate next actions
 
-1. **Device lab:** install `v0.2.0-awakening-dev` on Realme P2 Pro; run [OPS.md](OPS.md) checklist (CONSCIOUS #16).
-2. **Data:** replace `fallbackToDestructiveMigration` with Room `Migration(1,2)` for `building_stats` + `lastHarvestEpoch`.
-3. **Merge:** land [PR #1](https://github.com/sivaram311/forgecity-launcher/pull/1) after E2E GO + Reviewer #17.
-4. **Tag:** annotated `v0.2.0` only after device GO (not another debug-only tag).
-5. **Wave 3 / Phase 3:** weather emitter + quest map markers + chapter JSON packs (after Awakening gate).
+1. **Device lab:** connect Realme P2 Pro (`adb devices`), install `v0.2.0-awakening-dev` (or tip APK), run [OPS.md](OPS.md) checklist (CONSCIOUS #16). *Build host had no device attached 2026-07-19.*
+2. **Merge:** land [PR #1](https://github.com/sivaram311/forgecity-launcher/pull/1) after E2E GO + Reviewer #17.
+3. **Tag:** annotated `v0.2.0` only after device GO (not another debug-only tag).
+4. **Wave 3 / Phase 3:** weather emitter + quest map markers + chapter JSON packs (after Awakening gate).
+
+**Done this turn:** Room `Migration(1,2)` + removed `fallbackToDestructiveMigration`.
 
 ---
 

@@ -135,4 +135,4 @@ Lead merges when unit tests + Reviewer #17 GO; device E2E is a separate hire wit
 | 4 Symphony | `v0.4.0` | E+A+B+F | Device E2E required |
 | 5 Stable | `v1.0.0` | all | Promote evidence if distributed beyond sideload |
 
-**Current hire focus:** Stream F (P2 Pro E2E) + Stream C (`Migration(1,2)`).
+**Current hire focus:** Stream F (P2 Pro E2E when device available). Stream C Migration(1,2) ✅.

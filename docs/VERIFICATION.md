@@ -93,7 +93,17 @@ Parallel plan: `docs/PARALLEL-EXECUTION.md`
 | PR #1 → `main` | OPEN |
 | Tag `v0.2.0-awakening-dev` | PUBLISHED (prerelease, debug-signed) |
 | Realme P2 Pro E2E (#16) | **PENDING — next gate** |
-| Room `Migration(1,2)` | **PENDING** (destructive fallback still OK for debug only) |
-| Annotated `v0.2.0` | BLOCKED until E2E + migration + Reviewer GO |
+| Room Migration(1,2) | ✅ landed | `ForgeCityMigrations.MIGRATION_1_2`; no destructive fallback |
+| Annotated `v0.2.0` | BLOCKED until E2E + Reviewer GO |
 
 Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
+
+## 2026-07-19 — Room Migration(1,2)
+
+| Check | Result | Notes |
+|------|--------|-------|
+| `ForgeCityMigrations.MIGRATION_1_2` | LANDED | Adds `lastHarvestEpoch` + `building_stats` |
+| Destructive fallback removed | LANDED | `addMigrations` only |
+| Unit tests | PASS | `ForgeCityMigrationsTest` + full `testDebugUnitTest` |
+| `assembleDebug` | PASS | Tip after migration |
+| `adb devices` | EMPTY | No Realme attached — #16 still PENDING |

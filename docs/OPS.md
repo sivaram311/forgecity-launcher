@@ -87,5 +87,5 @@ adb shell am start -a android.settings.HOME_SETTINGS
 
 Sandbox DEV only. No host ports / Postgres / CSS for this APK.  
 **Debug prerelease** (`v0.2.0-awakening-dev`) is published for sideload.  
-**Annotated `v0.2.0` / non-debug** requires: device E2E GO + Room Migration(1,2)
-+ Reviewer #17.
+**Annotated `v0.2.0` / non-debug** requires: device E2E GO + Reviewer #17.  
+Room `Migration(1,2)` is in tip (destructive fallback removed).

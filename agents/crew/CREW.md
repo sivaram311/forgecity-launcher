@@ -35,10 +35,10 @@ Prerelease: `v0.2.0-awakening-dev`
 |------|--------|-------|
 | Wave 1 | ✅ landed | day/night, fly-in, UsageStats/WorkManager, launch levels |
 | Wave 2 | ✅ landed | particles, animated counters, Room levels, quest stubs, debounce |
-| Device E2E (#16) | ⏳ **NEXT** | blocks merge + annotated `v0.2.0` |
-| Room Migration(1,2) | ⏳ next | replace destructive fallback before non-debug |
+| Device E2E (#16) | ⏳ **NEXT** | blocks merge + annotated `v0.2.0` (no phone on build host) |
+| Room Migration(1,2) | ✅ landed | destructive fallback removed |
 
-**Hire next:** QA & Optimization (P2 Pro lab) in parallel with Data (Migration 1→2).
+**Hire next:** QA & Optimization (P2 Pro lab) when device is available.
 
 ## In-launcher living agents (Phase 4+)
 
