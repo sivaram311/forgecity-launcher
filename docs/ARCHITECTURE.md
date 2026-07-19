@@ -1,8 +1,8 @@
 # ForgeCity architecture
 
-**Status:** Forge Assistant + Background Video asset (`0.3.3-background-video-asset-dev`)
-**Primary device:** Realme P2 Pro 5G â€” Snapdragon 7s Gen 2 / Adreno 710 / 120 Hz
-**Auth / ports / DB env:** none (on-device Android app; no CSS, no host port)
+**Status:** Forge Assistant + Background Video + Tamil Agent Portal rewrite (`0.4.0-tamil-agent-dev`)
+**Primary device:** Realme P2 Pro 5G — Snapdragon 7s Gen 2 / Adreno 710 / 120 Hz
+**Auth / ports / DB env:** on-device app; optional HTTPS to Agent Portal rewrite endpoint (dedicated key)
 
 ## Stack
 
@@ -14,22 +14,24 @@
 | App discovery | `PackageManager` launcher intents + `<queries>` |
 | Persistence | Room v3 + migrations 1â†’2â†’3; SharedPreferences for assistant/atmosphere |
 | Background | WorkManager + UsageStats (Phase 2) |
-| Assistant | NotificationListenerService + local TTS; hybrid AI remains future |
+| Assistant | Explicit OFF / direct device-locale TTS / Agent Portal Tamil modes |
+| Launcher chrome | Persisted hidden-by-default overlay; always-present 48 dp safe-area toggle |
 
 ## Package map
 
 ```text
 buzz.delena.forgecity
-â”œâ”€â”€ MainActivity / ForgeCityApp
-â”œâ”€â”€ city/          Districts, IsoMath, DayNightCycle, classifier, state
-â”œâ”€â”€ launcher/      AppCatalog (query + launch + grid placement)
-â”œâ”€â”€ data/          Room entities, DAO, DB, Migrations(1â†’2), repository
-â”œâ”€â”€ usage/         UsageStats harvest, XP math, LaunchTracker, WorkManager
-â”œâ”€â”€ power/         AnimationBudget (PowerManager gate)
-â”œâ”€â”€ assistant/     Notification listener, TTS, settings, quiet hours
-â”œâ”€â”€ story/         Chapter briefings + starter quests
-â””â”€â”€ ui/            Compose home screen, city canvas, ViewModel
-    â””â”€â”€ background/ Media3 player + lifecycle-aware video composable
+├── MainActivity / ForgeCityApp
+├── city/          Districts, IsoMath, DayNightCycle, classifier, state
+├── launcher/      AppCatalog (query + launch + grid placement)
+├── data/          Room entities, DAO, DB, Migrations(1→2), repository
+├── usage/         UsageStats harvest, XP math, LaunchTracker, WorkManager
+├── power/         AnimationBudget (PowerManager gate)
+├── assistant/     Notification listener, TTS, settings, quiet hours
+│   └── rewrite/   Agent Portal HTTPS client, RAM queue, Tamil contract
+├── story/         Chapter briefings + starter quests
+└── ui/            Compose home screen, city canvas, ViewModel
+    └── background/ Media3 player + lifecycle-aware video composable
 ```
 
 Parallel streams: [PARALLEL-EXECUTION.md](PARALLEL-EXECUTION.md).
@@ -58,6 +60,18 @@ MVP classifier uses package/label heuristics; user overrides come later.
 - Prefer `graphicsLayer` / transform gestures over layout thrash.
 - Cap simultaneous particle emitters; profile on device before Filament upgrade.
 
+## Launcher chrome and speech routing
+
+`CityCanvas` and the background layers are always composed and interactive.
+Chapter/resources/settings/search/dock/hints/notification overlays use
+`AnimatedVisibility`; fresh installs hide them. A top-end chip stays outside
+that visibility gate, uses status-bar insets, and exposes TalkBack state.
+
+`AssistantSettingsStore` migrates legacy TTS/rewrite booleans to one persisted
+`AssistantSpeechMode`. Direct mode builds a local filtered line and never
+creates a network request. Portal Tamil mode alone enters the bounded no-store
+rewrite queue and selects `ta-IN`/`ta`; any failure remains silent.
+
 ## Permissions policy
 
 | Permission | MVP | Notes |
@@ -65,7 +79,8 @@ MVP classifier uses package/label heuristics; user overrides come later.
 | Launcher `<queries>` | Yes | Sufficient for home-screen app listing |
 | `PACKAGE_USAGE_STATS` | Declared | Used in Phase 2 XP; requires Settings grant |
 | `QUERY_ALL_PACKAGES` | No | Sideload-only option later; Play-restricted |
-| Notification listener | Yes | User-granted; deny-by-default allowlist, TTS off by default |
+| Notification listener | Yes | User-granted; deny-by-default allowlist, speech OFF by default |
+| `INTERNET` | Yes | Only for opt-in Agent Portal Tamil rewrite HTTPS |
 
 ## Phase plan
 

@@ -5,7 +5,7 @@ Apps become buildings. Habits rebuild districts. A neon city assistant can read
 notifications aloud when you opt in.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher (public)
-**Branch:** `main` · version `0.3.3-background-video-asset-dev`
+**Branch:** `main` tip still `0.3.3` published · **local tip** `0.4.0-tamil-agent-dev` (Tamil Agent Portal rewrite)
 **Latest prerelease:** [`v0.3.3-background-video-asset-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.3.3-background-video-asset-dev) (PR #5 merged)
 
 ## Download
@@ -25,24 +25,23 @@ Get-FileHash .\forgecity-0.3.3-background-video-asset-dev-debug.apk -Algorithm S
 adb install -r .\forgecity-0.3.3-background-video-asset-dev-debug.apk
 ```
 
-## What works in 0.3.3-background-video-asset-dev
+## What works in 0.4.0-tamil-agent-dev (local tip)
 
-- Bundled original procedural `city_background.mp4` (1080×1920 H.264, 10s, muted, ~3.0 MB)
-- Media3 ExoPlayer full-screen looping video layer beneath `CityCanvas`
-- Persisted Background Video toggle and 40–100% opacity slider
-- Lifecycle pause/resume, mute, local-media low buffer, power-save/screen-off gating
-- Runtime lookup still falls back to day/night gradient if the raw asset is removed
-- Sparse isometric city + depth-sorted AABB hit testing + press glow
-- Favorites dock (long-press pin/unpin, max 6, Room `building_stats.isFavorite`)
-- Neon assistant bubble + NotificationListenerService
-- Privacy-first TTS (off by default, empty allowlist, editable quiet hours, never persists bodies)
-- Assistant bubble invokes the notification's exact `contentIntent`, with app-launch fallback
-- Dusk purple→orange sky, power-grid lines, chapter card, level growth animation
-- Phase 2: UsageStats XP, day/night, fly-in, harvest debounce, Migration(1,2)+`(2,3)`
+- Immersive city-first launcher: chrome is hidden by default and a persistent
+  48 dp safe-area `UI +` / `UI −` chip restores or hides controls
+- Persisted speech mode: `OFF` (default), device-locale `DIRECT_TTS`, or
+  fail-closed `AGENT_PORTAL_TAMIL`, including legacy preference migration
+- **P0:** Eligible notifications → Agent Portal no-store Tamil rewrite → Tamil TTS
+- Opt-in Portal mode + encrypted `X-ForgeCity-Key` + HTTPS endpoint
+- Bounded RAM queue, coalesce by notification key, silent fail-closed (no English TTS fallback)
+- Tamil locale TTS (`ta-IN` / `ta`); no default-locale speech for rewrite path
+- **No Cloudflare Workers AI** in the launcher
+- All prior `0.3.3` features (video background, assistant bubble, favorites, UsageStats XP)
 
 ## Spec
 
-See [docs/IMPLEMENTATION-SPEC.md](docs/IMPLEMENTATION-SPEC.md) and
+See [docs/TAMIL-REWRITE-SPEC.md](docs/TAMIL-REWRITE-SPEC.md),
+[docs/IMPLEMENTATION-SPEC.md](docs/IMPLEMENTATION-SPEC.md), and
 [docs/BACKGROUND-VIDEO-SPEC.md](docs/BACKGROUND-VIDEO-SPEC.md).
 
 ## Build
@@ -61,3 +60,5 @@ See [docs/IMPLEMENTATION-SPEC.md](docs/IMPLEMENTATION-SPEC.md) and
 | [docs/VERIFICATION.md](docs/VERIFICATION.md) | Evidence record |
 | [docs/IMPLEMENTATION-SPEC.md](docs/IMPLEMENTATION-SPEC.md) | Assistant upgrade spec |
 | [docs/BACKGROUND-VIDEO-SPEC.md](docs/BACKGROUND-VIDEO-SPEC.md) | Media3 background contract |
+| [docs/TAMIL-REWRITE-SPEC.md](docs/TAMIL-REWRITE-SPEC.md) | **P0** Agent Portal Tamil rewrite + TTS |
+| [docs/GLM-IMPLEMENTATION-PLAN.md](docs/GLM-IMPLEMENTATION-PLAN.md) | Older plan — Cloudflare Workers AI path **rejected** for launcher |

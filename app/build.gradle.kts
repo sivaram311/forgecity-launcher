@@ -15,8 +15,8 @@ android {
         applicationId = "buzz.delena.forgecity"
         minSdk = 26
         targetSdk = 35
-        versionCode = 6
-        versionName = "0.3.3-background-video-asset-dev"
+        versionCode = 7
+        versionName = "0.4.0-tamil-agent-dev"
     }
 
     buildTypes {

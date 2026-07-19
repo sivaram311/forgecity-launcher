@@ -20,19 +20,28 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import buzz.delena.forgecity.assistant.AssistantSpeechMode
 import buzz.delena.forgecity.assistant.AssistantUiEvent
 import kotlinx.coroutines.delay
 
@@ -122,14 +131,18 @@ fun CityAssistantOverlay(
 fun AssistantSettingsCard(
     hasNotificationAccess: Boolean,
     assistantEnabled: Boolean,
-    ttsEnabled: Boolean,
+    speechMode: AssistantSpeechMode,
+    rewriteEndpoint: String,
+    apiKeyConfigured: Boolean,
     backgroundVideoEnabled: Boolean,
     backgroundVideoOpacity: Float,
     quietLabel: String,
     allowCount: Int,
     onOpenNotificationAccess: () -> Unit,
     onToggleAssistant: () -> Unit,
-    onToggleTts: () -> Unit,
+    onCycleSpeechMode: () -> Unit,
+    onRewriteEndpointChange: (String) -> Unit,
+    onSaveApiKey: (String) -> Unit,
     onToggleBackgroundVideo: () -> Unit,
     onBackgroundVideoOpacityChange: (Float) -> Unit,
     onQuietStartEarlier: () -> Unit,
@@ -139,6 +152,7 @@ fun AssistantSettingsCard(
     onOpenAllowlist: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var apiKeyDraft by remember { mutableStateOf("") }
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -159,7 +173,72 @@ fun AssistantSettingsCard(
             )
         }
         SettingRow("Assistant visible", assistantEnabled, onToggleAssistant)
-        SettingRow("Read aloud (TTS)", ttsEnabled, onToggleTts)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onCycleSpeechMode)
+                .padding(vertical = 6.dp),
+        ) {
+            Text("Speech mode", color = Color(0xFFFFF6F0), fontSize = 12.sp)
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = when (speechMode) {
+                    AssistantSpeechMode.OFF -> "OFF"
+                    AssistantSpeechMode.DIRECT_TTS -> "DIRECT"
+                    AssistantSpeechMode.AGENT_PORTAL_TAMIL -> "PORTAL தமிழ்"
+                },
+                color = Color(0xFFE8A15A),
+                fontSize = 11.sp,
+                fontWeight = FontWeight.SemiBold,
+            )
+        }
+        Text(
+            text = "Tap to cycle: off → device-locale direct TTS → Agent Portal Tamil. " +
+                "Portal mode uses store=false and fails closed silently.",
+            color = Color(0x88FFF6F0),
+            fontSize = 10.sp,
+        )
+        RemoteTextField(
+            value = rewriteEndpoint,
+            onValueChange = onRewriteEndpointChange,
+            placeholder = "https://portal.example/api/forgecity/rewrite",
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        RemoteTextField(
+            value = apiKeyDraft,
+            onValueChange = { apiKeyDraft = it },
+            placeholder = "X-ForgeCity-Key",
+            secret = true,
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(
+                if (apiKeyConfigured) "API key configured" else "No API key saved",
+                color = if (apiKeyConfigured) Color(0xFF4FD1C5) else Color(0x99FFF6F0),
+                fontSize = 10.sp,
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                "Save key",
+                color = Color(0xFFE8A15A),
+                fontSize = 11.sp,
+                modifier = Modifier
+                    .clickable {
+                        onSaveApiKey(apiKeyDraft)
+                        apiKeyDraft = ""
+                    }
+                    .padding(8.dp),
+            )
+        }
+        Text(
+            "Saved keys are encrypted by Android Keystore and are never displayed. " +
+                "Saving an empty field clears the key.",
+            color = Color(0x77FFF6F0),
+            fontSize = 9.sp,
+        )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = "Atmosphere",
@@ -213,11 +292,44 @@ fun AssistantSettingsCard(
                 .padding(top = 4.dp, bottom = 2.dp),
         )
         Text(
-            text = "Privacy: TTS off & empty allowlist by default. Bodies never saved.",
+            text = "Privacy defaults: speech off, allowlist empty. " +
+                "Notification text and Tamil replies are never persisted or logged.",
             color = Color(0x77FFF6F0),
             fontSize = 10.sp,
         )
     }
+}
+
+@Composable
+private fun RemoteTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String,
+    secret: Boolean = false,
+) {
+    BasicTextField(
+        value = value,
+        onValueChange = onValueChange,
+        singleLine = true,
+        textStyle = TextStyle(color = Color(0xFFFFF6F0), fontSize = 10.sp),
+        cursorBrush = SolidColor(Color(0xFFE8A15A)),
+        visualTransformation = if (secret) PasswordVisualTransformation() else {
+            androidx.compose.ui.text.input.VisualTransformation.None
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 4.dp)
+            .background(Color(0x66302A38), RoundedCornerShape(8.dp))
+            .padding(horizontal = 8.dp, vertical = 7.dp),
+        decorationBox = { inner ->
+            Box(contentAlignment = Alignment.CenterStart) {
+                if (value.isEmpty()) {
+                    Text(placeholder, color = Color(0x66FFF6F0), fontSize = 10.sp)
+                }
+                inner()
+            }
+        },
+    )
 }
 
 @Composable

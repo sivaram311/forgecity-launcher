@@ -199,3 +199,21 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | Release assets | PASS | APK + `.sha256`; download round-trip hash matched |
 | Bundled MP4 | PASS | procedural `city_background.mp4` in `res/raw` |
 | Realme E2E (#16) | PENDING | Blocks annotated production tags |
+
+
+## 2026-07-19 — Tamil Agent Portal rewrite 0.4.0-dev (local)
+
+| Check | Result | Notes |
+|------|--------|-------|
+| Grok architecture | PASS | Phone→HTTPS Agent Portal; no Cloudflare; no desktop CLI on device |
+| Portal endpoint | PASS | `POST /api/integrations/forgecity/tamil-rewrite`; dedicated `X-ForgeCity-Key`; no ChatMessage persistence |
+| Android pipeline | PASS | RAM queue, encrypted key, Tamil TTS `ta-IN`/`ta`, silent fail-closed |
+| Contract alignment | PASS | `schemaVersion` / `tamil` (not `tamilText`) |
+| Immersive chrome | SOURCE PASS | Hidden default; persistent 48 dp safe-area chip; canvas remains composed |
+| Speech migration/routing | UNIT PASS | OFF / DIRECT / PORTAL enum; legacy mapping; direct path has no client call |
+| `testDebugUnitTest` | PASS | Migration, routing, hidden default, parser, queue and existing suites |
+| `lintDebug` | PASS | |
+| `assembleDebug` | PASS | `0.4.0-tamil-agent-dev` / versionCode 7 |
+| APK SHA-256 | `E4C3E161D464D2AC15994AE91F5880FB160B7D99F775743A98A81F9224497AD8` | local debug artifact before release publish |
+| Cloudflare Workers AI | REJECTED | product ban for launcher |
+| Realme 360×780 immersive + speech E2E | PENDING | No physical run claimed; needs device + enabled portal env |

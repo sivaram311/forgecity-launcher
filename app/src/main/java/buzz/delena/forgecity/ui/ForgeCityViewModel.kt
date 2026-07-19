@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import buzz.delena.forgecity.assistant.AssistantEventBridge
+import buzz.delena.forgecity.assistant.AssistantSpeechMode
 import buzz.delena.forgecity.assistant.AssistantSettingsStore
 import buzz.delena.forgecity.assistant.AssistantUiEvent
 import buzz.delena.forgecity.assistant.NotificationAccess
@@ -55,8 +56,14 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
     private val _assistantEnabled = MutableStateFlow(assistantSettings.assistantEnabled)
     val assistantEnabled: StateFlow<Boolean> = _assistantEnabled.asStateFlow()
 
-    private val _ttsEnabled = MutableStateFlow(assistantSettings.ttsEnabled)
-    val ttsEnabled: StateFlow<Boolean> = _ttsEnabled.asStateFlow()
+    private val _speechMode = MutableStateFlow(assistantSettings.speechMode)
+    val speechMode: StateFlow<AssistantSpeechMode> = _speechMode.asStateFlow()
+
+    private val _rewriteEndpoint = MutableStateFlow(assistantSettings.rewriteEndpoint)
+    val rewriteEndpoint: StateFlow<String> = _rewriteEndpoint.asStateFlow()
+
+    private val _apiKeyConfigured = MutableStateFlow(assistantSettings.hasApiKey)
+    val apiKeyConfigured: StateFlow<Boolean> = _apiKeyConfigured.asStateFlow()
 
     private val _allowCount = MutableStateFlow(assistantSettings.allowedPackages().size)
     val allowCount: StateFlow<Int> = _allowCount.asStateFlow()
@@ -71,6 +78,10 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
     private val _backgroundVideoOpacity =
         MutableStateFlow(assistantSettings.backgroundVideoOpacity)
     val backgroundVideoOpacity: StateFlow<Float> = _backgroundVideoOpacity.asStateFlow()
+
+    private val _launcherChromeVisible =
+        MutableStateFlow(assistantSettings.launcherChromeVisible)
+    val launcherChromeVisible: StateFlow<Boolean> = _launcherChromeVisible.asStateFlow()
 
     private val _showAllowlist = MutableStateFlow(false)
     val showAllowlist: StateFlow<Boolean> = _showAllowlist.asStateFlow()
@@ -94,7 +105,7 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
         }
         viewModelScope.launch {
             AssistantEventBridge.events.collect { event ->
-                _assistantEvent.value = event
+                if (_launcherChromeVisible.value) _assistantEvent.value = event
             }
         }
         refreshApps()
@@ -124,7 +135,9 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
         _hasUsageAccess.value = harvester.hasUsageAccess()
         _hasNotificationAccess.value = NotificationAccess.hasAccess(getApplication())
         _assistantEnabled.value = assistantSettings.assistantEnabled
-        _ttsEnabled.value = assistantSettings.ttsEnabled
+        _speechMode.value = assistantSettings.speechMode
+        _rewriteEndpoint.value = assistantSettings.rewriteEndpoint
+        _apiKeyConfigured.value = assistantSettings.hasApiKey
         _allowCount.value = assistantSettings.allowedPackages().size
         _quietLabel.value = formatQuietLabel()
         _backgroundVideoEnabled.value = assistantSettings.backgroundVideoEnabled
@@ -174,9 +187,19 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
         _assistantEnabled.value = assistantSettings.assistantEnabled
     }
 
-    fun toggleTts() {
-        assistantSettings.ttsEnabled = !assistantSettings.ttsEnabled
-        _ttsEnabled.value = assistantSettings.ttsEnabled
+    fun cycleSpeechMode() {
+        assistantSettings.speechMode = assistantSettings.speechMode.next()
+        _speechMode.value = assistantSettings.speechMode
+    }
+
+    fun setRewriteEndpoint(value: String) {
+        assistantSettings.rewriteEndpoint = value
+        _rewriteEndpoint.value = assistantSettings.rewriteEndpoint
+    }
+
+    fun saveApiKey(value: String) {
+        assistantSettings.saveApiKey(value)
+        _apiKeyConfigured.value = assistantSettings.hasApiKey
     }
 
     fun toggleBackgroundVideo() {
@@ -188,6 +211,16 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
     fun setBackgroundVideoOpacity(opacity: Float) {
         assistantSettings.backgroundVideoOpacity = opacity
         _backgroundVideoOpacity.value = assistantSettings.backgroundVideoOpacity
+    }
+
+    fun toggleLauncherChrome() {
+        assistantSettings.launcherChromeVisible = !assistantSettings.launcherChromeVisible
+        _launcherChromeVisible.value = assistantSettings.launcherChromeVisible
+        if (!_launcherChromeVisible.value) {
+            closeAllowlist()
+            dismissAssistantEvent()
+            _query.value = ""
+        }
     }
 
     fun shiftQuietStart(deltaMinutes: Int) {

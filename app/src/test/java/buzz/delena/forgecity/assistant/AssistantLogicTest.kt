@@ -1,6 +1,7 @@
 package buzz.delena.forgecity.assistant
 
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -77,5 +78,63 @@ class NotificationDedupeTest {
         assertFalse(dedupe.shouldProcess("a"))
         now += 4_000L
         assertTrue(dedupe.shouldProcess("a"))
+    }
+}
+
+class AssistantSpeechModeTest {
+    @Test
+    fun migratesLegacyFlagsToOneExplicitMode() {
+        assertEquals(
+            AssistantSpeechMode.AGENT_PORTAL_TAMIL,
+            AssistantSpeechMode.migrate(ttsEnabled = true, remoteRewriteEnabled = true),
+        )
+        assertEquals(
+            AssistantSpeechMode.DIRECT_TTS,
+            AssistantSpeechMode.migrate(ttsEnabled = true, remoteRewriteEnabled = false),
+        )
+        assertEquals(
+            AssistantSpeechMode.OFF,
+            AssistantSpeechMode.migrate(ttsEnabled = false, remoteRewriteEnabled = true),
+        )
+    }
+
+    @Test
+    fun modeCycleIsStable() {
+        assertEquals(AssistantSpeechMode.DIRECT_TTS, AssistantSpeechMode.OFF.next())
+        assertEquals(
+            AssistantSpeechMode.AGENT_PORTAL_TAMIL,
+            AssistantSpeechMode.DIRECT_TTS.next(),
+        )
+        assertEquals(AssistantSpeechMode.OFF, AssistantSpeechMode.AGENT_PORTAL_TAMIL.next())
+    }
+
+    @Test
+    fun routesDirectWithoutPortalAndPortalOnlyWhenConfigured() {
+        assertEquals(
+            NotificationSpeechRoute.DIRECT,
+            NotificationSpeechRoute.resolve(
+                AssistantSpeechMode.DIRECT_TTS,
+                portalConfigured = false,
+            ),
+        )
+        assertEquals(
+            NotificationSpeechRoute.NONE,
+            NotificationSpeechRoute.resolve(
+                AssistantSpeechMode.AGENT_PORTAL_TAMIL,
+                portalConfigured = false,
+            ),
+        )
+        assertEquals(
+            NotificationSpeechRoute.AGENT_PORTAL_TAMIL,
+            NotificationSpeechRoute.resolve(
+                AssistantSpeechMode.AGENT_PORTAL_TAMIL,
+                portalConfigured = true,
+            ),
+        )
+    }
+
+    @Test
+    fun launcherChromeDefaultsHidden() {
+        assertFalse(LauncherChromeDefaults.VISIBLE)
     }
 }
