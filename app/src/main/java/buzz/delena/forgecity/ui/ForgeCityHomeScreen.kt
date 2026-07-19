@@ -73,7 +73,7 @@ fun ForgeCityHomeScreen(
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
             )
-            Spacer(Modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = state.briefing,
                 color = Color(0xD9FFF6F0),
