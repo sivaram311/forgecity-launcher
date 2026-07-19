@@ -70,6 +70,6 @@ MVP classifier uses package/label heuristics; user overrides come later.
 DEV-only sandbox project. No F:/G: deploy, no nginx host, no CSS client until a
 companion web console is explicitly requested.
 
-Remote: https://github.com/sivaram311/forgecity-launcher (private). Branch pushes
+Remote: https://github.com/sivaram311/forgecity-launcher (public). Branch pushes
 require Reviewer SIGN-OFF (CONSCIOUS #17). APK tags also need DEV device E2E
-(#14–#16) once Android SDK is available.
+(#14–#16) once a Realme P2 Pro is available for physical smoke.

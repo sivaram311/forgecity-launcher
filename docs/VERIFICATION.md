@@ -22,7 +22,7 @@ platform 35, build-tools 35.0.0, platform-tools).
 | APK badging | PASS | pkg `buzz.delena.forgecity` · v `0.1.0-mvp` · label ForgeCity · HOME launchable |
 | Release asset | PUBLISHED | `forgecity-0.1.0-mvp-debug.apk` (10.9 MB) + `.sha256` on tag `v0.1.0-mvp` (prerelease) |
 | Download round-trip | PASS | `gh release download` re-fetch SHA-256 matches build hash exactly |
-| Public accessibility | PRIVATE | Repo is private; links need GitHub auth. Make repo public for anonymous download |
+| Public accessibility | PUBLIC | Repo visibility set public 2026-07-19; anonymous APK HEAD returns 200 |
 | Realme device E2E (#14–#16) | PENDING | Debug prerelease; device run required before any non-debug release |
 
 Build command:

@@ -4,7 +4,7 @@ A story-driven isometric city home screen for Realme P2 / P2 Pro (ColorOS).
 Apps become buildings. Habits rebuild districts. Chapter 1 (**Embers**) ships as
 the MVP city shell.
 
-**Repo:** https://github.com/sivaram311/forgecity-launcher (private)  
+**Repo:** https://github.com/sivaram311/forgecity-launcher (public)  
 **Branch:** `feature/mvp-city-shell` · version `0.1.0-mvp`
 
 ## Download
@@ -18,19 +18,13 @@ Prerelease debug build (sideload for testing on Realme P2 Pro / Android 8.0+):
 This is a **debug-signed prerelease** for testing only. On-device Realme E2E is
 still pending, and no production (upload-key) signing has been applied.
 
-> The repo is **private**, so the download links require a signed-in GitHub
-> account with access. With the `gh` CLI:
->
-> ```powershell
-> gh release download v0.1.0-mvp --repo sivaram311/forgecity-launcher --pattern "*.apk"
-> ```
->
-> For anonymous public downloads, the repo must be made public first.
-
 Verify the hash before installing:
 
 ```powershell
+curl.exe -L -o forgecity-0.1.0-mvp-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.1.0-mvp/forgecity-0.1.0-mvp-debug.apk
 Get-FileHash .\forgecity-0.1.0-mvp-debug.apk -Algorithm SHA256
+# expect 073C495949BD52BB1FD9AD09ACBF1A65339F80F6F150B2B3F282960B86C2209A
 adb install -r .\forgecity-0.1.0-mvp-debug.apk
 ```
 
