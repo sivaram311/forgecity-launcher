@@ -5,28 +5,31 @@ Apps become buildings. Habits rebuild districts. A neon city assistant can read
 notifications aloud when you opt in.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher (public)
-**Branch:** `main` · version `0.4.1-tts-diagnostics-dev`
-**Latest prerelease:** [`v0.4.1-tts-diagnostics-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.4.1-tts-diagnostics-dev)
+**Branch:** `main` · version `0.4.2-rewrite-contract-fix-dev`
+**Latest prerelease:** [`v0.4.2-rewrite-contract-fix-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.4.2-rewrite-contract-fix-dev)
 
 ## Download
 
 Latest debug prerelease (sideload):
 
 - Releases: https://github.com/sivaram311/forgecity-launcher/releases
-- Tag target: `v0.4.1-tts-diagnostics-dev`
+- Tag target: `v0.4.2-rewrite-contract-fix-dev`
 
 This is **debug-signed**. Realme P2 Pro E2E (#16) is still pending for any annotated production tag.
 
 ```powershell
-curl.exe -L -o forgecity-0.4.1-tts-diagnostics-dev-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.4.1-tts-diagnostics-dev/forgecity-0.4.1-tts-diagnostics-dev-debug.apk
-Get-FileHash .\forgecity-0.4.1-tts-diagnostics-dev-debug.apk -Algorithm SHA256
-# expect 2CBFABC5BB4942719EAAC04A60BAAA9E0DC7A4F67413FE8EB9696C992855FAAF
-adb install -r .\forgecity-0.4.1-tts-diagnostics-dev-debug.apk
+curl.exe -L -o forgecity-0.4.2-rewrite-contract-fix-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.4.2-rewrite-contract-fix-dev/forgecity-0.4.2-rewrite-contract-fix-dev-debug.apk
+Get-FileHash .\forgecity-0.4.2-rewrite-contract-fix-dev-debug.apk -Algorithm SHA256
+# expect 476089BE96B3BCBAA7793D45AB865C8D7347772776FB5CDFD45F8DFD647C8F91
+adb install -r .\forgecity-0.4.2-rewrite-contract-fix-dev-debug.apk
 ```
 
-## What works in 0.4.1-tts-diagnostics-dev
+## What works in 0.4.2-rewrite-contract-fix-dev
 
+- **Fix:** rewrite request now sends exactly the 5 server-contract fields; the
+  invalid `store` body field (which caused HTTP 400 `invalid_request` →
+  "PORTAL failed") is removed. `no-store` is enforced via the request header.
 - `TEST TTS` runs the selected mode: OFF diagnosis, direct device TTS, or
   PROD-compatible Agent Portal rewrite followed by Tamil TTS
 - Saved API key is visible in config for device setup (still encrypted at rest)

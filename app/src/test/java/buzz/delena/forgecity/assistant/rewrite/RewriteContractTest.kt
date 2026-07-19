@@ -56,7 +56,7 @@ class RewriteResponseParserTest {
 
 class RewriteRequestTest {
     @Test
-    fun includesNoStoreAndEscapesNotificationText() {
+    fun escapesNotificationTextAndOmitsKey() {
         val json = RewriteRequest(
             notificationKey = "memory-only",
             appLabel = "Chat",
@@ -64,10 +64,26 @@ class RewriteRequestTest {
             body = "line one\nline two",
         ).toJson()
 
-        assertTrue(json.contains("\"store\":false"))
         assertTrue(json.contains("""A \"title\""""))
         assertTrue(json.contains("""line one\nline two"""))
         assertFalse(json.contains("memory-only"))
+    }
+
+    @Test
+    fun sendsExactlyTheServerContractFields() {
+        val json = RewriteRequest(
+            notificationKey = "k",
+            appLabel = "Chat",
+            title = "Title",
+            body = "Body",
+        ).toJson()
+
+        val keys = Regex("\"(\\w+)\":").findAll(json).map { it.groupValues[1] }.toSet()
+        assertEquals(
+            setOf("schemaVersion", "appLabel", "title", "text", "maxChars"),
+            keys,
+        )
+        assertFalse("must not send unsupported store field", json.contains("store"))
     }
 }
 

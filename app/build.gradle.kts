@@ -15,8 +15,8 @@ android {
         applicationId = "buzz.delena.forgecity"
         minSdk = 26
         targetSdk = 35
-        versionCode = 8
-        versionName = "0.4.1-tts-diagnostics-dev"
+        versionCode = 9
+        versionName = "0.4.2-rewrite-contract-fix-dev"
     }
 
     buildTypes {

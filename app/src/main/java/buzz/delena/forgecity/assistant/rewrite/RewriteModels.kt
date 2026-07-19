@@ -11,8 +11,6 @@ data class RewriteRequest(
             append('{')
             appendJson("schemaVersion", 1)
             append(',')
-            appendJson("store", false)
-            append(',')
             appendJson("appLabel", appLabel.take(MAX_APP_LABEL))
             append(',')
             appendJson("title", title.take(MAX_TITLE))
@@ -30,10 +28,6 @@ data class RewriteRequest(
     }
 
     private fun StringBuilder.appendJson(key: String, value: Int) {
-        append('"').append(key).append('"').append(':').append(value)
-    }
-
-    private fun StringBuilder.appendJson(key: String, value: Boolean) {
         append('"').append(key).append('"').append(':').append(value)
     }
 

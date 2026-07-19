@@ -253,3 +253,15 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | `assembleDebug` | PASS | |
 | APK SHA-256 | `2CBFABC5BB4942719EAAC04A60BAAA9E0DC7A4F67413FE8EB9696C992855FAAF` | `dist/forgecity-0.4.1-tts-diagnostics-dev-debug.apk` |
 | Physical TEST TTS | PENDING | No adb device attached; debug prerelease only |
+
+## 2026-07-20 — 0.4.2 rewrite contract fix
+
+| Check | Result | Notes |
+|------|--------|-------|
+| Root cause | CONFIRMED | App sent 6-field body incl. `store:false`; server (`ForgeCityRewriteContract`) requires exactly 5 → HTTP 400 `invalid_request` → app `Unavailable` |
+| curl repro | PASS | PROD: with `store` → 400; without `store` → 200 + Tamil (same key) |
+| Fix | PASS | `RewriteRequest.toJson()` emits exactly `schemaVersion,appLabel,title,text,maxChars`; `no-store` stays a header |
+| Regression test | PASS | `sendsExactlyTheServerContractFields` asserts key set and no `store` |
+| `testDebugUnitTest` / `lintDebug` / `assembleDebug` | PASS | versionCode 9 / `0.4.2-rewrite-contract-fix-dev` |
+| APK SHA-256 | `476089BE96B3BCBAA7793D45AB865C8D7347772776FB5CDFD45F8DFD647C8F91` | `dist/forgecity-0.4.2-rewrite-contract-fix-dev-debug.apk` |
+| Physical TEST TTS | PENDING | Awaiting Realme device |
