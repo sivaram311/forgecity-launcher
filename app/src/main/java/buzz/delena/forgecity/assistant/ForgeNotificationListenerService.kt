@@ -68,6 +68,7 @@ class ForgeNotificationListenerService : NotificationListenerService() {
             title = title.orEmpty().take(80),
             shortText = text.orEmpty().take(120),
             notificationKey = notification.key,
+            contentIntent = n.contentIntent,
         )
         AssistantEventBridge.emit(event)
 

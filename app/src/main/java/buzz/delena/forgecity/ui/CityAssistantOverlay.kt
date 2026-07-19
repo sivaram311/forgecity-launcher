@@ -127,6 +127,10 @@ fun AssistantSettingsCard(
     onOpenNotificationAccess: () -> Unit,
     onToggleAssistant: () -> Unit,
     onToggleTts: () -> Unit,
+    onQuietStartEarlier: () -> Unit,
+    onQuietStartLater: () -> Unit,
+    onQuietEndEarlier: () -> Unit,
+    onQuietEndLater: () -> Unit,
     onOpenAllowlist: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -152,7 +156,22 @@ fun AssistantSettingsCard(
         SettingRow("Assistant visible", assistantEnabled, onToggleAssistant)
         SettingRow("Read aloud (TTS)", ttsEnabled, onToggleTts)
         Text(
-            text = "Quiet hours $quietLabel · allowlist $allowCount apps",
+            text = "Quiet hours $quietLabel",
+            color = Color(0xAAFFF6F0),
+            fontSize = 11.sp,
+            modifier = Modifier.padding(top = 4.dp),
+        )
+        Row(
+            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(6.dp),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            QuietButton("Start −", onQuietStartEarlier)
+            QuietButton("Start +", onQuietStartLater)
+            QuietButton("End −", onQuietEndEarlier)
+            QuietButton("End +", onQuietEndLater)
+        }
+        Text(
+            text = "Allowlist $allowCount apps →",
             color = Color(0xAAFFF6F0),
             fontSize = 11.sp,
             modifier = Modifier
@@ -165,6 +184,19 @@ fun AssistantSettingsCard(
             fontSize = 10.sp,
         )
     }
+}
+
+@Composable
+private fun QuietButton(label: String, onClick: () -> Unit) {
+    Text(
+        text = label,
+        color = Color(0xFFE8A15A),
+        fontSize = 10.sp,
+        modifier = Modifier
+            .background(Color(0x44302A38), RoundedCornerShape(8.dp))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 7.dp, vertical = 6.dp),
+    )
 }
 
 @Composable

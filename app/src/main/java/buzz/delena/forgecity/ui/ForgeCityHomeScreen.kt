@@ -64,6 +64,10 @@ fun ForgeCityHomeScreen(
     onOpenNotificationAccess: () -> Unit,
     onToggleAssistant: () -> Unit,
     onToggleTts: () -> Unit,
+    onQuietStartEarlier: () -> Unit,
+    onQuietStartLater: () -> Unit,
+    onQuietEndEarlier: () -> Unit,
+    onQuietEndLater: () -> Unit,
     onOpenAllowlist: () -> Unit,
     onCloseAllowlist: () -> Unit,
     onToggleAllowedPackage: (String) -> Unit,
@@ -137,6 +141,10 @@ fun ForgeCityHomeScreen(
                 onOpenNotificationAccess = onOpenNotificationAccess,
                 onToggleAssistant = onToggleAssistant,
                 onToggleTts = onToggleTts,
+                onQuietStartEarlier = onQuietStartEarlier,
+                onQuietStartLater = onQuietStartLater,
+                onQuietEndEarlier = onQuietEndEarlier,
+                onQuietEndLater = onQuietEndLater,
                 onOpenAllowlist = onOpenAllowlist,
             )
             Spacer(modifier = Modifier.height(8.dp))

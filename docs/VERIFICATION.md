@@ -130,5 +130,19 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | `testDebugUnitTest` | PASS | hit/favorite/quiet/filter/dedupe/migration 2→3 |
 | `assembleDebug` | PASS | `0.3.0-forge-assistant-dev` |
 | APK SHA-256 | `073E26F33AA48FC3E210FBF8650FB09F99EB6EC066CE7B8C1411FC5084001D13` | |
-| Emulator screenshots | DEFERRED | SDK emulator binary missing on host; Realme also absent |
+| Emulator screenshots | DEFERRED | At 0.3.0 build time; follow-up installed tooling but virtualization blocks boot |
 | Device E2E (#16) | PENDING | Blocks annotated production tags |
+
+## 2026-07-19 — Forge Assistant 0.3.1 handoff closure
+
+| Check | Result | Notes |
+|------|--------|-------|
+| Editable quiet hours | LANDED | 30-minute start/end controls; persisted locally |
+| Exact notification action | LANDED | Bubble sends ephemeral `contentIntent`; app fallback |
+| Privacy boundary | PASS | `PendingIntent`/content remain in-memory; no notification persistence |
+| `testDebugUnitTest` | PASS | Full JVM suite |
+| `assembleDebug` | PASS | `0.3.1-forge-assistant-dev` (versionCode 4) |
+| APK SHA-256 | `F1FF71110BD2DC4BABF1D6E724EDDC7DA00075D0B6FAEE8E6CEE873F62920171` | |
+| Emulator tooling/image | INSTALLED | API 35 Google APIs x86_64 |
+| Emulator boot/screenshots | BLOCKED | Host virtualization extension unavailable |
+| Realme E2E (#16) | PENDING | Physical device absent |

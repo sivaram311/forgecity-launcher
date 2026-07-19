@@ -1,5 +1,6 @@
 package buzz.delena.forgecity.assistant
 
+import android.app.PendingIntent
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -10,6 +11,8 @@ data class AssistantUiEvent(
     val title: String,
     val shortText: String,
     val notificationKey: String,
+    /** Ephemeral system action; never persisted or logged. */
+    val contentIntent: PendingIntent? = null,
 )
 
 object AssistantEventBridge {

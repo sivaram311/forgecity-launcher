@@ -42,6 +42,7 @@ class MainActivity : ComponentActivity() {
             val assistant by viewModel.assistantEnabled.collectAsState()
             val tts by viewModel.ttsEnabled.collectAsState()
             val allowCount by viewModel.allowCount.collectAsState()
+            val quietLabel by viewModel.quietLabel.collectAsState()
             val showAllowlist by viewModel.showAllowlist.collectAsState()
             val dockMessage by viewModel.dockMessage.collectAsState()
             val levelUp by viewModel.levelUpEvent.collectAsState()
@@ -57,7 +58,7 @@ class MainActivity : ComponentActivity() {
                 assistantEnabled = assistant,
                 ttsEnabled = tts,
                 allowCount = allowCount,
-                quietLabel = viewModel.quietLabel,
+                quietLabel = quietLabel,
                 showAllowlist = showAllowlist,
                 dockMessage = dockMessage,
                 levelUpBuildingId = levelUp,
@@ -70,6 +71,10 @@ class MainActivity : ComponentActivity() {
                 onOpenNotificationAccess = { startActivity(viewModel.notificationAccessIntent()) },
                 onToggleAssistant = viewModel::toggleAssistant,
                 onToggleTts = viewModel::toggleTts,
+                onQuietStartEarlier = { viewModel.shiftQuietStart(-30) },
+                onQuietStartLater = { viewModel.shiftQuietStart(30) },
+                onQuietEndEarlier = { viewModel.shiftQuietEnd(-30) },
+                onQuietEndLater = { viewModel.shiftQuietEnd(30) },
                 onOpenAllowlist = viewModel::openAllowlist,
                 onCloseAllowlist = viewModel::closeAllowlist,
                 onToggleAllowedPackage = viewModel::toggleAllowedPackage,

@@ -61,6 +61,9 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
     private val _allowCount = MutableStateFlow(assistantSettings.allowedPackages().size)
     val allowCount: StateFlow<Int> = _allowCount.asStateFlow()
 
+    private val _quietLabel = MutableStateFlow(formatQuietLabel())
+    val quietLabel: StateFlow<String> = _quietLabel.asStateFlow()
+
     private val _showAllowlist = MutableStateFlow(false)
     val showAllowlist: StateFlow<Boolean> = _showAllowlist.asStateFlow()
 
@@ -75,12 +78,6 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
 
     val cityState: StateFlow<CityState> = repository.observeState()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), CityState())
-
-    val quietLabel: String
-        get() {
-            fun fmt(m: Int) = "%02d:%02d".format(m / 60, m % 60)
-            return "${fmt(assistantSettings.quietStartMinutes)}–${fmt(assistantSettings.quietEndMinutes)}"
-        }
 
     init {
         viewModelScope.launch {
@@ -121,6 +118,7 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
         _assistantEnabled.value = assistantSettings.assistantEnabled
         _ttsEnabled.value = assistantSettings.ttsEnabled
         _allowCount.value = assistantSettings.allowedPackages().size
+        _quietLabel.value = formatQuietLabel()
     }
 
     fun harvestNow(force: Boolean = false) {
@@ -151,7 +149,13 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun openAssistantEvent(event: AssistantUiEvent) {
-        catalog.launchPackage(event.packageName)
+        val opened = runCatching {
+            event.contentIntent?.send()
+            event.contentIntent != null
+        }.getOrDefault(false)
+        if (!opened) {
+            catalog.launchPackage(event.packageName)
+        }
         dismissAssistantEvent()
     }
 
@@ -163,6 +167,18 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
     fun toggleTts() {
         assistantSettings.ttsEnabled = !assistantSettings.ttsEnabled
         _ttsEnabled.value = assistantSettings.ttsEnabled
+    }
+
+    fun shiftQuietStart(deltaMinutes: Int) {
+        assistantSettings.quietStartMinutes =
+            wrapDayMinutes(assistantSettings.quietStartMinutes + deltaMinutes)
+        refreshEnvironment()
+    }
+
+    fun shiftQuietEnd(deltaMinutes: Int) {
+        assistantSettings.quietEndMinutes =
+            wrapDayMinutes(assistantSettings.quietEndMinutes + deltaMinutes)
+        refreshEnvironment()
     }
 
     fun openAllowlist() {
@@ -212,5 +228,14 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
 
     private companion object {
         const val HARVEST_MIN_INTERVAL_MS = 60L * 60L * 1000L
+
+        fun wrapDayMinutes(minutes: Int): Int =
+            ((minutes % (24 * 60)) + (24 * 60)) % (24 * 60)
+    }
+
+    private fun formatQuietLabel(): String {
+        fun fmt(minutes: Int) = "%02d:%02d".format(minutes / 60, minutes % 60)
+        return "${fmt(assistantSettings.quietStartMinutes)}–" +
+            fmt(assistantSettings.quietEndMinutes)
     }
 }
