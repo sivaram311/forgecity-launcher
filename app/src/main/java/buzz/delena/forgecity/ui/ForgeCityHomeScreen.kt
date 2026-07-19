@@ -1,6 +1,8 @@
 package buzz.delena.forgecity.ui
 
 import android.content.Intent
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -39,9 +42,11 @@ fun ForgeCityHomeScreen(
     hourOfDay: Int,
     ambientEnabled: Boolean,
     hasUsageAccess: Boolean,
+    levelUpBuildingId: String?,
     onQueryChange: (String) -> Unit,
     onBuildingTap: (CityBuilding) -> Unit,
     onOpenUsageAccess: () -> Unit,
+    onLevelUpConsumed: () -> Unit,
 ) {
     val filtered = buildings.filter {
         query.isBlank() || it.label.contains(query, ignoreCase = true)
@@ -61,7 +66,9 @@ fun ForgeCityHomeScreen(
             buildings = filtered,
             hourOfDay = hourOfDay,
             ambientEnabled = ambientEnabled,
+            levelUpBuildingId = levelUpBuildingId,
             onBuildingTap = onBuildingTap,
+            onLevelUpConsumed = onLevelUpConsumed,
             modifier = Modifier.fillMaxSize(),
         )
 
@@ -144,6 +151,11 @@ private fun ResourceStrip(state: CityState) {
 
 @Composable
 private fun ResourceChip(label: String, value: Int) {
+    val animated by animateIntAsState(
+        targetValue = value,
+        animationSpec = tween(durationMillis = 700),
+        label = "resource-$label",
+    )
     Column(
         modifier = Modifier
             .background(Color(0x66302A38), RoundedCornerShape(14.dp))
@@ -151,7 +163,7 @@ private fun ResourceChip(label: String, value: Int) {
     ) {
         Text(text = label, color = Color(0xA6FFF6F0), fontSize = 10.sp)
         Text(
-            text = value.toString(),
+            text = animated.toString(),
             color = Color(0xFFFFF6F0),
             fontSize = 14.sp,
             fontWeight = FontWeight.SemiBold,

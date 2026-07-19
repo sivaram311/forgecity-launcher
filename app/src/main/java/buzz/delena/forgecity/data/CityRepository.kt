@@ -27,9 +27,10 @@ class CityRepository(
         )
     }
 
+    /** Insert defaults only when absent so resources/progress survive restarts. */
     suspend fun ensureSeeded() {
-        dao.upsertMeta(CityMetaEntity())
-        StoryCatalog.starterQuests().forEach { dao.upsertQuest(it) }
+        dao.insertMetaIfAbsent(CityMetaEntity())
+        StoryCatalog.seededQuests().forEach { dao.insertQuestIfAbsent(it) }
     }
 
     suspend fun applyUsageGains(gains: UsageXpCalculator.Gains) {
@@ -43,6 +44,17 @@ class CityRepository(
             focus = gains.focus,
             goldDust = gains.goldDust,
         )
+    }
+
+    /** Debounce gate: only harvest after [minIntervalMs] since the last run. */
+    suspend fun shouldHarvest(now: Long, minIntervalMs: Long): Boolean {
+        val meta = dao.getMeta() ?: return true
+        return now - meta.lastHarvestEpoch >= minIntervalMs
+    }
+
+    suspend fun markHarvested(now: Long) {
+        ensureSeeded()
+        dao.setLastHarvest(now)
     }
 
     private fun unlockedForChapter(chapterId: Int): Set<District> =

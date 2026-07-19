@@ -33,7 +33,9 @@ import buzz.delena.forgecity.city.DayNightCycle
 import buzz.delena.forgecity.city.District
 import buzz.delena.forgecity.city.IsoMath
 import buzz.delena.forgecity.city.IsoPoint
+import kotlin.math.cos
 import kotlin.math.hypot
+import kotlin.math.sin
 import kotlin.random.Random
 import kotlinx.coroutines.launch
 
@@ -42,7 +44,9 @@ fun CityCanvas(
     buildings: List<CityBuilding>,
     hourOfDay: Int,
     ambientEnabled: Boolean,
+    levelUpBuildingId: String?,
     onBuildingTap: (CityBuilding) -> Unit,
+    onLevelUpConsumed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var scale by remember { mutableFloatStateOf(1f) }
@@ -50,6 +54,17 @@ fun CityCanvas(
     val animatedScale = remember { Animatable(1f) }
     val animatedOffset = remember { Animatable(Offset.Zero, Offset.VectorConverter) }
     val scope = rememberCoroutineScope()
+    val burst = remember { Animatable(0f) }
+    var burstBuildingId by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(levelUpBuildingId) {
+        val id = levelUpBuildingId ?: return@LaunchedEffect
+        burstBuildingId = id
+        burst.snapTo(0f)
+        burst.animateTo(1f, tween(700))
+        burstBuildingId = null
+        onLevelUpConsumed()
+    }
     val tileWidth = 88f
     val tileHeight = 44f
     val density = LocalDensity.current
@@ -176,8 +191,49 @@ fun CityCanvas(
                 )
                 drawBuildingIcon(point, building.icon)
             }
+
+            val celebrating = burstBuildingId
+            if (celebrating != null) {
+                buildings.firstOrNull { it.id == celebrating }?.let { building ->
+                    val point = IsoMath.gridToScreen(
+                        building.col.toFloat(),
+                        building.row.toFloat(),
+                        tileWidth,
+                        tileHeight,
+                    )
+                    drawLevelUpBurst(point, building.level, burst.value)
+                }
+            }
         }
     }
+}
+
+private fun DrawScope.drawLevelUpBurst(
+    point: IsoPoint,
+    level: Int,
+    progress: Float,
+) {
+    val roofTop = Offset(point.x, point.y - (18f + level * 10f))
+    val fade = (1f - progress).coerceIn(0f, 1f)
+    val particleCount = 12
+    val spread = 26f + progress * 46f
+    repeat(particleCount) { i ->
+        val angle = (2.0 * Math.PI * i / particleCount).toFloat()
+        val center = Offset(
+            roofTop.x + cos(angle) * spread,
+            roofTop.y + sin(angle) * spread * 0.6f - progress * 18f,
+        )
+        drawCircle(
+            color = Color(0xFFFFE08A).copy(alpha = fade),
+            radius = 3.5f * fade + 1.5f,
+            center = center,
+        )
+    }
+    drawCircle(
+        color = Color(0xFFFFF3C4).copy(alpha = fade * 0.5f),
+        radius = spread,
+        center = roofTop,
+    )
 }
 
 private fun DrawScope.drawBuildingPrism(

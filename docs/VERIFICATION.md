@@ -55,3 +55,20 @@ Parallel plan: `docs/PARALLEL-EXECUTION.md`
 | Unit tests (XP + day/night) | PASS | `testDebugUnitTest` green on Wave 1 |
 | `assembleDebug` | PASS | `0.2.0-awakening-dev` APK built |
 | Device E2E (#16) | PENDING | Blocks annotated `v0.2.0` tag |
+
+## 2026-07-19 — Phase 2 Wave 2 (Awakening depth)
+
+Branch: `feature/phase-2-awakening` · versionName `0.2.0-awakening-dev`  
+Parallel plan: `docs/PARALLEL-EXECUTION.md`
+
+| Track | Check | Result | Notes |
+|-------|-------|--------|-------|
+| A (UI) | Level-up particle burst | LANDED | Canvas radial burst on level increase |
+| A (UI) | Animated resource counters | LANDED | `animateIntAsState` on resource chips |
+| B (Systems) | Harvest debounce | LANDED | `lastHarvestEpoch` gate (1h) in ViewModel + worker |
+| C (Data) | Room-backed building levels | LANDED | `building_stats` table = level SoT (DB v2) |
+| C (Data) | Seed-reset bug fixed | FIXED | `insertMetaIfAbsent`/`insertQuestIfAbsent` (IGNORE) stop resource/quest reset on restart |
+| D (Story) | Chapter 2–3 quest stubs | LANDED | `StoryCatalog.chapterTwo/ThreeQuests` seeded locked |
+| Tests | `testDebugUnitTest` | PASS | + `StoryCatalogTest` (unique ids, chapter coverage) |
+| Build | `assembleDebug` | PASS | Green after `getValue` import fix |
+| Device E2E (#16) | PENDING | Still blocks annotated `v0.2.0` tag |

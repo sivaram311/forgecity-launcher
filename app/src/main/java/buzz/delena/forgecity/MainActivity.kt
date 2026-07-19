@@ -38,6 +38,7 @@ class MainActivity : ComponentActivity() {
             val hour by viewModel.hourOfDay.collectAsState()
             val ambient by viewModel.ambientEnabled.collectAsState()
             val usage by viewModel.hasUsageAccess.collectAsState()
+            val levelUp by viewModel.levelUpEvent.collectAsState()
             ForgeCityHomeScreen(
                 state = state,
                 buildings = buildings,
@@ -45,11 +46,13 @@ class MainActivity : ComponentActivity() {
                 hourOfDay = hour,
                 ambientEnabled = ambient,
                 hasUsageAccess = usage,
+                levelUpBuildingId = levelUp,
                 onQueryChange = viewModel::onQueryChange,
                 onBuildingTap = viewModel::launch,
                 onOpenUsageAccess = {
                     startActivity(viewModel.usageAccessIntent())
                 },
+                onLevelUpConsumed = viewModel::consumeLevelUpEvent,
             )
         }
         maybeRequestHomeRole()

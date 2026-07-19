@@ -9,9 +9,10 @@ import androidx.room.RoomDatabase
     entities = [
         CityMetaEntity::class,
         BuildingEntity::class,
+        BuildingStatEntity::class,
         StoryProgressEntity::class,
     ],
-    version = 1,
+    version = 2,
     exportSchema = false,
 )
 abstract class ForgeCityDatabase : RoomDatabase() {

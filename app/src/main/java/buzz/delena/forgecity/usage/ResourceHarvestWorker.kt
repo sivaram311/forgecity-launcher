@@ -17,14 +17,17 @@ class ResourceHarvestWorker(
     override suspend fun doWork(): Result {
         val harvester = UsageStatsHarvester(applicationContext)
         if (!harvester.hasUsageAccess()) return Result.success()
-        val gains = harvester.harvestLastHours(24)
         val repo = CityRepository(ForgeCityDatabase.get(applicationContext).cityDao())
-        repo.applyUsageGains(gains)
+        val now = System.currentTimeMillis()
+        if (!repo.shouldHarvest(now, MIN_INTERVAL_MS)) return Result.success()
+        repo.applyUsageGains(harvester.harvestLastHours(24))
+        repo.markHarvested(now)
         return Result.success()
     }
 
     companion object {
         private const val UNIQUE = "forgecity-resource-harvest"
+        private const val MIN_INTERVAL_MS = 60L * 60L * 1000L
 
         fun schedule(context: Context) {
             val request = PeriodicWorkRequestBuilder<ResourceHarvestWorker>(6, TimeUnit.HOURS)

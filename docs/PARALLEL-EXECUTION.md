@@ -71,15 +71,16 @@ Run **A + B + C** in the same branch tip:
 | W1-C1 | C | Resource apply + launch-count building levels | Room meta updates; levels redraw |
 | W1-F1 | F | Unit tests for XP + day/night math | `./gradlew testDebugUnitTest` green |
 
-### Wave 2 — Phase 2 polish (next)
+### Wave 2 — Phase 2 polish (landed on dev)
 
-| ID | Stream | Deliverable |
-|----|--------|-------------|
-| W2-A1 | A | Level-up particle burst (capped) |
-| W2-A2 | A | Animated resource counters |
-| W2-B1 | B | Usage access settings deep-link + first-run tip |
-| W2-C1 | C | Persist building entities (not only in-memory levels) |
-| W2-F1 | F | Realme P2 Pro baseline (120 Hz / battery) — **blocks v0.2.0 tag** |
+| ID | Stream | Deliverable | Status |
+|----|--------|-------------|--------|
+| W2-A1 | A | Level-up particle burst (capped, 12 particles) | ✅ landed (dev) |
+| W2-A2 | A | Animated resource counters (`animateIntAsState`) | ✅ landed (dev) |
+| W2-B1 | B | Usage access deep-link + harvest debounce (1h gate) | ✅ landed (dev) |
+| W2-C1 | C | Room-backed building levels (`building_stats`, DB v2) + idempotent seeding | ✅ landed (dev) |
+| W2-D1 | D | Chapter 2–3 quest stubs seeded (pulled forward) | ✅ landed (dev) |
+| W2-F1 | F | Realme P2 Pro baseline (120 Hz / battery) — **blocks v0.2.0 tag** | ⏳ pending device |
 
 ### Wave 3 — Phase 3 (parallel design + scaffold)
 

@@ -6,7 +6,7 @@ story — while staying performant on Snapdragon 7s Gen 2 + Adreno 710 + 120 Hz.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher  
 **Device SoT:** `E:\MyAgent\workflow\devices\REALME-P2-PRO.md`  
-**Last updated:** 2026-07-19 (Phase 2 Wave 1 landed on `feature/phase-2-awakening`)
+**Last updated:** 2026-07-19 (Phase 2 Waves 1–2 landed on `feature/phase-2-awakening`)
 
 ---
 
@@ -120,6 +120,15 @@ gate.
 | UsageStats XP → resources + WorkManager | Landed (dev) |
 | Building levels from launches | Landed (dev) |
 | Realme P2 Pro E2E | **PENDING** — blocks `v0.2.0` tag |
+
+| Wave 2 item | Status |
+|-------------|--------|
+| Level-up particle burst | Landed (dev) |
+| Animated resource counters | Landed (dev) |
+| Harvest debounce (1h gate) | Landed (dev) |
+| Room-backed building levels (`building_stats`, DB v2) | Landed (dev) |
+| Seed-reset bug fix (idempotent seeding) | Landed (dev) |
+| Chapter 2–3 quest stubs | Landed (dev) |
 
 - Deliverable: v0.2.0 “Awakening” — City feels alive and responsive to habits
 - **Gate:** Realme P2 Pro E2E + crew SIGN-OFF

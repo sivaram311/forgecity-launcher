@@ -21,9 +21,10 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class ForgeCityViewModel(application: Application) : AndroidViewModel(application) {
-    private val repository = CityRepository(ForgeCityDatabase.get(application).cityDao())
+    private val dao = ForgeCityDatabase.get(application).cityDao()
+    private val repository = CityRepository(dao)
     private val catalog = AppCatalog(application)
-    private val launchTracker = LaunchTracker(application)
+    private val launchTracker = LaunchTracker(dao)
     private val harvester = UsageStatsHarvester(application)
     private val animationBudget = AnimationBudget(application)
 
@@ -41,6 +42,10 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
 
     private val _hasUsageAccess = MutableStateFlow(harvester.hasUsageAccess())
     val hasUsageAccess: StateFlow<Boolean> = _hasUsageAccess.asStateFlow()
+
+    /** Building id that just leveled up; consumed by the canvas to fire a particle burst. */
+    private val _levelUpEvent = MutableStateFlow<String?>(null)
+    val levelUpEvent: StateFlow<String?> = _levelUpEvent.asStateFlow()
 
     val cityState: StateFlow<CityState> = repository.observeState()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), CityState())
@@ -60,8 +65,9 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun refreshApps() {
         viewModelScope.launch(Dispatchers.Default) {
+            val levels = launchTracker.levels()
             _buildings.value = catalog.loadBuildings().map { building ->
-                building.copy(level = launchTracker.levelFor(building.id))
+                building.copy(level = levels[building.id] ?: 1)
             }
         }
     }
@@ -72,19 +78,39 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
         _hasUsageAccess.value = harvester.hasUsageAccess()
     }
 
-    fun harvestNow() {
+    fun harvestNow(force: Boolean = false) {
         viewModelScope.launch(Dispatchers.IO) {
-            if (!harvester.hasUsageAccess()) return@launch
-            repository.applyUsageGains(harvester.harvestLastHours(24))
+            if (!harvester.hasUsageAccess()) {
+                _hasUsageAccess.value = false
+                return@launch
+            }
             _hasUsageAccess.value = true
+            val now = System.currentTimeMillis()
+            if (!force && !repository.shouldHarvest(now, HARVEST_MIN_INTERVAL_MS)) return@launch
+            repository.applyUsageGains(harvester.harvestLastHours(24))
+            repository.markHarvested(now)
         }
     }
 
     fun usageAccessIntent() = harvester.usageAccessSettingsIntent()
 
+    fun consumeLevelUpEvent() {
+        _levelUpEvent.value = null
+    }
+
     fun launch(building: CityBuilding) {
-        launchTracker.recordLaunch(building.id)
         runCatching { catalog.launch(building) }
-        refreshApps()
+        val previousLevel = building.level
+        viewModelScope.launch {
+            val newLevel = launchTracker.recordLaunch(building.id)
+            if (newLevel > previousLevel) {
+                _levelUpEvent.value = building.id
+            }
+            refreshApps()
+        }
+    }
+
+    private companion object {
+        const val HARVEST_MIN_INTERVAL_MS = 60L * 60L * 1000L
     }
 }
