@@ -64,6 +64,14 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
     private val _quietLabel = MutableStateFlow(formatQuietLabel())
     val quietLabel: StateFlow<String> = _quietLabel.asStateFlow()
 
+    private val _backgroundVideoEnabled =
+        MutableStateFlow(assistantSettings.backgroundVideoEnabled)
+    val backgroundVideoEnabled: StateFlow<Boolean> = _backgroundVideoEnabled.asStateFlow()
+
+    private val _backgroundVideoOpacity =
+        MutableStateFlow(assistantSettings.backgroundVideoOpacity)
+    val backgroundVideoOpacity: StateFlow<Float> = _backgroundVideoOpacity.asStateFlow()
+
     private val _showAllowlist = MutableStateFlow(false)
     val showAllowlist: StateFlow<Boolean> = _showAllowlist.asStateFlow()
 
@@ -119,6 +127,8 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
         _ttsEnabled.value = assistantSettings.ttsEnabled
         _allowCount.value = assistantSettings.allowedPackages().size
         _quietLabel.value = formatQuietLabel()
+        _backgroundVideoEnabled.value = assistantSettings.backgroundVideoEnabled
+        _backgroundVideoOpacity.value = assistantSettings.backgroundVideoOpacity
     }
 
     fun harvestNow(force: Boolean = false) {
@@ -167,6 +177,17 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
     fun toggleTts() {
         assistantSettings.ttsEnabled = !assistantSettings.ttsEnabled
         _ttsEnabled.value = assistantSettings.ttsEnabled
+    }
+
+    fun toggleBackgroundVideo() {
+        assistantSettings.backgroundVideoEnabled =
+            !assistantSettings.backgroundVideoEnabled
+        _backgroundVideoEnabled.value = assistantSettings.backgroundVideoEnabled
+    }
+
+    fun setBackgroundVideoOpacity(opacity: Float) {
+        assistantSettings.backgroundVideoOpacity = opacity
+        _backgroundVideoOpacity.value = assistantSettings.backgroundVideoOpacity
     }
 
     fun shiftQuietStart(deltaMinutes: Int) {

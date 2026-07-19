@@ -5,28 +5,32 @@ Apps become buildings. Habits rebuild districts. A neon city assistant can read
 notifications aloud when you opt in.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher (public)  
-**Branch:** `feature/assistant-handoff-gaps` · version `0.3.1-forge-assistant-dev`
-**Stable on main (pre-assistant):** Phase 2 Awakening merged · tag `v0.2.0-awakening-dev`
+**Branch:** `feature/background-video` · version `0.3.2-background-video-dev`
+**Previous prerelease:** `v0.3.1-forge-assistant-dev`
 
 ## Download
 
 Latest debug prerelease (sideload):
 
 - Releases: https://github.com/sivaram311/forgecity-launcher/releases
-- Tag target: `v0.3.1-forge-assistant-dev`
+- Tag target: `v0.3.2-background-video-dev`
 
 This is **debug-signed**. Realme P2 Pro E2E (#16) is still pending for any annotated production tag.
 
 ```powershell
-curl.exe -L -o forgecity-0.3.1-forge-assistant-dev-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.3.1-forge-assistant-dev/forgecity-0.3.1-forge-assistant-dev-debug.apk
-Get-FileHash .\forgecity-0.3.1-forge-assistant-dev-debug.apk -Algorithm SHA256
-# expect F1FF71110BD2DC4BABF1D6E724EDDC7DA00075D0B6FAEE8E6CEE873F62920171
-adb install -r .\forgecity-0.3.1-forge-assistant-dev-debug.apk
+curl.exe -L -o forgecity-0.3.2-background-video-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.3.2-background-video-dev/forgecity-0.3.2-background-video-dev-debug.apk
+Get-FileHash .\forgecity-0.3.2-background-video-dev-debug.apk -Algorithm SHA256
+# expect 5D0F84306085B4DDAF6CB57E59FE1009439F8F6CA71E9D011079A412C1D1CD2F
+adb install -r .\forgecity-0.3.2-background-video-dev-debug.apk
 ```
 
-## What works in 0.3.1-forge-assistant-dev
+## What works in 0.3.2-background-video-dev
 
+- Media3 ExoPlayer full-screen looping video layer beneath `CityCanvas`
+- Persisted Background Video toggle and 40–100% opacity slider
+- Lifecycle pause/resume, mute, local-media low buffer, power-save/screen-off gating
+- Runtime `city_background` lookup with safe day/night-gradient fallback when MP4 is absent
 - Sparse isometric city + depth-sorted AABB hit testing + press glow
 - Favorites dock (long-press pin/unpin, max 6, Room `building_stats.isFavorite`)
 - Neon assistant bubble + NotificationListenerService
@@ -37,7 +41,8 @@ adb install -r .\forgecity-0.3.1-forge-assistant-dev-debug.apk
 
 ## Spec
 
-See [docs/IMPLEMENTATION-SPEC.md](docs/IMPLEMENTATION-SPEC.md).
+See [docs/IMPLEMENTATION-SPEC.md](docs/IMPLEMENTATION-SPEC.md) and
+[docs/BACKGROUND-VIDEO-SPEC.md](docs/BACKGROUND-VIDEO-SPEC.md).
 
 ## Build
 
@@ -54,3 +59,4 @@ See [docs/IMPLEMENTATION-SPEC.md](docs/IMPLEMENTATION-SPEC.md).
 | [docs/OPS.md](docs/OPS.md) | Build / device ops |
 | [docs/VERIFICATION.md](docs/VERIFICATION.md) | Evidence record |
 | [docs/IMPLEMENTATION-SPEC.md](docs/IMPLEMENTATION-SPEC.md) | Assistant upgrade spec |
+| [docs/BACKGROUND-VIDEO-SPEC.md](docs/BACKGROUND-VIDEO-SPEC.md) | Media3 background contract |

@@ -1,4 +1,4 @@
-# Verification
+﻿# Verification
 
 ## 2026-07-19 — ForgeCity 0.1.0-mvp bootstrap
 
@@ -146,3 +146,20 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | Emulator tooling/image | INSTALLED | API 35 Google APIs x86_64 |
 | Emulator boot/screenshots | BLOCKED | Host virtualization extension unavailable |
 | Realme E2E (#16) | PENDING | Physical device absent |
+
+## 2026-07-19 — Media3 Background Video 0.3.2-dev
+
+| Check | Result | Notes |
+|------|--------|-------|
+| Media3 dependencies | PASS | exoplayer/ui/common 1.4.1 |
+| ExoPlayer lifecycle | LANDED | muted, repeat-all, low local buffer, release on dispose |
+| Home layer ordering | LANDED | video → contrast scrim → CityCanvas → UI |
+| Toggle / opacity | LANDED | persisted; default ON / 0.80; opacity clamped 0.4–1.0 |
+| Power gating | LANDED | AnimationBudget + live power-save receiver |
+| Missing asset fallback | PASS | build has no MP4; runtime lookup returns gradient fallback safely |
+| `testDebugUnitTest` | PASS | Existing JVM suite |
+| `lintDebug` | PASS | Media3 unstable APIs explicitly opted in |
+| `assembleDebug` | PASS | `0.3.2-background-video-dev` (versionCode 5) |
+| APK SHA-256 | `5D0F84306085B4DDAF6CB57E59FE1009439F8F6CA71E9D011079A412C1D1CD2F` | |
+| Final MP4 loop/decoder test | PENDING | `res/raw/city_background.mp4` not supplied |
+| Realme performance/battery | PENDING | Physical device absent; <5% target unverified |

@@ -135,6 +135,15 @@ gate.
 - Deliverable: v0.2.0 “Awakening” — City feels alive and responsive to habits
 - **Gate:** Realme P2 Pro E2E + crew SIGN-OFF
 
+### Experimental dev train — v0.3.x
+
+- `v0.3.0-forge-assistant-dev`: favorites, accurate hit testing, notification assistant/TTS
+- `v0.3.1-forge-assistant-dev`: editable quiet hours + exact notification actions
+- `v0.3.2-background-video-dev`: Media3 background layer, toggle/opacity,
+  lifecycle and power gating, missing-asset fallback
+- **Pending:** final H.264 MP4, seamless-loop visual test, Realme decoder,
+  thermal, 120Hz, and battery evidence
+
 ### Phase 3 — Story & World Depth — v0.3.0 (~4–6 weeks)
 
 - Chapters 1–3 branching + visual set pieces

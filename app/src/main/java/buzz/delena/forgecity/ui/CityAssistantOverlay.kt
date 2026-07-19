@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -122,11 +123,15 @@ fun AssistantSettingsCard(
     hasNotificationAccess: Boolean,
     assistantEnabled: Boolean,
     ttsEnabled: Boolean,
+    backgroundVideoEnabled: Boolean,
+    backgroundVideoOpacity: Float,
     quietLabel: String,
     allowCount: Int,
     onOpenNotificationAccess: () -> Unit,
     onToggleAssistant: () -> Unit,
     onToggleTts: () -> Unit,
+    onToggleBackgroundVideo: () -> Unit,
+    onBackgroundVideoOpacityChange: (Float) -> Unit,
     onQuietStartEarlier: () -> Unit,
     onQuietStartLater: () -> Unit,
     onQuietEndEarlier: () -> Unit,
@@ -155,6 +160,35 @@ fun AssistantSettingsCard(
         }
         SettingRow("Assistant visible", assistantEnabled, onToggleAssistant)
         SettingRow("Read aloud (TTS)", ttsEnabled, onToggleTts)
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = "Atmosphere",
+            color = Color(0xFFE8A15A),
+            fontSize = 11.sp,
+            fontWeight = FontWeight.SemiBold,
+        )
+        SettingRow("Background Video", backgroundVideoEnabled, onToggleBackgroundVideo)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text("Opacity", color = Color(0xAAFFF6F0), fontSize = 10.sp)
+            Slider(
+                value = backgroundVideoOpacity.coerceIn(0.4f, 1f),
+                onValueChange = onBackgroundVideoOpacityChange,
+                valueRange = 0.4f..1f,
+                enabled = backgroundVideoEnabled,
+                modifier = Modifier
+                    .weight(1f)
+                    .height(28.dp)
+                    .padding(horizontal = 8.dp),
+            )
+            Text(
+                text = "${(backgroundVideoOpacity * 100).toInt()}%",
+                color = Color(0xFFE8A15A),
+                fontSize = 10.sp,
+            )
+        }
         Text(
             text = "Quiet hours $quietLabel",
             color = Color(0xAAFFF6F0),
