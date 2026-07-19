@@ -117,3 +117,18 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | User E2E waiver | RECORDED | Merge authorized without device lab; **not** E2E PASS |
 | `feature/mvp-city-shell` | N/A | Already equal to pre-merge `main` — nothing unique |
 | Annotated `v0.2.0` | STILL BLOCKED | Needs real device GO |
+
+## 2026-07-19 — Forge Assistant 0.3.0-dev (feature/forge-assistant)
+
+| Check | Result | Notes |
+|------|--------|-------|
+| Spec saved | PASS | `docs/IMPLEMENTATION-SPEC.md` |
+| Sparse city + AABB hit + press glow | LANDED | `BuildingHitGeometry` + `IsoLayout` 120×60 |
+| Favorites dock (max 6) | LANDED | Room `building_stats.isFavorite` + `MIGRATION_2_3` |
+| NotificationListener + TTS | LANDED | Privacy: TTS off, empty allowlist, no body persistence |
+| Atmosphere polish | LANDED | Dusk sky, power grid, chapter card, height growth |
+| `testDebugUnitTest` | PASS | hit/favorite/quiet/filter/dedupe/migration 2→3 |
+| `assembleDebug` | PASS | `0.3.0-forge-assistant-dev` |
+| APK SHA-256 | `073E26F33AA48FC3E210FBF8650FB09F99EB6EC066CE7B8C1411FC5084001D13` | |
+| Emulator screenshots | DEFERRED | SDK emulator binary missing on host; Realme also absent |
+| Device E2E (#16) | PENDING | Blocks annotated production tags |

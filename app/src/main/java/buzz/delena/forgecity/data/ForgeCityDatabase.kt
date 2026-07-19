@@ -12,7 +12,7 @@ import androidx.room.RoomDatabase
         BuildingStatEntity::class,
         StoryProgressEntity::class,
     ],
-    version = 2,
+    version = 3,
     exportSchema = false,
 )
 abstract class ForgeCityDatabase : RoomDatabase() {
@@ -29,7 +29,10 @@ abstract class ForgeCityDatabase : RoomDatabase() {
                     ForgeCityDatabase::class.java,
                     "forgecity.db",
                 )
-                    .addMigrations(ForgeCityMigrations.MIGRATION_1_2)
+                    .addMigrations(
+                        ForgeCityMigrations.MIGRATION_1_2,
+                        ForgeCityMigrations.MIGRATION_2_3,
+                    )
                     .build()
                     .also { instance = it }
             }

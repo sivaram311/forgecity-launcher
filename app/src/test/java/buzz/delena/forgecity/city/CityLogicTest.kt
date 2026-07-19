@@ -3,8 +3,64 @@ package buzz.delena.forgecity.city
 import buzz.delena.forgecity.usage.UsageXpCalculator
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+
+class BuildingHitGeometryTest {
+    private data class Fake(val col: Int, val row: Int, val level: Int = 1)
+
+    @Test
+    fun depthKeySumsAxes() {
+        assertEquals(5, BuildingHitGeometry.depthKey(2, 3))
+    }
+
+    @Test
+    fun aabbContainsRoofArea() {
+        val point = IsoMath.gridToScreen(0f, 0f, IsoLayout.TILE_WIDTH, IsoLayout.TILE_HEIGHT)
+        val bounds = BuildingHitGeometry.prismBounds(point, level = 2)
+        assertTrue(bounds.contains(point.x, point.y - 20f))
+        assertFalse(bounds.contains(point.x + 200f, point.y))
+    }
+
+    @Test
+    fun frontBuildingWinsOverlap() {
+        val front = Fake(col = 2, row = 2, level = 3)
+        val back = Fake(col = 0, row = 0, level = 3)
+        val point = IsoMath.gridToScreen(2f, 2f, IsoLayout.TILE_WIDTH, IsoLayout.TILE_HEIGHT)
+        val hit = BuildingHitGeometry.pickBuilding(
+            cityX = point.x,
+            cityY = point.y - 10f,
+            buildings = listOf(back, front),
+            colOf = { it.col },
+            rowOf = { it.row },
+            levelOf = { it.level },
+        )
+        assertEquals(front, hit)
+    }
+
+    @Test
+    fun missReturnsNullFarAway() {
+        val only = Fake(0, 0)
+        val hit = BuildingHitGeometry.pickBuilding(
+            cityX = 900f,
+            cityY = 900f,
+            buildings = listOf(only),
+            colOf = { it.col },
+            rowOf = { it.row },
+            levelOf = { it.level },
+        )
+        assertNull(hit)
+    }
+
+    @Test
+    fun favoritePolicyCapsAtSix() {
+        assertTrue(FavoritePolicy.canPin(5, currentlyFavorite = false))
+        assertFalse(FavoritePolicy.canPin(6, currentlyFavorite = false))
+        assertTrue(FavoritePolicy.canPin(6, currentlyFavorite = true))
+    }
+}
 
 class IsoMathTest {
     @Test
@@ -57,6 +113,13 @@ class DayNightCycleTest {
     fun starsVisibleAtNightOnly() {
         assertTrue(DayNightCycle.starAlpha(22) > 0.5f)
         assertEquals(0f, DayNightCycle.starAlpha(14), 0.001f)
+    }
+
+    @Test
+    fun duskUsesPurpleOrangeBand() {
+        val (_, mid, bottom) = DayNightCycle.skyColors(18)
+        assertNotNull(mid)
+        assertTrue(bottom > 0xFFE00000)
     }
 }
 

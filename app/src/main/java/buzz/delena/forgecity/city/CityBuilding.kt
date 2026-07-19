@@ -13,4 +13,5 @@ data class CityBuilding(
     val col: Int,
     val row: Int,
     val level: Int = 1,
+    val isFavorite: Boolean = false,
 )

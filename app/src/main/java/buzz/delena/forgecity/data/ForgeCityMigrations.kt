@@ -25,4 +25,13 @@ object ForgeCityMigrations {
             )
         }
     }
+
+    /** v2 → v3: favorites pin flag on building_stats. */
+    val MIGRATION_2_3 = object : Migration(2, 3) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                "ALTER TABLE building_stats ADD COLUMN isFavorite INTEGER NOT NULL DEFAULT 0",
+            )
+        }
+    }
 }

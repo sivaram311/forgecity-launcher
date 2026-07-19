@@ -35,8 +35,17 @@ interface CityDao {
     @Query("SELECT * FROM building_stats WHERE id = :id")
     suspend fun getBuildingStat(id: String): BuildingStatEntity?
 
+    @Query("SELECT * FROM building_stats WHERE isFavorite = 1")
+    suspend fun getFavorites(): List<BuildingStatEntity>
+
+    @Query("SELECT COUNT(*) FROM building_stats WHERE isFavorite = 1")
+    suspend fun favoriteCount(): Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertBuildingStat(stat: BuildingStatEntity)
+
+    @Query("UPDATE building_stats SET isFavorite = :favorite WHERE id = :id")
+    suspend fun setFavorite(id: String, favorite: Boolean)
 
     @Query("SELECT * FROM story_progress")
     fun observeQuests(): Flow<List<StoryProgressEntity>>

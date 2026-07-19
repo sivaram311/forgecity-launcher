@@ -17,17 +17,19 @@ git checkout main
 
 ## Download (prerelease debug APK)
 
-Latest Phase 2 Awakening build:
+Latest Forge Assistant build:
 
 ```powershell
-curl.exe -L -o forgecity-0.2.0-awakening-dev-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.2.0-awakening-dev/forgecity-0.2.0-awakening-dev-debug.apk
-Get-FileHash .\forgecity-0.2.0-awakening-dev-debug.apk -Algorithm SHA256
-# expect 885182F9A12671BE1E68E3DF6819518FE20A308A3D6748FCAF2C440345E89B11
-adb install -r .\forgecity-0.2.0-awakening-dev-debug.apk
+curl.exe -L -o forgecity-0.3.0-forge-assistant-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.3.0-forge-assistant-dev/forgecity-0.3.0-forge-assistant-dev-debug.apk
+Get-FileHash .\forgecity-0.3.0-forge-assistant-dev-debug.apk -Algorithm SHA256
+# expect 073E26F33AA48FC3E210FBF8650FB09F99EB6EC066CE7B8C1411FC5084001D13
+adb install -r .\forgecity-0.3.0-forge-assistant-dev-debug.apk
 ```
 
-MVP shell (older): tag `v0.1.0-mvp` — SHA `073C4959...86C2209A`.
+Also grant: Home role, Usage Access, Notification Access (allowlist apps before TTS).
+
+Older: `v0.2.0-awakening-dev` (SHA `885182F9…`).
 
 Debug-signed, prerelease. Device E2E (#16) pending; do not treat as production.
 

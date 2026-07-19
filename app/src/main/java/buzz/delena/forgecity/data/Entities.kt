@@ -27,12 +27,13 @@ data class BuildingEntity(
     val level: Int = 1,
 )
 
-/** Durable per-building progression (Stream C SoT for levels). */
+/** Durable per-building progression (Stream C SoT for levels + favorites). */
 @Entity(tableName = "building_stats")
 data class BuildingStatEntity(
     @PrimaryKey val id: String,
     val launchCount: Int = 0,
     val level: Int = 1,
+    val isFavorite: Boolean = false,
 )
 
 @Entity(tableName = "story_progress")

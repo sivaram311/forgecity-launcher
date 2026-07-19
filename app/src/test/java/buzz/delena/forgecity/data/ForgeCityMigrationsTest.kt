@@ -1,7 +1,6 @@
 package buzz.delena.forgecity.data
 
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ForgeCityMigrationsTest {
@@ -13,7 +12,14 @@ class ForgeCityMigrationsTest {
     }
 
     @Test
-    fun migrationObjectIsRegisteredSingleton() {
-        assertTrue(ForgeCityMigrations.MIGRATION_1_2 === ForgeCityMigrations.MIGRATION_1_2)
+    fun migrationTwoToThreeSpansExpectedVersions() {
+        val migration = ForgeCityMigrations.MIGRATION_2_3
+        assertEquals(2, migration.startVersion)
+        assertEquals(3, migration.endVersion)
+    }
+
+    @Test
+    fun migrationObjectsAreStableSingletons() {
+        assertEquals(ForgeCityMigrations.MIGRATION_2_3, ForgeCityMigrations.MIGRATION_2_3)
     }
 }
