@@ -59,11 +59,14 @@ MVP classifier uses package/label heuristics; user overrides come later.
 
 ## Phase plan
 
-1. **MVP City Shell** ← current  
-2. Living map + UsageStats resources  
-3. Story engine branching  
-4. In-city AI agents  
-5. Realme polish (gestures, themes, battery modes)
+See **[ROADMAP.md](ROADMAP.md)** for the full phased plan (v0.1 → v1.0),
+feature matrix, risks, and success metrics.
+
+1. **MVP City Shell** ← current (`v0.1.0-mvp`)  
+2. Living map + UsageStats resources (`v0.2.0 Awakening`)  
+3. Story engine branching (`v0.3.0`)  
+4. In-city AI agents (`v0.4.0 Symphony`)  
+5. Realme polish + optional Filament / sync (`v1.0.0`)
 
 ## Promote / env
 

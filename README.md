@@ -72,6 +72,7 @@ Accept the home-role prompt, or Settings → Default apps → Home app.
 | Doc | Purpose |
 |-----|---------|
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Technical architecture |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | Phased roadmap (vision → v1.0) |
 | [docs/STORY-BIBLE.md](docs/STORY-BIBLE.md) | Campaign outline |
 | [docs/OPS.md](docs/OPS.md) | Build / device ops |
 | [docs/VERIFICATION.md](docs/VERIFICATION.md) | Evidence record |

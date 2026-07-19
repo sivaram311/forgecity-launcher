@@ -25,7 +25,17 @@ Detailed prompts: `agents/roles/`.
 4. Narrative — Chapter 1 quest stubs  
 5. QA — OPS checklist once SDK/device available  
 
+## Next pipeline (Phase 2 — Awakening)
+
+SoT: `docs/ROADMAP.md`. Suggested kickoff task: camera fly-in + building
+level-up with battery-aware animation gating, then UsageStats → resources.
+
+1. UI/Animation — parallax day/night + fly-in + level-up particles  
+2. Android Systems — UsageStats + PowerManager gates + WorkManager  
+3. Data — building levels + resource ledger migrations  
+4. QA — Realme P2 Pro 120 Hz + battery baseline  
+
 ## In-launcher living agents (Phase 4+)
 
 Mayor · Story Weaver · Architect · Scout · Guardian · Chronicler — see
-`docs/ARCHITECTURE.md`. Not implemented in MVP.
+`docs/ARCHITECTURE.md` and `docs/ROADMAP.md`. Not implemented in MVP.
