@@ -97,3 +97,24 @@ class PromptTemplateFormatterTest {
         assertTrue(formatted.contains("Speak a clear Tamil"))
     }
 }
+
+class PcmAudioNormalizerTest {
+    @Test
+    fun trimsOddRawPcmByte() {
+        val raw = ByteArray(5) { it.toByte() }
+        val normalized = buzz.delena.forgecity.assistant.PcmAudioNormalizer.normalize(raw, 24_000)
+        assertEquals(4, normalized.pcm.size)
+        assertEquals(24_000, normalized.sampleRateHz)
+        assertTrue(!normalized.hadWavHeader)
+    }
+
+    @Test
+    fun stripsWavHeaderAndReadsRate() {
+        val pcm = ByteArray(100) { it.toByte() }
+        val wav = buzz.delena.forgecity.assistant.PcmAudioNormalizer.toWav(pcm, 16_000)
+        val normalized = buzz.delena.forgecity.assistant.PcmAudioNormalizer.normalize(wav, 24_000)
+        assertTrue(normalized.hadWavHeader)
+        assertEquals(16_000, normalized.sampleRateHz)
+        assertTrue(normalized.pcm.contentEquals(pcm))
+    }
+}

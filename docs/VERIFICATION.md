@@ -320,3 +320,14 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | Unit/lint/assemble | PASS | versionCode 13 |
 | APK SHA-256 | `1644ED69CC47074932E327170F998D9593ED73A1CEE0AD0FB7B34A2F9C92BC6A` | |
 | Realme E2E (#16) | PENDING | |
+
+## 2026-07-20 — 0.4.7 PCM playback fix
+
+| Check | Result | Notes |
+|------|--------|-------|
+| MODE_STREAM AudioTrack | PASS | replaces MODE_STATIC |
+| MediaPlayer WAV fallback | PASS | cacheDir temp wav |
+| Diagnostics | PASS | `pcm_play_attempt` / backend tags |
+| Unit/lint/assemble | PASS | versionCode 14 |
+| APK SHA-256 | `C98727E5F1169E486193D6E3E1ADBF9D21AA646E76231EE841A85F5756B9B377` | |
+| Realme E2E (#16) | PENDING | |

@@ -5,37 +5,24 @@ Apps become buildings. Habits rebuild districts. A neon city assistant can read
 notifications aloud when you opt in.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher (public)
-**Branch:** `main` · version `0.4.6-gemini-native-audio-dev`
-**Latest prerelease:** [`v0.4.6-gemini-native-audio-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.4.6-gemini-native-audio-dev)
+**Branch:** `main` · version `0.4.7-pcm-playback-fix-dev`
+**Latest prerelease:** [`v0.4.7-pcm-playback-fix-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.4.7-pcm-playback-fix-dev)
 
 ## Download
 
-Latest debug prerelease (sideload):
-
-- Releases: https://github.com/sivaram311/forgecity-launcher/releases
-- Tag target: `v0.4.6-gemini-native-audio-dev`
-
-This is **debug-signed**. Realme P2 Pro E2E (#16) is still pending for any annotated production tag.
-
 ```powershell
-curl.exe -L -o forgecity-0.4.6-gemini-native-audio-dev-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.4.6-gemini-native-audio-dev/forgecity-0.4.6-gemini-native-audio-dev-debug.apk
-Get-FileHash .\forgecity-0.4.6-gemini-native-audio-dev-debug.apk -Algorithm SHA256
-# expect 1644ED69CC47074932E327170F998D9593ED73A1CEE0AD0FB7B34A2F9C92BC6A
-adb install -r .\forgecity-0.4.6-gemini-native-audio-dev-debug.apk
+curl.exe -L -o forgecity-0.4.7-pcm-playback-fix-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.4.7-pcm-playback-fix-dev/forgecity-0.4.7-pcm-playback-fix-dev-debug.apk
+Get-FileHash .\forgecity-0.4.7-pcm-playback-fix-dev-debug.apk -Algorithm SHA256
+# expect C98727E5F1169E486193D6E3E1ADBF9D21AA646E76231EE841A85F5756B9B377
+adb install -r .\forgecity-0.4.7-pcm-playback-fix-dev-debug.apk
 ```
 
-## What works in 0.4.6-gemini-native-audio-dev
+## What works in 0.4.7-pcm-playback-fix-dev
 
-- **Gemini native audio TTS** (`gemini-3.1-flash-tts-preview`) — template → PCM → `AudioTrack`
-- Modes: OFF → DIRECT → PORTAL → **GEMINI AUDIO** → **CASCADE** (Audio→Portal→device)
-- Configurable TTS model, voice (`Kore`), language (`ta-IN`)
-- Editable audio prompt template with `{appLabel}` `{title}` `{text}` `{maxChars}`
-- Separate chips: **`ASSIST`**, **`SEARCH`**, **`DOCK`** (+ `UI`)
-- Custom editable **TEST TTS** text field
-- Portal Tamil rewrite remains cascade tier 2
-- Saved API key visible in config for device setup (encrypted at rest)
-- Safe terminal diagnostics via `adb logcat -s ForgeCityTTS`; keys and message
-  content are never logged
-- Immersive city-first launcher: chrome hidden by default; 48 dp `UI +` / `UI −` chip
-- Persisted speech mode with legacy preference migration
+- Fix: Gemini native audio **playback** (streamed AudioTrack + MediaPlayer WAV fallback)
+- Gemini TTS (`gemini-3.1-flash-tts-preview`) — template → PCM → play
+- Modes: OFF → DIRECT → PORTAL → GEMINI AUDIO → CASCADE
+- Voice / language / prompt template config
+- Separate ASSIST / SEARCH / DOCK / UI chips
+- Diagnostics: `adb logcat -s ForgeCityTTS`

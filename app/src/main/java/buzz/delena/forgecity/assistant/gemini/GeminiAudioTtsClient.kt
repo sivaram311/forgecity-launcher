@@ -260,7 +260,8 @@ internal object GeminiAudioResponseParser {
             ?: "audio/L16;rate=24000"
         val b64 = extractJsonString(region, "data") ?: return null
         val pcm = runCatching {
-            Base64.getDecoder().decode(b64)
+            // MIME decoder tolerates newlines/whitespace in API base64 payloads.
+            Base64.getMimeDecoder().decode(b64)
         }.getOrNull() ?: return null
         val rate = RATE_REGEX.find(mimeType)?.groupValues?.getOrNull(1)?.toIntOrNull()
             ?: 24_000

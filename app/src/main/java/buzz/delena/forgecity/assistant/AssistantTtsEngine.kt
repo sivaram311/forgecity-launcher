@@ -6,8 +6,12 @@ import android.media.AudioFormat
 import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.media.AudioTrack
+import android.media.MediaPlayer
 import android.os.Build
 import android.speech.tts.TextToSpeech
+import java.io.File
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import java.util.Locale
 import java.util.concurrent.Executors
 
@@ -19,6 +23,7 @@ class AssistantTtsEngine(context: Context) {
     private val readyCallbacks = mutableListOf<(Readiness) -> Unit>()
     private var focusRequest: AudioFocusRequest? = null
     private var pcmTrack: AudioTrack? = null
+    private var mediaPlayer: MediaPlayer? = null
     private val pcmExecutor = Executors.newSingleThreadExecutor { task ->
         Thread(task, "forgecity-pcm-play").apply { isDaemon = true }
     }
@@ -71,7 +76,10 @@ class AssistantTtsEngine(context: Context) {
         )
     }
 
-    /** Play raw 16-bit little-endian mono PCM from Gemini native audio TTS. */
+    /**
+     * Play Gemini native audio. Accepts raw L16 PCM or a RIFF/WAV wrapper.
+     * Uses streamed AudioTrack first; falls back to MediaPlayer + temp WAV.
+     */
     fun playPcm(
         pcm: ByteArray,
         sampleRateHz: Int,
@@ -82,72 +90,156 @@ class AssistantTtsEngine(context: Context) {
             callback?.invoke(SpeakResult.EMPTY)
             return
         }
-        val rate = sampleRateHz.coerceIn(8_000, 48_000)
         pcmExecutor.execute {
             var reported = false
             try {
-                stopPcmLocked()
+                stopPlaybackLocked()
                 tts?.stop()
-                requestFocus()
-                val attrs = AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_ASSISTANCE_ACCESSIBILITY)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-                    .build()
-                val format = AudioFormat.Builder()
-                    .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
-                    .setSampleRate(rate)
-                    .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
-                    .build()
-                val minBuf = AudioTrack.getMinBufferSize(
-                    rate,
-                    AudioFormat.CHANNEL_OUT_MONO,
-                    AudioFormat.ENCODING_PCM_16BIT,
-                )
-                if (minBuf <= 0) {
-                    ForgeCityTtsDiagnostics.warn("pcm_blocked", "reason=bad_buffer")
-                    abandonFocus()
-                    callback?.invoke(SpeakResult.UNAVAILABLE)
+                val normalized = PcmAudioNormalizer.normalize(pcm, sampleRateHz)
+                if (normalized.pcm.isEmpty()) {
+                    ForgeCityTtsDiagnostics.warn("pcm_blocked", "reason=empty_after_normalize")
+                    callback?.invoke(SpeakResult.EMPTY)
                     return@execute
                 }
-                val track = AudioTrack.Builder()
-                    .setAudioAttributes(attrs)
-                    .setAudioFormat(format)
-                    .setBufferSizeInBytes(maxOf(minBuf, pcm.size))
-                    .setTransferMode(AudioTrack.MODE_STATIC)
-                    .build()
-                if (track.state != AudioTrack.STATE_INITIALIZED) {
-                    track.release()
-                    ForgeCityTtsDiagnostics.warn("pcm_blocked", "reason=track_init")
-                    abandonFocus()
-                    callback?.invoke(SpeakResult.UNAVAILABLE)
-                    return@execute
-                }
-                synchronized(this) { pcmTrack = track }
-                val written = track.write(pcm, 0, pcm.size)
-                if (written <= 0) {
-                    ForgeCityTtsDiagnostics.warn("pcm_write_failed", "written=$written")
-                    abandonFocus()
-                    callback?.invoke(SpeakResult.UNAVAILABLE)
-                    return@execute
-                }
-                track.play()
                 ForgeCityTtsDiagnostics.info(
-                    "pcm_play_started",
-                    "bytes=${pcm.size} rateHz=$rate written=$written",
+                    "pcm_play_attempt",
+                    "bytes=${normalized.pcm.size} rateHz=${normalized.sampleRateHz} wav=${normalized.hadWavHeader}",
                 )
-                reported = true
-                callback?.invoke(SpeakResult.STARTED)
-                val durationMs = ((pcm.size / 2.0) / rate * 1000.0).toLong().coerceAtLeast(50L)
-                Thread.sleep(durationMs + 80L)
-            } catch (_: InterruptedException) {
+                requestFocus()
+                if (playViaAudioTrack(normalized.pcm, normalized.sampleRateHz)) {
+                    reported = true
+                    callback?.invoke(SpeakResult.STARTED)
+                    waitForPcmDuration(normalized.pcm.size, normalized.sampleRateHz)
+                    return@execute
+                }
+                ForgeCityTtsDiagnostics.warn("pcm_audiotrack_failed", "trying=mediaplayer")
+                if (playViaMediaPlayer(normalized.pcm, normalized.sampleRateHz)) {
+                    reported = true
+                    callback?.invoke(SpeakResult.STARTED)
+                    waitForPcmDuration(normalized.pcm.size, normalized.sampleRateHz)
+                    return@execute
+                }
+                ForgeCityTtsDiagnostics.warn("pcm_play_failed", "reason=all_backends")
+                callback?.invoke(SpeakResult.UNAVAILABLE)
+            } catch (e: InterruptedException) {
                 Thread.currentThread().interrupt()
-            } catch (_: Exception) {
-                ForgeCityTtsDiagnostics.warn("pcm_play_failed")
+            } catch (e: Exception) {
+                ForgeCityTtsDiagnostics.warn(
+                    "pcm_play_failed",
+                    "reason=exception type=${e.javaClass.simpleName}",
+                )
                 if (!reported) callback?.invoke(SpeakResult.UNAVAILABLE)
             } finally {
-                stopPcmLocked()
+                stopPlaybackLocked()
                 abandonFocus()
             }
+        }
+    }
+
+    private fun playViaAudioTrack(pcm: ByteArray, sampleRateHz: Int): Boolean {
+        val minBuf = AudioTrack.getMinBufferSize(
+            sampleRateHz,
+            AudioFormat.CHANNEL_OUT_MONO,
+            AudioFormat.ENCODING_PCM_16BIT,
+        )
+        if (minBuf <= 0) {
+            ForgeCityTtsDiagnostics.warn("pcm_blocked", "reason=bad_buffer minBuf=$minBuf")
+            return false
+        }
+        val attrs = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_MEDIA)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+            .build()
+        val format = AudioFormat.Builder()
+            .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+            .setSampleRate(sampleRateHz)
+            .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
+            .build()
+        val track = try {
+            AudioTrack.Builder()
+                .setAudioAttributes(attrs)
+                .setAudioFormat(format)
+                .setBufferSizeInBytes(minBuf * 2)
+                .setTransferMode(AudioTrack.MODE_STREAM)
+                .build()
+        } catch (e: Exception) {
+            ForgeCityTtsDiagnostics.warn(
+                "pcm_blocked",
+                "reason=track_build type=${e.javaClass.simpleName}",
+            )
+            return false
+        }
+        if (track.state != AudioTrack.STATE_INITIALIZED) {
+            track.release()
+            ForgeCityTtsDiagnostics.warn("pcm_blocked", "reason=track_init state=${track.state}")
+            return false
+        }
+        synchronized(this) { pcmTrack = track }
+        return try {
+            track.play()
+            var offset = 0
+            while (offset < pcm.size) {
+                val chunk = minOf(minBuf, pcm.size - offset)
+                val written = track.write(pcm, offset, chunk)
+                if (written < 0) {
+                    ForgeCityTtsDiagnostics.warn("pcm_write_failed", "written=$written offset=$offset")
+                    return false
+                }
+                if (written == 0) {
+                    Thread.sleep(10)
+                    continue
+                }
+                offset += written
+            }
+            ForgeCityTtsDiagnostics.info(
+                "pcm_play_started",
+                "backend=audiotrack bytes=${pcm.size} rateHz=$sampleRateHz",
+            )
+            true
+        } catch (e: Exception) {
+            ForgeCityTtsDiagnostics.warn(
+                "pcm_audiotrack_exception",
+                "type=${e.javaClass.simpleName}",
+            )
+            false
+        }
+    }
+
+    private fun playViaMediaPlayer(pcm: ByteArray, sampleRateHz: Int): Boolean {
+        val wavFile = File(appContext.cacheDir, "forgecity-gemini-tts.wav")
+        return try {
+            wavFile.writeBytes(PcmAudioNormalizer.toWav(pcm, sampleRateHz))
+            val player = MediaPlayer()
+            synchronized(this) { mediaPlayer = player }
+            player.setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                    .build(),
+            )
+            player.setDataSource(wavFile.absolutePath)
+            player.prepare()
+            player.start()
+            ForgeCityTtsDiagnostics.info(
+                "pcm_play_started",
+                "backend=mediaplayer bytes=${pcm.size} rateHz=$sampleRateHz",
+            )
+            true
+        } catch (e: Exception) {
+            ForgeCityTtsDiagnostics.warn(
+                "pcm_mediaplayer_failed",
+                "type=${e.javaClass.simpleName}",
+            )
+            false
+        }
+    }
+
+    private fun waitForPcmDuration(byteCount: Int, sampleRateHz: Int) {
+        val durationMs = ((byteCount / 2.0) / sampleRateHz * 1000.0).toLong().coerceAtLeast(50L)
+        try {
+            Thread.sleep(durationMs + 120L)
+        } catch (_: InterruptedException) {
+            Thread.currentThread().interrupt()
         }
     }
 
@@ -207,12 +299,12 @@ class AssistantTtsEngine(context: Context) {
 
     fun stop() {
         tts?.stop()
-        stopPcmLocked()
+        stopPlaybackLocked()
         abandonFocus()
     }
 
     @Synchronized
-    private fun stopPcmLocked() {
+    private fun stopPlaybackLocked() {
         runCatching {
             pcmTrack?.pause()
             pcmTrack?.flush()
@@ -220,6 +312,11 @@ class AssistantTtsEngine(context: Context) {
             pcmTrack?.release()
         }
         pcmTrack = null
+        runCatching {
+            mediaPlayer?.stop()
+            mediaPlayer?.release()
+        }
+        mediaPlayer = null
     }
 
     fun shutdown() {
@@ -246,7 +343,7 @@ class AssistantTtsEngine(context: Context) {
             val req = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK)
                 .setAudioAttributes(
                     AudioAttributes.Builder()
-                        .setUsage(AudioAttributes.USAGE_ASSISTANCE_ACCESSIBILITY)
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
                         .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
                         .build(),
                 )
@@ -271,5 +368,83 @@ class AssistantTtsEngine(context: Context) {
             @Suppress("DEPRECATION")
             audioManager.abandonAudioFocus(null)
         }
+    }
+}
+
+/** Normalize Gemini audio bytes (raw L16 or RIFF/WAV) for playback. */
+internal object PcmAudioNormalizer {
+    data class NormalizedPcm(
+        val pcm: ByteArray,
+        val sampleRateHz: Int,
+        val hadWavHeader: Boolean,
+    )
+
+    fun normalize(raw: ByteArray, fallbackRateHz: Int): NormalizedPcm {
+        val rate = fallbackRateHz.coerceIn(8_000, 48_000)
+        if (raw.size >= 12 &&
+            raw[0] == 'R'.code.toByte() &&
+            raw[1] == 'I'.code.toByte() &&
+            raw[2] == 'F'.code.toByte() &&
+            raw[3] == 'F'.code.toByte()
+        ) {
+            val parsed = parseWav(raw)
+            if (parsed != null) return parsed
+        }
+        val even = if (raw.size % 2 == 0) raw else raw.copyOf(raw.size - 1)
+        return NormalizedPcm(pcm = even, sampleRateHz = rate, hadWavHeader = false)
+    }
+
+    fun toWav(pcm: ByteArray, sampleRateHz: Int): ByteArray {
+        val header = ByteBuffer.allocate(44).order(ByteOrder.LITTLE_ENDIAN)
+        val dataSize = pcm.size
+        header.put("RIFF".toByteArray(Charsets.US_ASCII))
+        header.putInt(36 + dataSize)
+        header.put("WAVE".toByteArray(Charsets.US_ASCII))
+        header.put("fmt ".toByteArray(Charsets.US_ASCII))
+        header.putInt(16)
+        header.putShort(1) // PCM
+        header.putShort(1) // mono
+        header.putInt(sampleRateHz)
+        header.putInt(sampleRateHz * 2) // byte rate
+        header.putShort(2) // block align
+        header.putShort(16) // bits
+        header.put("data".toByteArray(Charsets.US_ASCII))
+        header.putInt(dataSize)
+        return header.array() + pcm
+    }
+
+    private fun parseWav(bytes: ByteArray): NormalizedPcm? {
+        if (bytes.size < 44) return null
+        var offset = 12
+        var sampleRate = 24_000
+        var data: ByteArray? = null
+        while (offset + 8 <= bytes.size) {
+            val id = String(bytes, offset, 4, Charsets.US_ASCII)
+            val size = ByteBuffer.wrap(bytes, offset + 4, 4)
+                .order(ByteOrder.LITTLE_ENDIAN)
+                .int
+                .coerceAtLeast(0)
+            val chunkStart = offset + 8
+            val chunkEnd = (chunkStart + size).coerceAtMost(bytes.size)
+            when (id) {
+                "fmt " -> {
+                    if (size >= 16 && chunkStart + 16 <= bytes.size) {
+                        val fmt = ByteBuffer.wrap(bytes, chunkStart, 16).order(ByteOrder.LITTLE_ENDIAN)
+                        val audioFormat = fmt.short.toInt() and 0xffff
+                        val channels = fmt.short.toInt() and 0xffff
+                        sampleRate = fmt.int.coerceIn(8_000, 48_000)
+                        if (audioFormat != 1 || channels != 1) return null
+                    }
+                }
+                "data" -> {
+                    data = bytes.copyOfRange(chunkStart, chunkEnd)
+                }
+            }
+            offset = chunkEnd + (if (size % 2 == 1) 1 else 0)
+            if (id == "data") break
+        }
+        val pcm = data ?: return null
+        val even = if (pcm.size % 2 == 0) pcm else pcm.copyOf(pcm.size - 1)
+        return NormalizedPcm(pcm = even, sampleRateHz = sampleRate, hadWavHeader = true)
     }
 }
