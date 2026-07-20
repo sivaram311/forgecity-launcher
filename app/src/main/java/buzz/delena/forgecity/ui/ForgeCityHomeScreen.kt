@@ -75,6 +75,7 @@ fun ForgeCityHomeScreen(
     backgroundVideoEnabled: Boolean,
     backgroundVideoOpacity: Float,
     launcherChromeVisible: Boolean,
+    assistantToolsVisible: Boolean,
     showAllowlist: Boolean,
     dockMessage: String?,
     levelUpBuildingId: String?,
@@ -97,6 +98,7 @@ fun ForgeCityHomeScreen(
     onToggleBackgroundVideo: () -> Unit,
     onBackgroundVideoOpacityChange: (Float) -> Unit,
     onToggleLauncherChrome: () -> Unit,
+    onToggleAssistantTools: () -> Unit,
     onQuietStartEarlier: () -> Unit,
     onQuietStartLater: () -> Unit,
     onQuietEndEarlier: () -> Unit,
@@ -191,42 +193,44 @@ fun ForgeCityHomeScreen(
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                AssistantSettingsCard(
-                    hasNotificationAccess = hasNotificationAccess,
-                    assistantEnabled = assistantEnabled,
-                    speechMode = speechMode,
-                    rewriteEndpoint = rewriteEndpoint,
-                    apiKeyConfigured = apiKeyConfigured,
-                    apiKey = apiKey,
-                    geminiApiKeyConfigured = geminiApiKeyConfigured,
-                    geminiApiKey = geminiApiKey,
-                    geminiModel = geminiModel,
-                    promptTemplate = promptTemplate,
-                    speechTestStatus = speechTestStatus,
-                    backgroundVideoEnabled = backgroundVideoEnabled,
-                    backgroundVideoOpacity = backgroundVideoOpacity,
-                    quietLabel = quietLabel,
-                    allowCount = allowCount,
-                    onOpenNotificationAccess = onOpenNotificationAccess,
-                    onToggleAssistant = onToggleAssistant,
-                    onCycleSpeechMode = onCycleSpeechMode,
-                    onRewriteEndpointChange = onRewriteEndpointChange,
-                    onSaveApiKey = onSaveApiKey,
-                    onGeminiModelChange = onGeminiModelChange,
-                    onPromptTemplateChange = onPromptTemplateChange,
-                    onSaveGeminiApiKey = onSaveGeminiApiKey,
-                    onTestSpeechMode = onTestSpeechMode,
-                    onClearSpeechTestStatus = onClearSpeechTestStatus,
-                    onToggleBackgroundVideo = onToggleBackgroundVideo,
-                    onBackgroundVideoOpacityChange = onBackgroundVideoOpacityChange,
-                    onQuietStartEarlier = onQuietStartEarlier,
-                    onQuietStartLater = onQuietStartLater,
-                    onQuietEndEarlier = onQuietEndEarlier,
-                    onQuietEndLater = onQuietEndLater,
-                    onOpenAllowlist = onOpenAllowlist,
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                SearchBar(query = query, onQueryChange = onQueryChange)
+                if (assistantToolsVisible) {
+                    AssistantSettingsCard(
+                        hasNotificationAccess = hasNotificationAccess,
+                        assistantEnabled = assistantEnabled,
+                        speechMode = speechMode,
+                        rewriteEndpoint = rewriteEndpoint,
+                        apiKeyConfigured = apiKeyConfigured,
+                        apiKey = apiKey,
+                        geminiApiKeyConfigured = geminiApiKeyConfigured,
+                        geminiApiKey = geminiApiKey,
+                        geminiModel = geminiModel,
+                        promptTemplate = promptTemplate,
+                        speechTestStatus = speechTestStatus,
+                        backgroundVideoEnabled = backgroundVideoEnabled,
+                        backgroundVideoOpacity = backgroundVideoOpacity,
+                        quietLabel = quietLabel,
+                        allowCount = allowCount,
+                        onOpenNotificationAccess = onOpenNotificationAccess,
+                        onToggleAssistant = onToggleAssistant,
+                        onCycleSpeechMode = onCycleSpeechMode,
+                        onRewriteEndpointChange = onRewriteEndpointChange,
+                        onSaveApiKey = onSaveApiKey,
+                        onGeminiModelChange = onGeminiModelChange,
+                        onPromptTemplateChange = onPromptTemplateChange,
+                        onSaveGeminiApiKey = onSaveGeminiApiKey,
+                        onTestSpeechMode = onTestSpeechMode,
+                        onClearSpeechTestStatus = onClearSpeechTestStatus,
+                        onToggleBackgroundVideo = onToggleBackgroundVideo,
+                        onBackgroundVideoOpacityChange = onBackgroundVideoOpacityChange,
+                        onQuietStartEarlier = onQuietStartEarlier,
+                        onQuietStartLater = onQuietStartLater,
+                        onQuietEndEarlier = onQuietEndEarlier,
+                        onQuietEndLater = onQuietEndLater,
+                        onOpenAllowlist = onOpenAllowlist,
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    SearchBar(query = query, onQueryChange = onQueryChange)
+                }
             }
         }
 
@@ -247,7 +251,7 @@ fun ForgeCityHomeScreen(
         }
 
         AnimatedVisibility(
-            visible = launcherChromeVisible,
+            visible = launcherChromeVisible && assistantToolsVisible,
             enter = fadeIn(),
             exit = fadeOut(),
             modifier = Modifier
@@ -284,7 +288,7 @@ fun ForgeCityHomeScreen(
             }
         }
 
-        if (launcherChromeVisible && showAllowlist) {
+        if (launcherChromeVisible && assistantToolsVisible && showAllowlist) {
             AllowlistSheet(
                 buildings = buildings.distinctBy { it.packageName },
                 isPackageAllowed = isPackageAllowed,
@@ -293,34 +297,67 @@ fun ForgeCityHomeScreen(
             )
         }
 
-        Box(
-            contentAlignment = Alignment.Center,
+        Column(
+            horizontalAlignment = Alignment.End,
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .statusBarsPadding()
-                .padding(top = 6.dp, end = 6.dp)
-                .size(48.dp)
-                .semantics {
-                    contentDescription =
-                        if (launcherChromeVisible) "Hide UI" else "Show UI"
-                    stateDescription =
-                        if (launcherChromeVisible) "Launcher UI shown" else "Launcher UI hidden"
-                }
-                .clickable(
-                    role = Role.Button,
-                    onClick = onToggleLauncherChrome,
-                ),
+                .padding(top = 6.dp, end = 6.dp),
         ) {
-            Text(
-                text = if (launcherChromeVisible) "UI −" else "UI +",
-                color = Color(0xFFFFF6F0),
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .background(Color(0xCC201828), RoundedCornerShape(14.dp))
-                    .padding(horizontal = 8.dp, vertical = 6.dp),
+            ChromeChip(
+                label = if (launcherChromeVisible) "UI −" else "UI +",
+                contentDescription = if (launcherChromeVisible) "Hide UI" else "Show UI",
+                stateDescription =
+                    if (launcherChromeVisible) "Launcher UI shown" else "Launcher UI hidden",
+                onClick = onToggleLauncherChrome,
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            ChromeChip(
+                label = if (assistantToolsVisible) "ASSIST −" else "ASSIST +",
+                contentDescription =
+                    if (assistantToolsVisible) {
+                        "Hide assistant search and apps"
+                    } else {
+                        "Show assistant search and apps"
+                    },
+                stateDescription =
+                    if (assistantToolsVisible) {
+                        "Assistant tools shown"
+                    } else {
+                        "Assistant tools hidden"
+                    },
+                onClick = onToggleAssistantTools,
             )
         }
+    }
+}
+
+@Composable
+private fun ChromeChip(
+    label: String,
+    contentDescription: String,
+    stateDescription: String,
+    onClick: () -> Unit,
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .size(48.dp)
+            .semantics {
+                this.contentDescription = contentDescription
+                this.stateDescription = stateDescription
+            }
+            .clickable(role = Role.Button, onClick = onClick),
+    ) {
+        Text(
+            text = label,
+            color = Color(0xFFFFF6F0),
+            fontSize = 10.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .background(Color(0xCC201828), RoundedCornerShape(14.dp))
+                .padding(horizontal = 6.dp, vertical = 6.dp),
+        )
     }
 }
 

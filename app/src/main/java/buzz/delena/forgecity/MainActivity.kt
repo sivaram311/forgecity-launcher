@@ -61,6 +61,7 @@ class MainActivity : ComponentActivity() {
             val backgroundVideoEnabled by viewModel.backgroundVideoEnabled.collectAsState()
             val backgroundVideoOpacity by viewModel.backgroundVideoOpacity.collectAsState()
             val launcherChromeVisible by viewModel.launcherChromeVisible.collectAsState()
+            val assistantToolsVisible by viewModel.assistantToolsVisible.collectAsState()
             val showAllowlist by viewModel.showAllowlist.collectAsState()
             val dockMessage by viewModel.dockMessage.collectAsState()
             val levelUp by viewModel.levelUpEvent.collectAsState()
@@ -88,6 +89,7 @@ class MainActivity : ComponentActivity() {
                 backgroundVideoEnabled = backgroundVideoEnabled,
                 backgroundVideoOpacity = backgroundVideoOpacity,
                 launcherChromeVisible = launcherChromeVisible,
+                assistantToolsVisible = assistantToolsVisible,
                 showAllowlist = showAllowlist,
                 dockMessage = dockMessage,
                 levelUpBuildingId = levelUp,
@@ -110,6 +112,7 @@ class MainActivity : ComponentActivity() {
                 onToggleBackgroundVideo = viewModel::toggleBackgroundVideo,
                 onBackgroundVideoOpacityChange = viewModel::setBackgroundVideoOpacity,
                 onToggleLauncherChrome = viewModel::toggleLauncherChrome,
+                onToggleAssistantTools = viewModel::toggleAssistantTools,
                 onQuietStartEarlier = { viewModel.shiftQuietStart(-30) },
                 onQuietStartLater = { viewModel.shiftQuietStart(30) },
                 onQuietEndEarlier = { viewModel.shiftQuietEnd(-30) },

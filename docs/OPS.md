@@ -20,14 +20,20 @@ git checkout main
 Latest Tamil Agent + TTS diagnostics build:
 
 ```powershell
-curl.exe -L -o forgecity-0.4.3-gemini-cascade-dev-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.4.3-gemini-cascade-dev/forgecity-0.4.3-gemini-cascade-dev-debug.apk
-Get-FileHash .\forgecity-0.4.3-gemini-cascade-dev-debug.apk -Algorithm SHA256
-# expect AFFEEAA381CC9AB2BDE81F4737BE03F499FD021704A94A11B2D429AC21A9B985
-adb install -r .\forgecity-0.4.3-gemini-cascade-dev-debug.apk
+curl.exe -L -o forgecity-0.4.4-gemini-fix-assist-chip-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.4.4-gemini-fix-assist-chip-dev/forgecity-0.4.4-gemini-fix-assist-chip-dev-debug.apk
+Get-FileHash .\forgecity-0.4.4-gemini-fix-assist-chip-dev-debug.apk -Algorithm SHA256
+# expect AE44CEA9E688D2115460809A02E1EDC08190BD60DE6F3F2EC5EB679A1402C491
+adb install -r .\forgecity-0.4.4-gemini-fix-assist-chip-dev-debug.apk
 ```
 
 Also grant: Home role, Usage Access, Notification Access (allowlist apps before speech).
+
+### ASSIST chip (0.4.4)
+
+Persistent top-right **`ASSIST +` / `ASSIST −`** (below `UI +/−`) toggles City Assistant
+panel, search bar, and favorites dock independently of full chrome. City canvas
+and chapter/resources stay under the main `UI` chip.
 
 ### Tamil Agent Portal rewrite (0.4.0)
 

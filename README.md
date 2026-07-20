@@ -5,32 +5,32 @@ Apps become buildings. Habits rebuild districts. A neon city assistant can read
 notifications aloud when you opt in.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher (public)
-**Branch:** `main` · version `0.4.3-gemini-cascade-dev`
-**Latest prerelease:** [`v0.4.3-gemini-cascade-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.4.3-gemini-cascade-dev)
+**Branch:** `main` · version `0.4.4-gemini-fix-assist-chip-dev`
+**Latest prerelease:** [`v0.4.4-gemini-fix-assist-chip-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.4.4-gemini-fix-assist-chip-dev)
 
 ## Download
 
 Latest debug prerelease (sideload):
 
 - Releases: https://github.com/sivaram311/forgecity-launcher/releases
-- Tag target: `v0.4.3-gemini-cascade-dev`
+- Tag target: `v0.4.4-gemini-fix-assist-chip-dev`
 
 This is **debug-signed**. Realme P2 Pro E2E (#16) is still pending for any annotated production tag.
 
 ```powershell
-curl.exe -L -o forgecity-0.4.3-gemini-cascade-dev-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.4.3-gemini-cascade-dev/forgecity-0.4.3-gemini-cascade-dev-debug.apk
-Get-FileHash .\forgecity-0.4.3-gemini-cascade-dev-debug.apk -Algorithm SHA256
-# expect AFFEEAA381CC9AB2BDE81F4737BE03F499FD021704A94A11B2D429AC21A9B985
-adb install -r .\forgecity-0.4.3-gemini-cascade-dev-debug.apk
+curl.exe -L -o forgecity-0.4.4-gemini-fix-assist-chip-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.4.4-gemini-fix-assist-chip-dev/forgecity-0.4.4-gemini-fix-assist-chip-dev-debug.apk
+Get-FileHash .\forgecity-0.4.4-gemini-fix-assist-chip-dev-debug.apk -Algorithm SHA256
+# expect AE44CEA9E688D2115460809A02E1EDC08190BD60DE6F3F2EC5EB679A1402C491
+adb install -r .\forgecity-0.4.4-gemini-fix-assist-chip-dev-debug.apk
 ```
 
-## What works in 0.4.3-gemini-cascade-dev
+## What works in 0.4.4-gemini-fix-assist-chip-dev
 
-- **`SMART_CASCADE` mode:** Gemini API rewrite → Agent Portal Tamil → device TTS fallback
-- **Editable pre-template** with `{appLabel}` `{title}` `{text}` `{maxChars}` (Gemini tier)
-- **Gemini API key + model** in City Assistant (Keystore encrypted)
-- Prior 0.4.2 contract fix, 0.4.1 TEST TTS + diagnostics, 0.4.0 Portal Tamil path
+- **Fix:** Gemini default model migrated from shut-down `gemini-2.0-flash` → `gemini-2.5-flash`
+- Clearer Gemini failure reasons (auth / model / no-Tamil / timeout)
+- **`ASSIST +/−` chip** toggles City Assistant + search + favorites dock
+- Prior SMART_CASCADE + Portal Tamil + TEST TTS + diagnostics
 - Saved API key is visible in config for device setup (still encrypted at rest)
 - Safe terminal diagnostics via `adb logcat -s ForgeCityTTS`; keys and message
   content are never logged

@@ -103,6 +103,10 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
         MutableStateFlow(assistantSettings.launcherChromeVisible)
     val launcherChromeVisible: StateFlow<Boolean> = _launcherChromeVisible.asStateFlow()
 
+    private val _assistantToolsVisible =
+        MutableStateFlow(assistantSettings.assistantToolsVisible)
+    val assistantToolsVisible: StateFlow<Boolean> = _assistantToolsVisible.asStateFlow()
+
     private val _showAllowlist = MutableStateFlow(false)
     val showAllowlist: StateFlow<Boolean> = _showAllowlist.asStateFlow()
 
@@ -273,6 +277,15 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
         if (!_launcherChromeVisible.value) {
             closeAllowlist()
             dismissAssistantEvent()
+            _query.value = ""
+        }
+    }
+
+    fun toggleAssistantTools() {
+        assistantSettings.assistantToolsVisible = !assistantSettings.assistantToolsVisible
+        _assistantToolsVisible.value = assistantSettings.assistantToolsVisible
+        if (!_assistantToolsVisible.value) {
+            closeAllowlist()
             _query.value = ""
         }
     }

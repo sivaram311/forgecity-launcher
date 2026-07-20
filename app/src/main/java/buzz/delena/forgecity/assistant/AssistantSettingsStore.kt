@@ -112,9 +112,11 @@ class AssistantSettingsStore(context: Context) {
             prefs.contains(KEY_GEMINI_API_KEY_IV)
 
     var geminiModel: String
-        get() = prefs.getString(KEY_GEMINI_MODEL, GeminiRewriteClient.DEFAULT_MODEL).orEmpty()
+        get() = GeminiRewriteClient.normalizeModel(
+            prefs.getString(KEY_GEMINI_MODEL, GeminiRewriteClient.DEFAULT_MODEL).orEmpty(),
+        )
         set(value) = prefs.edit()
-            .putString(KEY_GEMINI_MODEL, value.trim().ifBlank { GeminiRewriteClient.DEFAULT_MODEL })
+            .putString(KEY_GEMINI_MODEL, GeminiRewriteClient.normalizeModel(value))
             .apply()
 
     var promptTemplate: String
@@ -172,6 +174,11 @@ class AssistantSettingsStore(context: Context) {
         get() = prefs.getBoolean(KEY_LAUNCHER_CHROME_VISIBLE, LauncherChromeDefaults.VISIBLE)
         set(value) = prefs.edit().putBoolean(KEY_LAUNCHER_CHROME_VISIBLE, value).apply()
 
+    /** City Assistant panel + search + favorites dock (apps). Independent of full chrome. */
+    var assistantToolsVisible: Boolean
+        get() = prefs.getBoolean(KEY_ASSISTANT_TOOLS_VISIBLE, true)
+        set(value) = prefs.edit().putBoolean(KEY_ASSISTANT_TOOLS_VISIBLE, value).apply()
+
     fun allowedPackages(): Set<String> =
         prefs.getStringSet(KEY_ALLOW, emptySet())?.toSet().orEmpty()
 
@@ -226,6 +233,7 @@ class AssistantSettingsStore(context: Context) {
         private const val KEY_BACKGROUND_VIDEO = "background_video_enabled"
         private const val KEY_BACKGROUND_OPACITY = "background_video_opacity"
         private const val KEY_LAUNCHER_CHROME_VISIBLE = "launcher_chrome_visible"
+        private const val KEY_ASSISTANT_TOOLS_VISIBLE = "assistant_tools_visible"
         private const val ANDROID_KEYSTORE = "AndroidKeyStore"
         private const val KEYSTORE_PORTAL_ALIAS = "forgecity_assistant_api_key"
         private const val KEYSTORE_GEMINI_ALIAS = "forgecity_gemini_api_key"

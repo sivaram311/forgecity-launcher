@@ -48,10 +48,15 @@ class CascadeSpeechOrchestrator(
                     return
                 }
                 is GeminiRewriteResult.Unauthorized ->
-                    onStatus?.invoke("Gemini auth failed; trying Portal…")
+                    onStatus?.invoke("Gemini auth failed (bad key); trying Portal…")
+                is GeminiRewriteResult.ModelUnavailable ->
+                    onStatus?.invoke("Gemini model unavailable (try gemini-2.5-flash); Portal…")
                 is GeminiRewriteResult.Timeout ->
                     onStatus?.invoke("Gemini timeout; trying Portal…")
-                else -> onStatus?.invoke("Gemini unavailable; trying Portal…")
+                is GeminiRewriteResult.Malformed ->
+                    onStatus?.invoke("Gemini response not Tamil; trying Portal…")
+                is GeminiRewriteResult.Unavailable ->
+                    onStatus?.invoke("Gemini unavailable; trying Portal…")
             }
         } else {
             ForgeCityTtsDiagnostics.info("cascade_skip", "tier=gemini reason=no_key")

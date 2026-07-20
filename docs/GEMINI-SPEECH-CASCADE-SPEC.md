@@ -50,7 +50,7 @@ Template is editable in City Assistant, persisted in prefs, and applied on every
 | Setting | Storage | Default |
 |---------|---------|---------|
 | API key | Android Keystore encrypted | empty |
-| Model | plain pref | `gemini-2.0-flash` |
+| Model | plain pref | `gemini-2.5-flash` |
 | Pre-template | plain pref | see `PromptTemplateDefaults` |
 
 HTTPS only: `generativelanguage.googleapis.com`. Key never logged.

@@ -248,7 +248,7 @@ fun AssistantSettingsCard(
         RemoteTextField(
             value = geminiModel,
             onValueChange = onGeminiModelChange,
-            placeholder = "gemini-2.0-flash",
+            placeholder = "gemini-2.5-flash",
         )
         RemoteTextField(
             value = geminiKeyDraft,
