@@ -286,3 +286,14 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | Tip | `82d92c7` | Gemini cascade source |
 | APK SHA-256 | `AFFEEAA381CC9AB2BDE81F4737BE03F499FD021704A94A11B2D429AC21A9B985` | download round-trip at publish |
 | Realme E2E (#16) | PENDING | Blocks annotated production tags |
+
+## 2026-07-20 — 0.4.4 Gemini unavailable root-cause + ASSIST chip
+
+| Check | Result | Notes |
+|------|--------|-------|
+| Root cause | CONFIRMED | Default `gemini-2.0-flash` shut down 2026-06-01; 400 API_KEY_INVALID / Malformed mislabeled as Unavailable |
+| Fix | PASS | Default + migrate → `gemini-2.5-flash`; header auth; distinct status strings |
+| ASSIST chip | PASS | Hides assistant + search + favorites; 48 dp; persisted |
+| `testDebugUnitTest` / `lintDebug` / `assembleDebug` | PASS | versionCode 11 |
+| APK SHA-256 | `AE44CEA9E688D2115460809A02E1EDC08190BD60DE6F3F2EC5EB679A1402C491` | |
+| Realme E2E (#16) | PENDING | |
