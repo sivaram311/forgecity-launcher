@@ -6,23 +6,23 @@ notifications aloud when you opt in.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher (public)
 **Branch:** `main` · version `0.4.3-gemini-cascade-dev`
-**Latest prerelease:** [`v0.4.2-rewrite-contract-fix-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.4.2-rewrite-contract-fix-dev)
+**Latest prerelease:** [`v0.4.3-gemini-cascade-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.4.3-gemini-cascade-dev)
 
 ## Download
 
 Latest debug prerelease (sideload):
 
 - Releases: https://github.com/sivaram311/forgecity-launcher/releases
-- Tag target: `v0.4.2-rewrite-contract-fix-dev`
+- Tag target: `v0.4.3-gemini-cascade-dev`
 
 This is **debug-signed**. Realme P2 Pro E2E (#16) is still pending for any annotated production tag.
 
 ```powershell
-curl.exe -L -o forgecity-0.4.2-rewrite-contract-fix-dev-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.4.2-rewrite-contract-fix-dev/forgecity-0.4.2-rewrite-contract-fix-dev-debug.apk
-Get-FileHash .\forgecity-0.4.2-rewrite-contract-fix-dev-debug.apk -Algorithm SHA256
-# expect 476089BE96B3BCBAA7793D45AB865C8D7347772776FB5CDFD45F8DFD647C8F91
-adb install -r .\forgecity-0.4.2-rewrite-contract-fix-dev-debug.apk
+curl.exe -L -o forgecity-0.4.3-gemini-cascade-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.4.3-gemini-cascade-dev/forgecity-0.4.3-gemini-cascade-dev-debug.apk
+Get-FileHash .\forgecity-0.4.3-gemini-cascade-dev-debug.apk -Algorithm SHA256
+# expect AFFEEAA381CC9AB2BDE81F4737BE03F499FD021704A94A11B2D429AC21A9B985
+adb install -r .\forgecity-0.4.3-gemini-cascade-dev-debug.apk
 ```
 
 ## What works in 0.4.3-gemini-cascade-dev

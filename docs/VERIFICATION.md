@@ -275,4 +275,14 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | Gemini client | SOURCE PASS | HTTPS `generativelanguage.googleapis.com`; Tamil validation |
 | `CascadeSpeechOrchestrator` | SOURCE PASS | tier fallthrough + diagnostics |
 | `testDebugUnitTest` / `lintDebug` / `assembleDebug` | PASS | versionCode 10 |
+| APK SHA-256 | `AFFEEAA381CC9AB2BDE81F4737BE03F499FD021704A94A11B2D429AC21A9B985` | `dist/forgecity-0.4.3-gemini-cascade-dev-debug.apk` |
 | Physical cascade E2E | PENDING | No adb device |
+
+## 2026-07-20 — v0.4.3-gemini-cascade-dev published
+
+| Check | Result | Notes |
+|------|--------|-------|
+| Debug prerelease | PASS | https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.4.3-gemini-cascade-dev |
+| Tip | `82d92c7` | Gemini cascade source |
+| APK SHA-256 | `AFFEEAA381CC9AB2BDE81F4737BE03F499FD021704A94A11B2D429AC21A9B985` | download round-trip at publish |
+| Realme E2E (#16) | PENDING | Blocks annotated production tags |

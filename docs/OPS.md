@@ -20,11 +20,11 @@ git checkout main
 Latest Tamil Agent + TTS diagnostics build:
 
 ```powershell
-curl.exe -L -o forgecity-0.4.2-rewrite-contract-fix-dev-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.4.2-rewrite-contract-fix-dev/forgecity-0.4.2-rewrite-contract-fix-dev-debug.apk
-Get-FileHash .\forgecity-0.4.2-rewrite-contract-fix-dev-debug.apk -Algorithm SHA256
-# expect 476089BE96B3BCBAA7793D45AB865C8D7347772776FB5CDFD45F8DFD647C8F91
-adb install -r .\forgecity-0.4.2-rewrite-contract-fix-dev-debug.apk
+curl.exe -L -o forgecity-0.4.3-gemini-cascade-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.4.3-gemini-cascade-dev/forgecity-0.4.3-gemini-cascade-dev-debug.apk
+Get-FileHash .\forgecity-0.4.3-gemini-cascade-dev-debug.apk -Algorithm SHA256
+# expect AFFEEAA381CC9AB2BDE81F4737BE03F499FD021704A94A11B2D429AC21A9B985
+adb install -r .\forgecity-0.4.3-gemini-cascade-dev-debug.apk
 ```
 
 Also grant: Home role, Usage Access, Notification Access (allowlist apps before speech).
