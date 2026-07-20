@@ -307,3 +307,16 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | Custom TEST TTS text | PASS | Persisted; used by all modes |
 | Unit/lint/assemble | PASS | versionCode 12 |
 | APK SHA-256 | `86E1CEDA64908B69771E614B210F743070AFDAC0D0E2A7D3D705A98D3FECC917` | |
+
+## 2026-07-20 — 0.4.6 Gemini native audio TTS
+
+| Check | Result | Notes |
+|------|--------|-------|
+| Gemini AUDIO path | PASS | `responseModalities:AUDIO` → PCM `AudioTrack` |
+| Text-model migration | PASS | `gemini-2.5-flash` → `gemini-3.1-flash-tts-preview` |
+| Voice / language prefs | PASS | default `Kore` / `ta-IN` |
+| CASCADE order | PASS | Gemini audio → Portal → DIRECT |
+| `GEMINI_TAMIL` UI | PASS | Labelled GEMINI AUDIO; fail-closed |
+| Unit/lint/assemble | PASS | versionCode 13 |
+| APK SHA-256 | `1644ED69CC47074932E327170F998D9593ED73A1CEE0AD0FB7B34A2F9C92BC6A` | |
+| Realme E2E (#16) | PENDING | |

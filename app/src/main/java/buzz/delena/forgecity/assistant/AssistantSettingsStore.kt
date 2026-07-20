@@ -1,7 +1,7 @@
 package buzz.delena.forgecity.assistant
 
 import android.content.Context
-import buzz.delena.forgecity.assistant.gemini.GeminiRewriteClient
+import buzz.delena.forgecity.assistant.gemini.GeminiAudioTtsClient
 import buzz.delena.forgecity.assistant.gemini.PromptTemplateDefaults
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
@@ -112,11 +112,33 @@ class AssistantSettingsStore(context: Context) {
             prefs.contains(KEY_GEMINI_API_KEY_IV)
 
     var geminiModel: String
-        get() = GeminiRewriteClient.normalizeModel(
-            prefs.getString(KEY_GEMINI_MODEL, GeminiRewriteClient.DEFAULT_MODEL).orEmpty(),
+        get() = GeminiAudioTtsClient.normalizeTtsModel(
+            prefs.getString(KEY_GEMINI_MODEL, GeminiAudioTtsClient.DEFAULT_TTS_MODEL).orEmpty(),
         )
         set(value) = prefs.edit()
-            .putString(KEY_GEMINI_MODEL, GeminiRewriteClient.normalizeModel(value))
+            .putString(KEY_GEMINI_MODEL, GeminiAudioTtsClient.normalizeTtsModel(value))
+            .apply()
+
+    var geminiVoice: String
+        get() = prefs.getString(KEY_GEMINI_VOICE, GeminiAudioTtsClient.DEFAULT_VOICE)
+            .orEmpty()
+            .ifBlank { GeminiAudioTtsClient.DEFAULT_VOICE }
+        set(value) = prefs.edit()
+            .putString(
+                KEY_GEMINI_VOICE,
+                value.trim().ifBlank { GeminiAudioTtsClient.DEFAULT_VOICE },
+            )
+            .apply()
+
+    var geminiLanguageCode: String
+        get() = prefs.getString(KEY_GEMINI_LANGUAGE, GeminiAudioTtsClient.DEFAULT_LANGUAGE)
+            .orEmpty()
+            .ifBlank { GeminiAudioTtsClient.DEFAULT_LANGUAGE }
+        set(value) = prefs.edit()
+            .putString(
+                KEY_GEMINI_LANGUAGE,
+                value.trim().ifBlank { GeminiAudioTtsClient.DEFAULT_LANGUAGE },
+            )
             .apply()
 
     var promptTemplate: String
@@ -147,6 +169,8 @@ class AssistantSettingsStore(context: Context) {
     fun cascadeSpeechConfig(): CascadeSpeechConfig = CascadeSpeechConfig(
         geminiApiKey = geminiApiKey(),
         geminiModel = geminiModel,
+        geminiVoice = geminiVoice,
+        geminiLanguageCode = geminiLanguageCode,
         promptTemplate = promptTemplate,
         portalEndpoint = rewriteEndpoint,
         portalApiKey = apiKey(),
@@ -245,6 +269,8 @@ class AssistantSettingsStore(context: Context) {
         private const val KEY_GEMINI_ENCRYPTED_API_KEY = "gemini_api_key_ciphertext"
         private const val KEY_GEMINI_API_KEY_IV = "gemini_api_key_iv"
         private const val KEY_GEMINI_MODEL = "gemini_model"
+        private const val KEY_GEMINI_VOICE = "gemini_voice"
+        private const val KEY_GEMINI_LANGUAGE = "gemini_language"
         private const val KEY_PROMPT_TEMPLATE = "prompt_template"
         private const val KEY_ALLOW = "allowed_packages"
         private const val KEY_QUIET_START = "quiet_start"

@@ -1,8 +1,48 @@
 package buzz.delena.forgecity.assistant.gemini
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.util.Base64
+
+class GeminiAudioTtsClientTest {
+    @Test
+    fun migratesTextModelsToTtsDefault() {
+        assertEquals(
+            GeminiAudioTtsClient.DEFAULT_TTS_MODEL,
+            GeminiAudioTtsClient.normalizeTtsModel("gemini-2.5-flash"),
+        )
+        assertEquals(
+            GeminiAudioTtsClient.DEFAULT_TTS_MODEL,
+            GeminiAudioTtsClient.normalizeTtsModel("models/gemini-2.0-flash"),
+        )
+    }
+
+    @Test
+    fun keepsExplicitTtsModel() {
+        assertEquals(
+            "gemini-3.1-flash-tts-preview",
+            GeminiAudioTtsClient.normalizeTtsModel("gemini-3.1-flash-tts-preview"),
+        )
+    }
+
+    @Test
+    fun extractsInlinePcmAndSampleRate() {
+        val pcm = ByteArray(128) { it.toByte() }
+        val b64 = Base64.getEncoder().encodeToString(pcm)
+        val json = """
+            {"candidates":[{"content":{"parts":[{"inlineData":{
+              "mimeType":"audio/L16;rate=24000",
+              "data":"$b64"
+            }}]}}]}
+        """.trimIndent()
+        val payload = GeminiAudioResponseParser.extract(json)
+        assertNotNull(payload)
+        assertEquals(24_000, payload!!.sampleRateHz)
+        assertTrue(payload.pcm.contentEquals(pcm))
+    }
+}
 
 class GeminiRewriteClientTest {
     @Test
@@ -54,5 +94,6 @@ class PromptTemplateFormatterTest {
             text = "Body",
         )
         assertTrue(formatted.contains("ForgeCity"))
+        assertTrue(formatted.contains("Speak a clear Tamil"))
     }
 }

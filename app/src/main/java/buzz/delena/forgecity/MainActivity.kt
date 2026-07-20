@@ -54,6 +54,8 @@ class MainActivity : ComponentActivity() {
             val geminiApiKeyConfigured by viewModel.geminiApiKeyConfigured.collectAsState()
             val geminiApiKey by viewModel.geminiApiKey.collectAsState()
             val geminiModel by viewModel.geminiModel.collectAsState()
+            val geminiVoice by viewModel.geminiVoice.collectAsState()
+            val geminiLanguageCode by viewModel.geminiLanguageCode.collectAsState()
             val promptTemplate by viewModel.promptTemplate.collectAsState()
             val speechTestStatus by viewModel.speechTestStatus.collectAsState()
             val allowCount by viewModel.allowCount.collectAsState()
@@ -85,6 +87,8 @@ class MainActivity : ComponentActivity() {
                 geminiApiKeyConfigured = geminiApiKeyConfigured,
                 geminiApiKey = geminiApiKey,
                 geminiModel = geminiModel,
+                geminiVoice = geminiVoice,
+                geminiLanguageCode = geminiLanguageCode,
                 promptTemplate = promptTemplate,
                 speechTestStatus = speechTestStatus,
                 allowCount = allowCount,
@@ -111,6 +115,8 @@ class MainActivity : ComponentActivity() {
                 onRewriteEndpointChange = viewModel::setRewriteEndpoint,
                 onSaveApiKey = viewModel::saveApiKey,
                 onGeminiModelChange = viewModel::setGeminiModel,
+                onGeminiVoiceChange = viewModel::setGeminiVoice,
+                onGeminiLanguageCodeChange = viewModel::setGeminiLanguageCode,
                 onPromptTemplateChange = viewModel::setPromptTemplate,
                 onSaveGeminiApiKey = viewModel::saveGeminiApiKey,
                 onTestSpeechMode = viewModel::testSpeechMode,

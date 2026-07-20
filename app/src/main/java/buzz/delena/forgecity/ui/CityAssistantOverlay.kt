@@ -138,6 +138,8 @@ fun AssistantSettingsCard(
     geminiApiKeyConfigured: Boolean,
     geminiApiKey: String,
     geminiModel: String,
+    geminiVoice: String,
+    geminiLanguageCode: String,
     promptTemplate: String,
     speechTestText: String,
     speechTestStatus: String?,
@@ -151,6 +153,8 @@ fun AssistantSettingsCard(
     onRewriteEndpointChange: (String) -> Unit,
     onSaveApiKey: (String) -> Unit,
     onGeminiModelChange: (String) -> Unit,
+    onGeminiVoiceChange: (String) -> Unit,
+    onGeminiLanguageCodeChange: (String) -> Unit,
     onPromptTemplateChange: (String) -> Unit,
     onSaveGeminiApiKey: (String) -> Unit,
     onSpeechTestTextChange: (String) -> Unit,
@@ -207,8 +211,8 @@ fun AssistantSettingsCard(
                     AssistantSpeechMode.OFF -> "OFF"
                     AssistantSpeechMode.DIRECT_TTS -> "DIRECT"
                     AssistantSpeechMode.AGENT_PORTAL_TAMIL -> "PORTAL தமிழ்"
-                    AssistantSpeechMode.GEMINI_TAMIL -> "GEMINI தமிழ்"
-                    AssistantSpeechMode.SMART_CASCADE -> "CASCADE Gemini→Portal→TTS"
+                    AssistantSpeechMode.GEMINI_TAMIL -> "GEMINI AUDIO"
+                    AssistantSpeechMode.SMART_CASCADE -> "CASCADE Audio→Portal→TTS"
                 },
                 color = Color(0xFFE8A15A),
                 fontSize = 11.sp,
@@ -216,12 +220,12 @@ fun AssistantSettingsCard(
             )
         }
         Text(
-            text = "Tap to cycle: OFF → DIRECT → PORTAL → GEMINI → CASCADE.",
+            text = "Tap to cycle: OFF → DIRECT → PORTAL → GEMINI AUDIO → CASCADE.",
             color = Color(0x88FFF6F0),
             fontSize = 10.sp,
         )
         Text(
-            text = "Gemini pre-template",
+            text = "Gemini audio prompt",
             color = Color(0xFFE8A15A),
             fontSize = 11.sp,
             fontWeight = FontWeight.SemiBold,
@@ -237,12 +241,12 @@ fun AssistantSettingsCard(
             minLines = 4,
         )
         Text(
-            text = "Placeholders: {appLabel} {title} {text} {maxChars}. Applied before Gemini calls.",
+            text = "Placeholders: {appLabel} {title} {text} {maxChars}. Sent to Gemini TTS (native audio).",
             color = Color(0x77FFF6F0),
             fontSize = 9.sp,
         )
         Text(
-            text = "Gemini API",
+            text = "Gemini native audio",
             color = Color(0xFFE8A15A),
             fontSize = 11.sp,
             fontWeight = FontWeight.SemiBold,
@@ -251,7 +255,17 @@ fun AssistantSettingsCard(
         RemoteTextField(
             value = geminiModel,
             onValueChange = onGeminiModelChange,
-            placeholder = "gemini-2.5-flash",
+            placeholder = "gemini-3.1-flash-tts-preview",
+        )
+        RemoteTextField(
+            value = geminiVoice,
+            onValueChange = onGeminiVoiceChange,
+            placeholder = "Kore",
+        )
+        RemoteTextField(
+            value = geminiLanguageCode,
+            onValueChange = onGeminiLanguageCodeChange,
+            placeholder = "ta-IN",
         )
         RemoteTextField(
             value = geminiKeyDraft,

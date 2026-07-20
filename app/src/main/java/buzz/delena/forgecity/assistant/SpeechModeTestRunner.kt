@@ -84,10 +84,10 @@ class SpeechModeTestRunner(context: Context) : AutoCloseable {
             }
             AssistantSpeechMode.GEMINI_TAMIL -> {
                 if (config.geminiApiKey.isNullOrBlank()) {
-                    onStatus("GEMINI failed: key missing")
+                    onStatus("GEMINI AUDIO failed: key missing")
                     return
                 }
-                onStatus("Testing Gemini Tamil rewrite…")
+                onStatus("Testing Gemini native audio…")
                 executor.execute {
                     cascadeOrchestrator.runGeminiOnly(
                         CascadeSpeechInput(
@@ -102,7 +102,7 @@ class SpeechModeTestRunner(context: Context) : AutoCloseable {
                 }
             }
             AssistantSpeechMode.SMART_CASCADE -> {
-                onStatus("Testing Gemini → Portal → device cascade…")
+                onStatus("Testing Gemini audio → Portal → device cascade…")
                 executor.execute {
                     cascadeOrchestrator.run(
                         CascadeSpeechInput(

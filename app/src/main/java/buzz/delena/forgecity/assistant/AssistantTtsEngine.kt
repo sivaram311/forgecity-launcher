@@ -2,11 +2,14 @@ package buzz.delena.forgecity.assistant
 
 import android.content.Context
 import android.media.AudioAttributes
+import android.media.AudioFormat
 import android.media.AudioFocusRequest
 import android.media.AudioManager
+import android.media.AudioTrack
 import android.os.Build
 import android.speech.tts.TextToSpeech
 import java.util.Locale
+import java.util.concurrent.Executors
 
 class AssistantTtsEngine(context: Context) {
     private val appContext = context.applicationContext
@@ -15,6 +18,10 @@ class AssistantTtsEngine(context: Context) {
     private var readiness: Readiness = Readiness.INITIALIZING
     private val readyCallbacks = mutableListOf<(Readiness) -> Unit>()
     private var focusRequest: AudioFocusRequest? = null
+    private var pcmTrack: AudioTrack? = null
+    private val pcmExecutor = Executors.newSingleThreadExecutor { task ->
+        Thread(task, "forgecity-pcm-play").apply { isDaemon = true }
+    }
 
     enum class Readiness {
         INITIALIZING,
@@ -62,6 +69,86 @@ class AssistantTtsEngine(context: Context) {
             speechRate = 0.9f,
             callback = callback,
         )
+    }
+
+    /** Play raw 16-bit little-endian mono PCM from Gemini native audio TTS. */
+    fun playPcm(
+        pcm: ByteArray,
+        sampleRateHz: Int,
+        callback: ((SpeakResult) -> Unit)? = null,
+    ) {
+        if (pcm.isEmpty()) {
+            ForgeCityTtsDiagnostics.warn("pcm_blocked", "reason=empty")
+            callback?.invoke(SpeakResult.EMPTY)
+            return
+        }
+        val rate = sampleRateHz.coerceIn(8_000, 48_000)
+        pcmExecutor.execute {
+            var reported = false
+            try {
+                stopPcmLocked()
+                tts?.stop()
+                requestFocus()
+                val attrs = AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_ASSISTANCE_ACCESSIBILITY)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                    .build()
+                val format = AudioFormat.Builder()
+                    .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+                    .setSampleRate(rate)
+                    .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
+                    .build()
+                val minBuf = AudioTrack.getMinBufferSize(
+                    rate,
+                    AudioFormat.CHANNEL_OUT_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT,
+                )
+                if (minBuf <= 0) {
+                    ForgeCityTtsDiagnostics.warn("pcm_blocked", "reason=bad_buffer")
+                    abandonFocus()
+                    callback?.invoke(SpeakResult.UNAVAILABLE)
+                    return@execute
+                }
+                val track = AudioTrack.Builder()
+                    .setAudioAttributes(attrs)
+                    .setAudioFormat(format)
+                    .setBufferSizeInBytes(maxOf(minBuf, pcm.size))
+                    .setTransferMode(AudioTrack.MODE_STATIC)
+                    .build()
+                if (track.state != AudioTrack.STATE_INITIALIZED) {
+                    track.release()
+                    ForgeCityTtsDiagnostics.warn("pcm_blocked", "reason=track_init")
+                    abandonFocus()
+                    callback?.invoke(SpeakResult.UNAVAILABLE)
+                    return@execute
+                }
+                synchronized(this) { pcmTrack = track }
+                val written = track.write(pcm, 0, pcm.size)
+                if (written <= 0) {
+                    ForgeCityTtsDiagnostics.warn("pcm_write_failed", "written=$written")
+                    abandonFocus()
+                    callback?.invoke(SpeakResult.UNAVAILABLE)
+                    return@execute
+                }
+                track.play()
+                ForgeCityTtsDiagnostics.info(
+                    "pcm_play_started",
+                    "bytes=${pcm.size} rateHz=$rate written=$written",
+                )
+                reported = true
+                callback?.invoke(SpeakResult.STARTED)
+                val durationMs = ((pcm.size / 2.0) / rate * 1000.0).toLong().coerceAtLeast(50L)
+                Thread.sleep(durationMs + 80L)
+            } catch (_: InterruptedException) {
+                Thread.currentThread().interrupt()
+            } catch (_: Exception) {
+                ForgeCityTtsDiagnostics.warn("pcm_play_failed")
+                if (!reported) callback?.invoke(SpeakResult.UNAVAILABLE)
+            } finally {
+                stopPcmLocked()
+                abandonFocus()
+            }
+        }
     }
 
     private fun speak(
@@ -120,11 +207,24 @@ class AssistantTtsEngine(context: Context) {
 
     fun stop() {
         tts?.stop()
+        stopPcmLocked()
         abandonFocus()
+    }
+
+    @Synchronized
+    private fun stopPcmLocked() {
+        runCatching {
+            pcmTrack?.pause()
+            pcmTrack?.flush()
+            pcmTrack?.stop()
+            pcmTrack?.release()
+        }
+        pcmTrack = null
     }
 
     fun shutdown() {
         stop()
+        pcmExecutor.shutdownNow()
         tts?.shutdown()
         tts = null
         synchronized(this) {

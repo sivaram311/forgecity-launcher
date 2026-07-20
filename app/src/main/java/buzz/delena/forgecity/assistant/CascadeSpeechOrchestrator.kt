@@ -1,7 +1,7 @@
 package buzz.delena.forgecity.assistant
 
-import buzz.delena.forgecity.assistant.gemini.GeminiRewriteClient
-import buzz.delena.forgecity.assistant.gemini.GeminiRewriteResult
+import buzz.delena.forgecity.assistant.gemini.GeminiAudioResult
+import buzz.delena.forgecity.assistant.gemini.GeminiAudioTtsClient
 import buzz.delena.forgecity.assistant.gemini.PromptTemplateFormatter
 import buzz.delena.forgecity.assistant.rewrite.AgentPortalRewriteClient
 import buzz.delena.forgecity.assistant.rewrite.RewriteRequest
@@ -17,13 +17,15 @@ data class CascadeSpeechInput(
 data class CascadeSpeechConfig(
     val geminiApiKey: String?,
     val geminiModel: String,
+    val geminiVoice: String,
+    val geminiLanguageCode: String,
     val promptTemplate: String,
     val portalEndpoint: String,
     val portalApiKey: String?,
 )
 
 class CascadeSpeechOrchestrator(
-    private val geminiClient: GeminiRewriteClient = GeminiRewriteClient(),
+    private val geminiAudioClient: GeminiAudioTtsClient = GeminiAudioTtsClient(),
     private val portalClient: AgentPortalRewriteClient = AgentPortalRewriteClient(),
     private val tts: AssistantTtsEngine,
 ) : AutoCloseable {
@@ -33,21 +35,21 @@ class CascadeSpeechOrchestrator(
         config: CascadeSpeechConfig,
         onStatus: ((String) -> Unit)? = null,
     ) {
-        if (tryGemini(input, config, onStatus, failMessagePrefix = "trying Portal…")) return
+        if (tryGeminiAudio(input, config, onStatus, failMessagePrefix = "trying Portal…")) return
         tryPortalThenDirect(input, config, onStatus)
     }
 
-    /** Gemini-only path: no Portal / device fallback (fail closed). */
+    /** Gemini native audio only: no Portal / device fallback (fail closed). */
     fun runGeminiOnly(
         input: CascadeSpeechInput,
         config: CascadeSpeechConfig,
         onStatus: ((String) -> Unit)? = null,
     ) {
-        if (tryGemini(input, config, onStatus, failMessagePrefix = "stopped")) return
-        onStatus?.invoke("GEMINI failed closed")
+        if (tryGeminiAudio(input, config, onStatus, failMessagePrefix = "stopped")) return
+        onStatus?.invoke("GEMINI AUDIO failed closed")
     }
 
-    private fun tryGemini(
+    private fun tryGeminiAudio(
         input: CascadeSpeechInput,
         config: CascadeSpeechConfig,
         onStatus: ((String) -> Unit)?,
@@ -61,36 +63,63 @@ class CascadeSpeechOrchestrator(
         )
         val geminiKey = config.geminiApiKey?.takeIf { it.isNotBlank() }
         if (geminiKey == null) {
-            ForgeCityTtsDiagnostics.info("cascade_skip", "tier=gemini reason=no_key")
+            ForgeCityTtsDiagnostics.info("cascade_skip", "tier=gemini_audio reason=no_key")
             onStatus?.invoke("Gemini key missing; $failMessagePrefix")
             return false
         }
-        ForgeCityTtsDiagnostics.info("cascade_try", "tier=gemini")
-        return when (val result = geminiClient.rewrite(geminiKey, config.geminiModel, prompt)) {
-            is GeminiRewriteResult.Success -> {
-                speakTamil(result.tamilText, onStatus, "Gemini")
+        ForgeCityTtsDiagnostics.info("cascade_try", "tier=gemini_audio")
+        return when (
+            val result = geminiAudioClient.synthesize(
+                apiKey = geminiKey,
+                model = config.geminiModel,
+                prompt = prompt,
+                voice = config.geminiVoice,
+                languageCode = config.geminiLanguageCode,
+            )
+        ) {
+            is GeminiAudioResult.Success -> {
+                playGeminiAudio(result, onStatus)
                 true
             }
-            is GeminiRewriteResult.Unauthorized -> {
+            is GeminiAudioResult.Unauthorized -> {
                 onStatus?.invoke("Gemini auth failed (bad key); $failMessagePrefix")
                 false
             }
-            is GeminiRewriteResult.ModelUnavailable -> {
-                onStatus?.invoke("Gemini model unavailable; $failMessagePrefix")
+            is GeminiAudioResult.ModelUnavailable -> {
+                onStatus?.invoke("Gemini TTS model unavailable; $failMessagePrefix")
                 false
             }
-            is GeminiRewriteResult.Timeout -> {
-                onStatus?.invoke("Gemini timeout; $failMessagePrefix")
+            is GeminiAudioResult.Timeout -> {
+                onStatus?.invoke("Gemini audio timeout; $failMessagePrefix")
                 false
             }
-            is GeminiRewriteResult.Malformed -> {
-                onStatus?.invoke("Gemini response not Tamil; $failMessagePrefix")
+            is GeminiAudioResult.Malformed -> {
+                onStatus?.invoke("Gemini audio malformed; $failMessagePrefix")
                 false
             }
-            is GeminiRewriteResult.Unavailable -> {
-                onStatus?.invoke("Gemini unavailable; $failMessagePrefix")
+            is GeminiAudioResult.Unavailable -> {
+                onStatus?.invoke("Gemini audio unavailable; $failMessagePrefix")
                 false
             }
+        }
+    }
+
+    private fun playGeminiAudio(
+        result: GeminiAudioResult.Success,
+        onStatus: ((String) -> Unit)?,
+    ) {
+        tts.playPcm(result.pcm, result.sampleRateHz) { speakResult ->
+            ForgeCityTtsDiagnostics.info(
+                "cascade_gemini_audio_result",
+                "result=$speakResult rateHz=${result.sampleRateHz}",
+            )
+            onStatus?.invoke(
+                if (speakResult == AssistantTtsEngine.SpeakResult.STARTED) {
+                    "Gemini native audio started"
+                } else {
+                    "Gemini audio OK; playback $speakResult"
+                },
+            )
         }
     }
 
@@ -163,7 +192,7 @@ class CascadeSpeechOrchestrator(
     }
 
     override fun close() {
-        geminiClient.close()
+        geminiAudioClient.close()
         portalClient.close()
     }
 }

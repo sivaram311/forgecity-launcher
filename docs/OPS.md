@@ -17,17 +17,24 @@ git checkout main
 
 ## Download (prerelease debug APK)
 
-Latest Tamil Agent + TTS diagnostics build:
+Latest Gemini native audio build:
 
 ```powershell
-curl.exe -L -o forgecity-0.4.4-gemini-fix-assist-chip-dev-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.4.4-gemini-fix-assist-chip-dev/forgecity-0.4.4-gemini-fix-assist-chip-dev-debug.apk
-Get-FileHash .\forgecity-0.4.4-gemini-fix-assist-chip-dev-debug.apk -Algorithm SHA256
-# expect AE44CEA9E688D2115460809A02E1EDC08190BD60DE6F3F2EC5EB679A1402C491
-adb install -r .\forgecity-0.4.4-gemini-fix-assist-chip-dev-debug.apk
+curl.exe -L -o forgecity-0.4.6-gemini-native-audio-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.4.6-gemini-native-audio-dev/forgecity-0.4.6-gemini-native-audio-dev-debug.apk
+Get-FileHash .\forgecity-0.4.6-gemini-native-audio-dev-debug.apk -Algorithm SHA256
+adb install -r .\forgecity-0.4.6-gemini-native-audio-dev-debug.apk
 ```
 
 Also grant: Home role, Usage Access, Notification Access (allowlist apps before speech).
+
+### Gemini native audio (0.4.6)
+
+1. Save Gemini API key in City Assistant.
+2. Confirm model `gemini-3.1-flash-tts-preview`, voice `Kore`, language `ta-IN`.
+3. Cycle speech mode to **GEMINI AUDIO** (fail-closed) or **CASCADE** (audio → Portal → device).
+4. Edit the audio prompt template if needed; TEST TTS exercises the active mode.
+5. Logcat: `adb logcat -s ForgeCityTTS` — look for `gemini_audio_*` / `pcm_play_started`.
 
 ### ASSIST chip (0.4.4)
 

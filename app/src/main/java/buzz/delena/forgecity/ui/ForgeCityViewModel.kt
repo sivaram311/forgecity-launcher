@@ -79,6 +79,12 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
     private val _geminiModel = MutableStateFlow(assistantSettings.geminiModel)
     val geminiModel: StateFlow<String> = _geminiModel.asStateFlow()
 
+    private val _geminiVoice = MutableStateFlow(assistantSettings.geminiVoice)
+    val geminiVoice: StateFlow<String> = _geminiVoice.asStateFlow()
+
+    private val _geminiLanguageCode = MutableStateFlow(assistantSettings.geminiLanguageCode)
+    val geminiLanguageCode: StateFlow<String> = _geminiLanguageCode.asStateFlow()
+
     private val _promptTemplate = MutableStateFlow(assistantSettings.promptTemplate)
     val promptTemplate: StateFlow<String> = _promptTemplate.asStateFlow()
 
@@ -177,6 +183,8 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
         _geminiApiKeyConfigured.value = assistantSettings.hasGeminiApiKey
         _geminiApiKey.value = assistantSettings.geminiApiKey().orEmpty()
         _geminiModel.value = assistantSettings.geminiModel
+        _geminiVoice.value = assistantSettings.geminiVoice
+        _geminiLanguageCode.value = assistantSettings.geminiLanguageCode
         _promptTemplate.value = assistantSettings.promptTemplate
         _allowCount.value = assistantSettings.allowedPackages().size
         _quietLabel.value = formatQuietLabel()
@@ -246,6 +254,16 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
     fun setGeminiModel(value: String) {
         assistantSettings.geminiModel = value
         _geminiModel.value = assistantSettings.geminiModel
+    }
+
+    fun setGeminiVoice(value: String) {
+        assistantSettings.geminiVoice = value
+        _geminiVoice.value = assistantSettings.geminiVoice
+    }
+
+    fun setGeminiLanguageCode(value: String) {
+        assistantSettings.geminiLanguageCode = value
+        _geminiLanguageCode.value = assistantSettings.geminiLanguageCode
     }
 
     fun setPromptTemplate(value: String) {

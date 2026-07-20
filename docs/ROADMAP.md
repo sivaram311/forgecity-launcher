@@ -6,7 +6,7 @@ story — while staying performant on Snapdragon 7s Gen 2 + Adreno 710 + 120 Hz.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher  
 **Device SoT:** `E:\MyAgent\workflow\devices\REALME-P2-PRO.md`  
-**Last updated:** 2026-07-20 (`0.4.3-gemini-cascade-dev` in progress · **P1 = Gemini → Portal → DIRECT cascade**)
+**Last updated:** 2026-07-20 (`0.4.6-gemini-native-audio-dev` · **P1 = Gemini native audio → Portal → DIRECT**)
 
 ---
 
@@ -152,19 +152,20 @@ gate.
 - Story Weaver (basic)
 - **Gate:** device E2E + SIGN-OFF
 
-### Phase 3.5 — Smart speech cascade — v0.4.3 “Gemini tier” (in progress)
+### Phase 3.5 — Smart speech cascade — v0.4.6 “Gemini native audio” (in progress)
 
 **Spec:** [GEMINI-SPEECH-CASCADE-SPEC.md](GEMINI-SPEECH-CASCADE-SPEC.md) · **Parallel:** streams G1–G4 in [PARALLEL-EXECUTION.md](PARALLEL-EXECUTION.md)
 
 | Item | Status |
 |------|--------|
-| `SMART_CASCADE`: Gemini → Agent Portal → device TTS | 🚧 |
-| Editable pre-template (`{appLabel}`, `{title}`, `{text}`, `{maxChars}`) | 🚧 |
-| Gemini API key + model in City Assistant | 🚧 |
-| TEST TTS runs full cascade | 🚧 |
+| `SMART_CASCADE`: Gemini **native audio** → Agent Portal → device TTS | ✅ source |
+| Editable prompt template (`{appLabel}`, `{title}`, `{text}`, `{maxChars}`) | ✅ |
+| Gemini API key + TTS model / voice / `ta-IN` in City Assistant | ✅ |
+| `GEMINI_TAMIL` = fail-closed native audio | ✅ |
+| TEST TTS runs full cascade | ✅ |
 | Realme E2E for cascade | ⏳ #16 |
 
-Gemini rewrite is **opt-in** (notification text sent to Google when key is set).
+Gemini audio is **opt-in** (notification text sent to Google when key is set).
 
 ### Phase 4 — AI Agents & Polish — v0.4.0 “Symphony” (~6–8 weeks)
 

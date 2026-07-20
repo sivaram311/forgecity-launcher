@@ -1,34 +1,35 @@
 # Gemini speech cascade — product spec
 
-**Status:** implementing (`0.4.3-gemini-cascade-dev`)  
-**Priority:** **P1** (after P0 Tamil Portal + device diagnostics)  
+**Status:** implementing (`0.4.6-gemini-native-audio-dev`)  
+**Priority:** **P1**  
 **Date:** 2026-07-20
 
 ## Goal
 
-Add a **smart cascade** speech path:
+Smart cascade speech path with **Gemini native audio TTS** as tier 1:
 
 ```text
 Eligible notification / TEST TTS
-  → apply user-editable pre-template (placeholders)
-  → 1) Google Gemini API rewrite (first preference, if configured + reachable)
-  → 2) Agent Portal Tamil rewrite (second, if configured + reachable)
-  → 3) Device default-locale TTS (last resort, local DIRECT line)
+  → apply user-editable prompt template (placeholders)
+  → 1) Google Gemini TTS model (`responseModalities: AUDIO`) → PCM playback
+  → 2) Agent Portal Tamil rewrite → device Tamil TTS
+  → 3) Device default-locale TTS (last resort)
 ```
 
-Gemini performs **text rewrite**; Android **Tamil TTS** speaks Gemini/Portal output.
-Gemini native audio TTS is **out of scope** for v1.
+Gemini returns **audio bytes** (typically 24 kHz L16 PCM). Android plays via `AudioTrack`.
+Device Tamil TTS is only used for Portal / DIRECT tiers.
 
-## Speech modes (unchanged manual paths + new cascade)
+## Speech modes
 
 | Mode | Behaviour |
 |------|-----------|
 | `OFF` | No speech |
 | `DIRECT_TTS` | Local filtered line → device locale TTS (no network) |
 | `AGENT_PORTAL_TAMIL` | Portal only → Tamil TTS; fail-closed silent |
-| `SMART_CASCADE` | Gemini → Portal → DIRECT (this spec) |
+| `GEMINI_TAMIL` (UI: **GEMINI AUDIO**) | Native audio only; fail-closed |
+| `SMART_CASCADE` | Gemini audio → Portal → DIRECT |
 
-## Pre-template
+## Prompt template
 
 User-editable template with placeholders:
 
@@ -37,47 +38,38 @@ User-editable template with placeholders:
 | `{appLabel}` | Notification app label |
 | `{title}` | Notification title |
 | `{text}` | Notification body |
-| `{maxChars}` | Output char budget (220) |
+| `{maxChars}` | Spoken content budget (220) |
 
-**Gemini:** formatted template is the `generateContent` user prompt.  
-**Portal:** unchanged server contract (`appLabel`, `title`, `text`, `maxChars`) — server rewrites; template is not injected into Portal v1.  
+**Gemini audio:** formatted template is the `generateContent` user prompt (style + content).  
+**Portal:** unchanged server contract — template is not injected into Portal.  
 **DIRECT fallback:** `NotificationSpeechFilter.spokenLine` (no template).
-
-Template is editable in City Assistant, persisted in prefs, and applied on every TEST TTS / live notification before Gemini is called.
 
 ## Gemini configuration (launcher)
 
 | Setting | Storage | Default |
 |---------|---------|---------|
 | API key | Android Keystore encrypted | empty |
-| Model | plain pref | `gemini-2.5-flash` |
-| Pre-template | plain pref | see `PromptTemplateDefaults` |
+| TTS model | plain pref | `gemini-3.1-flash-tts-preview` |
+| Voice | plain pref | `Kore` |
+| Language | plain pref | `ta-IN` |
+| Prompt template | plain pref | see `PromptTemplateDefaults` |
 
-HTTPS only: `generativelanguage.googleapis.com`. Key never logged.
+Prior text-only models (`gemini-2.5-flash`, etc.) are auto-migrated to the TTS default.
+
+HTTPS only: `generativelanguage.googleapis.com`. Key never logged. Bodies / PCM never logged.
 
 ## Privacy
 
 | Path | Data leaves device? |
 |------|---------------------|
 | DIRECT | No |
-| Portal | Yes — to your Agent Portal host (no-store) |
-| Gemini | Yes — to Google Generative Language API (user opt-in via key) |
-| Cascade | Gemini attempt first; Portal only if Gemini fails |
+| Portal | Yes — Agent Portal host (no-store) |
+| Gemini audio | Yes — Google Generative Language API (opt-in via key) |
+| Cascade | Gemini audio first; Portal only if Gemini fails |
 
-Notification bodies are **not persisted** on device. Diagnostics log route/HTTP/TTS enums only.
+## Out of scope (this train)
 
-## Parallel workstreams (this train)
-
-| Stream | Owner | Deliverable |
-|--------|-------|-------------|
-| **G1** | ai-integration | `GeminiRewriteClient`, `PromptTemplateFormatter`, `CascadeSpeechOrchestrator` |
-| **G2** | android-systems | `AssistantSettingsStore`, `AssistantSpeechMode`, listener + test runner routing |
-| **G3** | ui-animation | City Assistant fields: Gemini key/model, template editor, CASCADE label |
-| **G4** | qa-optimization | Unit tests, VERIFICATION, OPS, ROADMAP |
-
-## Out of scope (v1)
-
-- Gemini audio output / WaveNet
+- Multi-speaker dialogue
+- Streaming SSE playback
 - Cloudflare Workers AI
-- Portal server-side template injection
 - Annotated production tag (Realme E2E still pending)
