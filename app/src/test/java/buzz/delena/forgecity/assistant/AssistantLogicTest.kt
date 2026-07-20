@@ -105,7 +105,22 @@ class AssistantSpeechModeTest {
             AssistantSpeechMode.AGENT_PORTAL_TAMIL,
             AssistantSpeechMode.DIRECT_TTS.next(),
         )
-        assertEquals(AssistantSpeechMode.OFF, AssistantSpeechMode.AGENT_PORTAL_TAMIL.next())
+        assertEquals(
+            AssistantSpeechMode.SMART_CASCADE,
+            AssistantSpeechMode.AGENT_PORTAL_TAMIL.next(),
+        )
+        assertEquals(AssistantSpeechMode.OFF, AssistantSpeechMode.SMART_CASCADE.next())
+    }
+
+    @Test
+    fun cascadeRouteAlwaysAvailable() {
+        assertEquals(
+            NotificationSpeechRoute.SMART_CASCADE,
+            NotificationSpeechRoute.resolve(
+                AssistantSpeechMode.SMART_CASCADE,
+                portalConfigured = false,
+            ),
+        )
     }
 
     @Test

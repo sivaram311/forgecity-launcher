@@ -8,21 +8,21 @@ import java.util.concurrent.Executors
 
 class SpeechModeTestRunner(context: Context) : AutoCloseable {
     private val tts = AssistantTtsEngine(context)
+    private val cascadeOrchestrator = CascadeSpeechOrchestrator(tts = tts)
     private val executor = Executors.newSingleThreadExecutor { task ->
         Thread(task, "forgecity-tts-test").apply { isDaemon = true }
     }
 
     fun run(
         mode: AssistantSpeechMode,
-        endpoint: String,
-        apiKey: String?,
+        config: CascadeSpeechConfig,
         onStatus: (String) -> Unit,
     ) {
         ForgeCityTtsDiagnostics.info("test_start", "mode=$mode")
         when (mode) {
             AssistantSpeechMode.OFF -> {
                 ForgeCityTtsDiagnostics.warn("test_blocked", "reason=mode_off")
-                onStatus("OFF: select DIRECT or PORTAL தமிழ்")
+                onStatus("OFF: select a speech mode")
             }
             AssistantSpeechMode.DIRECT_TTS -> {
                 onStatus("Testing device TTS…")
@@ -38,17 +38,17 @@ class SpeechModeTestRunner(context: Context) : AutoCloseable {
                 }
             }
             AssistantSpeechMode.AGENT_PORTAL_TAMIL -> {
-                if (endpoint.isBlank() || apiKey.isNullOrBlank()) {
+                if (config.portalEndpoint.isBlank() || config.portalApiKey.isNullOrBlank()) {
                     ForgeCityTtsDiagnostics.warn("test_portal_blocked", "reason=config_missing")
                     onStatus("PORTAL failed: endpoint/key missing")
                     return
                 }
-                onStatus("Testing PROD rewrite + Tamil TTS…")
+                onStatus("Testing Portal rewrite + Tamil TTS…")
                 executor.execute {
                     val result = AgentPortalRewriteClient().use { client ->
                         client.rewrite(
-                            endpoint,
-                            apiKey,
+                            config.portalEndpoint,
+                            config.portalApiKey,
                             RewriteRequest(
                                 notificationKey = "manual-tts-test",
                                 appLabel = "ForgeCity",
@@ -80,11 +80,27 @@ class SpeechModeTestRunner(context: Context) : AutoCloseable {
                     }
                 }
             }
+            AssistantSpeechMode.SMART_CASCADE -> {
+                onStatus("Testing Gemini → Portal → device cascade…")
+                executor.execute {
+                    cascadeOrchestrator.run(
+                        CascadeSpeechInput(
+                            notificationKey = "manual-cascade-test",
+                            appLabel = "ForgeCity",
+                            title = "Speech test",
+                            body = "ForgeCity notification speech is working.",
+                        ),
+                        config,
+                        onStatus = onStatus,
+                    )
+                }
+            }
         }
     }
 
     override fun close() {
         executor.shutdownNow()
+        cascadeOrchestrator.close()
         tts.shutdown()
     }
 }

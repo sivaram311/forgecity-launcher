@@ -3,7 +3,8 @@ package buzz.delena.forgecity.assistant
 enum class AssistantSpeechMode {
     OFF,
     DIRECT_TTS,
-    AGENT_PORTAL_TAMIL;
+    AGENT_PORTAL_TAMIL,
+    SMART_CASCADE;
 
     fun next(): AssistantSpeechMode = entries[(ordinal + 1) % entries.size]
 
@@ -23,7 +24,8 @@ enum class AssistantSpeechMode {
 enum class NotificationSpeechRoute {
     NONE,
     DIRECT,
-    AGENT_PORTAL_TAMIL;
+    AGENT_PORTAL_TAMIL,
+    SMART_CASCADE;
 
     companion object {
         fun resolve(
@@ -34,6 +36,7 @@ enum class NotificationSpeechRoute {
             AssistantSpeechMode.DIRECT_TTS -> DIRECT
             AssistantSpeechMode.AGENT_PORTAL_TAMIL ->
                 if (portalConfigured) AGENT_PORTAL_TAMIL else NONE
+            AssistantSpeechMode.SMART_CASCADE -> SMART_CASCADE
         }
     }
 }

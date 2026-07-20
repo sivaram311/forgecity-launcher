@@ -265,3 +265,14 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | `testDebugUnitTest` / `lintDebug` / `assembleDebug` | PASS | versionCode 9 / `0.4.2-rewrite-contract-fix-dev` |
 | APK SHA-256 | `476089BE96B3BCBAA7793D45AB865C8D7347772776FB5CDFD45F8DFD647C8F91` | `dist/forgecity-0.4.2-rewrite-contract-fix-dev-debug.apk` |
 | Physical TEST TTS | PENDING | Awaiting Realme device |
+
+## 2026-07-20 — 0.4.3 Gemini cascade (source)
+
+| Check | Result | Notes |
+|------|--------|-------|
+| `SMART_CASCADE` mode | SOURCE PASS | Gemini → Portal → DIRECT routing |
+| Pre-template editor | SOURCE PASS | persisted; placeholders substituted |
+| Gemini client | SOURCE PASS | HTTPS `generativelanguage.googleapis.com`; Tamil validation |
+| `CascadeSpeechOrchestrator` | SOURCE PASS | tier fallthrough + diagnostics |
+| `testDebugUnitTest` / `lintDebug` / `assembleDebug` | PASS | versionCode 10 |
+| Physical cascade E2E | PENDING | No adb device |

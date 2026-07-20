@@ -5,7 +5,7 @@ Apps become buildings. Habits rebuild districts. A neon city assistant can read
 notifications aloud when you opt in.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher (public)
-**Branch:** `main` · version `0.4.2-rewrite-contract-fix-dev`
+**Branch:** `main` · version `0.4.3-gemini-cascade-dev`
 **Latest prerelease:** [`v0.4.2-rewrite-contract-fix-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.4.2-rewrite-contract-fix-dev)
 
 ## Download
@@ -25,13 +25,12 @@ Get-FileHash .\forgecity-0.4.2-rewrite-contract-fix-dev-debug.apk -Algorithm SHA
 adb install -r .\forgecity-0.4.2-rewrite-contract-fix-dev-debug.apk
 ```
 
-## What works in 0.4.2-rewrite-contract-fix-dev
+## What works in 0.4.3-gemini-cascade-dev
 
-- **Fix:** rewrite request now sends exactly the 5 server-contract fields; the
-  invalid `store` body field (which caused HTTP 400 `invalid_request` →
-  "PORTAL failed") is removed. `no-store` is enforced via the request header.
-- `TEST TTS` runs the selected mode: OFF diagnosis, direct device TTS, or
-  PROD-compatible Agent Portal rewrite followed by Tamil TTS
+- **`SMART_CASCADE` mode:** Gemini API rewrite → Agent Portal Tamil → device TTS fallback
+- **Editable pre-template** with `{appLabel}` `{title}` `{text}` `{maxChars}` (Gemini tier)
+- **Gemini API key + model** in City Assistant (Keystore encrypted)
+- Prior 0.4.2 contract fix, 0.4.1 TEST TTS + diagnostics, 0.4.0 Portal Tamil path
 - Saved API key is visible in config for device setup (still encrypted at rest)
 - Safe terminal diagnostics via `adb logcat -s ForgeCityTTS`; keys and message
   content are never logged
@@ -69,4 +68,5 @@ See [docs/TAMIL-REWRITE-SPEC.md](docs/TAMIL-REWRITE-SPEC.md),
 | [docs/IMPLEMENTATION-SPEC.md](docs/IMPLEMENTATION-SPEC.md) | Assistant upgrade spec |
 | [docs/BACKGROUND-VIDEO-SPEC.md](docs/BACKGROUND-VIDEO-SPEC.md) | Media3 background contract |
 | [docs/TAMIL-REWRITE-SPEC.md](docs/TAMIL-REWRITE-SPEC.md) | **P0** Agent Portal Tamil rewrite + TTS |
+| [docs/GEMINI-SPEECH-CASCADE-SPEC.md](docs/GEMINI-SPEECH-CASCADE-SPEC.md) | **P1** Gemini → Portal → device TTS cascade |
 | [docs/GLM-IMPLEMENTATION-PLAN.md](docs/GLM-IMPLEMENTATION-PLAN.md) | Older plan — Cloudflare Workers AI path **rejected** for launcher |

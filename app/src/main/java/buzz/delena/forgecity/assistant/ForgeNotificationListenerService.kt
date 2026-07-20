@@ -7,6 +7,7 @@ import buzz.delena.forgecity.assistant.rewrite.AgentPortalRewriteClient
 import buzz.delena.forgecity.assistant.rewrite.NotificationRewritePipeline
 import buzz.delena.forgecity.assistant.rewrite.RewriteRequest
 import java.util.Calendar
+import java.util.concurrent.Executors
 
 class ForgeNotificationListenerService : NotificationListenerService() {
     private val settings by lazy { AssistantSettingsStore(this) }
@@ -14,6 +15,10 @@ class ForgeNotificationListenerService : NotificationListenerService() {
     private val dedupe = NotificationDedupe()
     private var tts: AssistantTtsEngine? = null
     private var rewritePipeline: NotificationRewritePipeline? = null
+    private var cascadeOrchestrator: CascadeSpeechOrchestrator? = null
+    private val cascadeExecutor = Executors.newSingleThreadExecutor { task ->
+        Thread(task, "forgecity-cascade").apply { isDaemon = true }
+    }
 
     override fun onListenerConnected() {
         super.onListenerConnected()
@@ -27,6 +32,7 @@ class ForgeNotificationListenerService : NotificationListenerService() {
             endpoint = { settings.rewriteEndpoint },
             apiKey = settings::apiKey,
         )
+        cascadeOrchestrator = CascadeSpeechOrchestrator(tts = engine)
     }
 
     override fun onListenerDisconnected() {
@@ -42,6 +48,9 @@ class ForgeNotificationListenerService : NotificationListenerService() {
     private fun closeSpeechPipeline() {
         rewritePipeline?.close()
         rewritePipeline = null
+        cascadeOrchestrator?.close()
+        cascadeOrchestrator = null
+        cascadeExecutor.shutdownNow()
         tts?.shutdown()
         tts = null
     }
@@ -131,7 +140,37 @@ class ForgeNotificationListenerService : NotificationListenerService() {
                     ),
                 )
             }
+            NotificationSpeechRoute.SMART_CASCADE -> {
+                cascadeExecutor.execute {
+                    if (!canUseCascadeSpeech()) return@execute
+                    cascadeOrchestrator?.run(
+                        CascadeSpeechInput(
+                            notificationKey = notification.key,
+                            appLabel = label,
+                            title = title.orEmpty(),
+                            body = text.orEmpty(),
+                        ),
+                        settings.cascadeSpeechConfig(),
+                    )
+                }
+            }
         }
+    }
+
+    private fun canUseCascadeSpeech(): Boolean {
+        if (!settings.assistantEnabled ||
+            settings.speechMode != AssistantSpeechMode.SMART_CASCADE ||
+            !speechBudget.allowsSpeech
+        ) {
+            return false
+        }
+        val now = Calendar.getInstance()
+        val minutes = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE)
+        return !QuietHours.isQuiet(
+            minutes,
+            settings.quietStartMinutes,
+            settings.quietEndMinutes,
+        )
     }
 
     private fun canUseRemoteSpeech(): Boolean {

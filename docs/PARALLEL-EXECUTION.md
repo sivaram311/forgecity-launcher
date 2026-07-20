@@ -143,7 +143,17 @@ Lead merges when unit tests + Reviewer #17 GO; device E2E is a separate hire wit
 | 2 Awakening | `v0.2.0-awakening-dev` | A+B+C+D+F | ✅ Waves 1–2 + debug prerelease; **device E2E** for annotated `v0.2.0` |
 | 2.5 Video | `v0.3.3-background-video-asset-dev` | A+B+F | ✅ framework + procedural MP4 on `main`; Realme E2E open |
 | 3 Narrative | `v0.3.0` | A+D(+E0)+F | Device E2E required |
+| 3.5 Gemini cascade | `v0.4.3-gemini-cascade-dev` | G1–G4 | Device E2E for cascade |
 | 4 Symphony | `v0.4.0` | E+A+B+F | Device E2E required |
 | 5 Stable | `v1.0.0` | all | Promote evidence if distributed beyond sideload |
 
-**Current hire focus:** Stream F (Realme P2 Pro video/decoder/thermal/battery E2E).
+**Current hire focus:** Stream G1–G4 (Gemini cascade `0.4.3`) + Stream F (Realme E2E).
+
+### Wave 3.5 — Gemini cascade (2026-07-20)
+
+| ID | Stream | Deliverable | Status |
+|----|--------|-------------|--------|
+| G1 | ai-integration | `GeminiRewriteClient`, `CascadeSpeechOrchestrator` | 🚧 |
+| G2 | android-systems | `SMART_CASCADE` mode + listener routing | 🚧 |
+| G3 | ui-animation | Gemini key/model + pre-template editor | 🚧 |
+| G4 | qa-optimization | Tests + VERIFICATION + OPS | 🚧 |

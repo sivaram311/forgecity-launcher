@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -134,6 +135,10 @@ fun AssistantSettingsCard(
     rewriteEndpoint: String,
     apiKeyConfigured: Boolean,
     apiKey: String,
+    geminiApiKeyConfigured: Boolean,
+    geminiApiKey: String,
+    geminiModel: String,
+    promptTemplate: String,
     speechTestStatus: String?,
     backgroundVideoEnabled: Boolean,
     backgroundVideoOpacity: Float,
@@ -144,6 +149,9 @@ fun AssistantSettingsCard(
     onCycleSpeechMode: () -> Unit,
     onRewriteEndpointChange: (String) -> Unit,
     onSaveApiKey: (String) -> Unit,
+    onGeminiModelChange: (String) -> Unit,
+    onPromptTemplateChange: (String) -> Unit,
+    onSaveGeminiApiKey: (String) -> Unit,
     onTestSpeechMode: () -> Unit,
     onClearSpeechTestStatus: () -> Unit,
     onToggleBackgroundVideo: () -> Unit,
@@ -156,6 +164,8 @@ fun AssistantSettingsCard(
     modifier: Modifier = Modifier,
 ) {
     var apiKeyDraft by remember(apiKey) { mutableStateOf(apiKey) }
+    var geminiKeyDraft by remember(geminiApiKey) { mutableStateOf(geminiApiKey) }
+    var templateDraft by remember(promptTemplate) { mutableStateOf(promptTemplate) }
     LaunchedEffect(speechTestStatus) {
         if (speechTestStatus == null) return@LaunchedEffect
         delay(8_000)
@@ -195,6 +205,7 @@ fun AssistantSettingsCard(
                     AssistantSpeechMode.OFF -> "OFF"
                     AssistantSpeechMode.DIRECT_TTS -> "DIRECT"
                     AssistantSpeechMode.AGENT_PORTAL_TAMIL -> "PORTAL தமிழ்"
+                    AssistantSpeechMode.SMART_CASCADE -> "CASCADE Gemini→Portal→TTS"
                 },
                 color = Color(0xFFE8A15A),
                 fontSize = 11.sp,
@@ -202,10 +213,73 @@ fun AssistantSettingsCard(
             )
         }
         Text(
-            text = "Tap to cycle: off → device-locale direct TTS → Agent Portal Tamil. " +
-                "Portal mode uses store=false and fails closed silently.",
+            text = "Tap to cycle: OFF → DIRECT → PORTAL → CASCADE (Gemini, then Portal, then device TTS).",
             color = Color(0x88FFF6F0),
             fontSize = 10.sp,
+        )
+        Text(
+            text = "Gemini pre-template",
+            color = Color(0xFFE8A15A),
+            fontSize = 11.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(top = 6.dp),
+        )
+        RemoteMultilineField(
+            value = templateDraft,
+            onValueChange = {
+                templateDraft = it
+                onPromptTemplateChange(it)
+            },
+            placeholder = "{appLabel} {title} {text} {maxChars}",
+            minLines = 4,
+        )
+        Text(
+            text = "Placeholders: {appLabel} {title} {text} {maxChars}. Applied before Gemini calls.",
+            color = Color(0x77FFF6F0),
+            fontSize = 9.sp,
+        )
+        Text(
+            text = "Gemini API",
+            color = Color(0xFFE8A15A),
+            fontSize = 11.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(top = 6.dp),
+        )
+        RemoteTextField(
+            value = geminiModel,
+            onValueChange = onGeminiModelChange,
+            placeholder = "gemini-2.0-flash",
+        )
+        RemoteTextField(
+            value = geminiKeyDraft,
+            onValueChange = { geminiKeyDraft = it },
+            placeholder = "Gemini API key",
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(
+                if (geminiApiKeyConfigured) "Gemini key configured" else "No Gemini key saved",
+                color = if (geminiApiKeyConfigured) Color(0xFF4FD1C5) else Color(0x99FFF6F0),
+                fontSize = 10.sp,
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                "Save Gemini key",
+                color = Color(0xFFE8A15A),
+                fontSize = 11.sp,
+                modifier = Modifier
+                    .clickable { onSaveGeminiApiKey(geminiKeyDraft) }
+                    .padding(8.dp),
+            )
+        }
+        Text(
+            text = "Agent Portal (tier 2)",
+            color = Color(0xFFE8A15A),
+            fontSize = 11.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(top = 6.dp),
         )
         RemoteTextField(
             value = rewriteEndpoint,
@@ -229,7 +303,7 @@ fun AssistantSettingsCard(
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(
-                "Save key",
+                "Save Portal key",
                 color = Color(0xFFE8A15A),
                 fontSize = 11.sp,
                 modifier = Modifier
@@ -336,6 +410,35 @@ fun AssistantSettingsCard(
             fontSize = 10.sp,
         )
     }
+}
+
+@Composable
+private fun RemoteMultilineField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String,
+    minLines: Int = 3,
+) {
+    BasicTextField(
+        value = value,
+        onValueChange = onValueChange,
+        textStyle = TextStyle(color = Color(0xFFFFF6F0), fontSize = 10.sp),
+        cursorBrush = SolidColor(Color(0xFFE8A15A)),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 4.dp)
+            .heightIn(min = (minLines * 16).dp)
+            .background(Color(0x66302A38), RoundedCornerShape(8.dp))
+            .padding(horizontal = 8.dp, vertical = 7.dp),
+        decorationBox = { inner ->
+            Box(contentAlignment = Alignment.TopStart) {
+                if (value.isEmpty()) {
+                    Text(placeholder, color = Color(0x66FFF6F0), fontSize = 10.sp)
+                }
+                inner()
+            }
+        },
+    )
 }
 
 @Composable

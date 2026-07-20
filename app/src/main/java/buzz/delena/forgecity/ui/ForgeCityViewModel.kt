@@ -70,6 +70,18 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
     private val _apiKey = MutableStateFlow(assistantSettings.apiKey().orEmpty())
     val apiKey: StateFlow<String> = _apiKey.asStateFlow()
 
+    private val _geminiApiKeyConfigured = MutableStateFlow(assistantSettings.hasGeminiApiKey)
+    val geminiApiKeyConfigured: StateFlow<Boolean> = _geminiApiKeyConfigured.asStateFlow()
+
+    private val _geminiApiKey = MutableStateFlow(assistantSettings.geminiApiKey().orEmpty())
+    val geminiApiKey: StateFlow<String> = _geminiApiKey.asStateFlow()
+
+    private val _geminiModel = MutableStateFlow(assistantSettings.geminiModel)
+    val geminiModel: StateFlow<String> = _geminiModel.asStateFlow()
+
+    private val _promptTemplate = MutableStateFlow(assistantSettings.promptTemplate)
+    val promptTemplate: StateFlow<String> = _promptTemplate.asStateFlow()
+
     private val _speechTestStatus = MutableStateFlow<String?>(null)
     val speechTestStatus: StateFlow<String?> = _speechTestStatus.asStateFlow()
 
@@ -147,6 +159,10 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
         _rewriteEndpoint.value = assistantSettings.rewriteEndpoint
         _apiKeyConfigured.value = assistantSettings.hasApiKey
         _apiKey.value = assistantSettings.apiKey().orEmpty()
+        _geminiApiKeyConfigured.value = assistantSettings.hasGeminiApiKey
+        _geminiApiKey.value = assistantSettings.geminiApiKey().orEmpty()
+        _geminiModel.value = assistantSettings.geminiModel
+        _promptTemplate.value = assistantSettings.promptTemplate
         _allowCount.value = assistantSettings.allowedPackages().size
         _quietLabel.value = formatQuietLabel()
         _backgroundVideoEnabled.value = assistantSettings.backgroundVideoEnabled
@@ -212,11 +228,26 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
         _apiKey.value = assistantSettings.apiKey().orEmpty()
     }
 
+    fun setGeminiModel(value: String) {
+        assistantSettings.geminiModel = value
+        _geminiModel.value = assistantSettings.geminiModel
+    }
+
+    fun setPromptTemplate(value: String) {
+        assistantSettings.promptTemplate = value
+        _promptTemplate.value = assistantSettings.promptTemplate
+    }
+
+    fun saveGeminiApiKey(value: String) {
+        assistantSettings.saveGeminiApiKey(value)
+        _geminiApiKeyConfigured.value = assistantSettings.hasGeminiApiKey
+        _geminiApiKey.value = assistantSettings.geminiApiKey().orEmpty()
+    }
+
     fun testSpeechMode() {
         speechModeTestRunner.run(
             mode = assistantSettings.speechMode,
-            endpoint = assistantSettings.rewriteEndpoint,
-            apiKey = assistantSettings.apiKey(),
+            config = assistantSettings.cascadeSpeechConfig(),
             onStatus = { _speechTestStatus.value = it },
         )
     }

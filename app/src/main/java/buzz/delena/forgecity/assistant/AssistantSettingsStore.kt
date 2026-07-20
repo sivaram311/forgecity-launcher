@@ -1,6 +1,8 @@
 package buzz.delena.forgecity.assistant
 
 import android.content.Context
+import buzz.delena.forgecity.assistant.gemini.GeminiRewriteClient
+import buzz.delena.forgecity.assistant.gemini.PromptTemplateDefaults
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
@@ -44,32 +46,58 @@ class AssistantSettingsStore(context: Context) {
     val isRemoteRewriteConfigured: Boolean
         get() = rewriteEndpoint.isNotBlank() && hasApiKey
 
-    fun saveApiKey(value: String): Boolean {
+    fun saveApiKey(value: String): Boolean = saveEncryptedKey(
+        value = value,
+        ciphertextKey = KEY_ENCRYPTED_API_KEY,
+        ivKey = KEY_API_KEY_IV,
+        keystoreAlias = KEYSTORE_PORTAL_ALIAS,
+        onClear = { clearApiKey() },
+    )
+
+    private fun saveEncryptedKey(
+        value: String,
+        ciphertextKey: String,
+        ivKey: String,
+        keystoreAlias: String,
+        onClear: (() -> Unit)? = null,
+    ): Boolean {
         val key = value.trim()
         if (key.isEmpty()) {
-            clearApiKey()
+            if (onClear != null) onClear() else {
+                prefs.edit().remove(ciphertextKey).remove(ivKey).apply()
+            }
             return true
         }
         return runCatching {
             val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION)
-            cipher.init(Cipher.ENCRYPT_MODE, getOrCreateSecretKey())
+            cipher.init(Cipher.ENCRYPT_MODE, getOrCreateSecretKey(keystoreAlias))
             val encrypted = cipher.doFinal(key.toByteArray(Charsets.UTF_8))
             prefs.edit()
-                .putString(KEY_ENCRYPTED_API_KEY, Base64.encodeToString(encrypted, Base64.NO_WRAP))
-                .putString(KEY_API_KEY_IV, Base64.encodeToString(cipher.iv, Base64.NO_WRAP))
+                .putString(ciphertextKey, Base64.encodeToString(encrypted, Base64.NO_WRAP))
+                .putString(ivKey, Base64.encodeToString(cipher.iv, Base64.NO_WRAP))
                 .apply()
         }.isSuccess
     }
 
-    fun apiKey(): String? {
-        val encrypted = prefs.getString(KEY_ENCRYPTED_API_KEY, null) ?: return null
-        val iv = prefs.getString(KEY_API_KEY_IV, null) ?: return null
+    fun apiKey(): String? = readEncryptedKey(
+        ciphertextKey = KEY_ENCRYPTED_API_KEY,
+        ivKey = KEY_API_KEY_IV,
+        keystoreAlias = KEYSTORE_PORTAL_ALIAS,
+    )
+
+    private fun readEncryptedKey(
+        ciphertextKey: String,
+        ivKey: String,
+        keystoreAlias: String,
+    ): String? {
+        val encrypted = prefs.getString(ciphertextKey, null) ?: return null
+        val storedIv = prefs.getString(ivKey, null) ?: return null
         return runCatching {
             val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION)
             cipher.init(
                 Cipher.DECRYPT_MODE,
-                secretKey(),
-                GCMParameterSpec(GCM_TAG_BITS, Base64.decode(iv, Base64.NO_WRAP)),
+                secretKey(keystoreAlias),
+                GCMParameterSpec(GCM_TAG_BITS, Base64.decode(storedIv, Base64.NO_WRAP)),
             )
             cipher.doFinal(Base64.decode(encrypted, Base64.NO_WRAP)).toString(Charsets.UTF_8)
         }.getOrNull()
@@ -78,6 +106,49 @@ class AssistantSettingsStore(context: Context) {
     fun clearApiKey() {
         prefs.edit().remove(KEY_ENCRYPTED_API_KEY).remove(KEY_API_KEY_IV).apply()
     }
+
+    val hasGeminiApiKey: Boolean
+        get() = prefs.contains(KEY_GEMINI_ENCRYPTED_API_KEY) &&
+            prefs.contains(KEY_GEMINI_API_KEY_IV)
+
+    var geminiModel: String
+        get() = prefs.getString(KEY_GEMINI_MODEL, GeminiRewriteClient.DEFAULT_MODEL).orEmpty()
+        set(value) = prefs.edit()
+            .putString(KEY_GEMINI_MODEL, value.trim().ifBlank { GeminiRewriteClient.DEFAULT_MODEL })
+            .apply()
+
+    var promptTemplate: String
+        get() = prefs.getString(KEY_PROMPT_TEMPLATE, PromptTemplateDefaults.TEMPLATE)
+            .orEmpty()
+            .ifBlank { PromptTemplateDefaults.TEMPLATE }
+        set(value) = prefs.edit().putString(KEY_PROMPT_TEMPLATE, value).apply()
+
+    fun saveGeminiApiKey(value: String): Boolean = saveEncryptedKey(
+        value = value,
+        ciphertextKey = KEY_GEMINI_ENCRYPTED_API_KEY,
+        ivKey = KEY_GEMINI_API_KEY_IV,
+        keystoreAlias = KEYSTORE_GEMINI_ALIAS,
+        onClear = {
+            prefs.edit()
+                .remove(KEY_GEMINI_ENCRYPTED_API_KEY)
+                .remove(KEY_GEMINI_API_KEY_IV)
+                .apply()
+        },
+    )
+
+    fun geminiApiKey(): String? = readEncryptedKey(
+        ciphertextKey = KEY_GEMINI_ENCRYPTED_API_KEY,
+        ivKey = KEY_GEMINI_API_KEY_IV,
+        keystoreAlias = KEYSTORE_GEMINI_ALIAS,
+    )
+
+    fun cascadeSpeechConfig(): CascadeSpeechConfig = CascadeSpeechConfig(
+        geminiApiKey = geminiApiKey(),
+        geminiModel = geminiModel,
+        promptTemplate = promptTemplate,
+        portalEndpoint = rewriteEndpoint,
+        portalApiKey = apiKey(),
+    )
 
     var quietStartMinutes: Int
         get() = prefs.getInt(KEY_QUIET_START, 22 * 60)
@@ -114,18 +185,18 @@ class AssistantSettingsStore(context: Context) {
         setAllowedPackages(next)
     }
 
-    private fun secretKey(): SecretKey {
+    private fun secretKey(alias: String = KEYSTORE_PORTAL_ALIAS): SecretKey {
         val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
-        return keyStore.getKey(KEYSTORE_ALIAS, null) as? SecretKey
+        return keyStore.getKey(alias, null) as? SecretKey
             ?: error("Assistant API key is unavailable")
     }
 
-    private fun getOrCreateSecretKey(): SecretKey {
-        runCatching { secretKey() }.getOrNull()?.let { return it }
+    private fun getOrCreateSecretKey(alias: String): SecretKey {
+        runCatching { secretKey(alias) }.getOrNull()?.let { return it }
         val generator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEYSTORE)
         generator.init(
             KeyGenParameterSpec.Builder(
-                KEYSTORE_ALIAS,
+                alias,
                 KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT,
             )
                 .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
@@ -145,6 +216,10 @@ class AssistantSettingsStore(context: Context) {
         private const val KEY_REWRITE_ENDPOINT = "rewrite_endpoint"
         private const val KEY_ENCRYPTED_API_KEY = "rewrite_api_key_ciphertext"
         private const val KEY_API_KEY_IV = "rewrite_api_key_iv"
+        private const val KEY_GEMINI_ENCRYPTED_API_KEY = "gemini_api_key_ciphertext"
+        private const val KEY_GEMINI_API_KEY_IV = "gemini_api_key_iv"
+        private const val KEY_GEMINI_MODEL = "gemini_model"
+        private const val KEY_PROMPT_TEMPLATE = "prompt_template"
         private const val KEY_ALLOW = "allowed_packages"
         private const val KEY_QUIET_START = "quiet_start"
         private const val KEY_QUIET_END = "quiet_end"
@@ -152,7 +227,8 @@ class AssistantSettingsStore(context: Context) {
         private const val KEY_BACKGROUND_OPACITY = "background_video_opacity"
         private const val KEY_LAUNCHER_CHROME_VISIBLE = "launcher_chrome_visible"
         private const val ANDROID_KEYSTORE = "AndroidKeyStore"
-        private const val KEYSTORE_ALIAS = "forgecity_assistant_api_key"
+        private const val KEYSTORE_PORTAL_ALIAS = "forgecity_assistant_api_key"
+        private const val KEYSTORE_GEMINI_ALIAS = "forgecity_gemini_api_key"
         private const val CIPHER_TRANSFORMATION = "AES/GCM/NoPadding"
         private const val GCM_TAG_BITS = 128
     }

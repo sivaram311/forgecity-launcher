@@ -51,6 +51,10 @@ class MainActivity : ComponentActivity() {
             val rewriteEndpoint by viewModel.rewriteEndpoint.collectAsState()
             val apiKeyConfigured by viewModel.apiKeyConfigured.collectAsState()
             val apiKey by viewModel.apiKey.collectAsState()
+            val geminiApiKeyConfigured by viewModel.geminiApiKeyConfigured.collectAsState()
+            val geminiApiKey by viewModel.geminiApiKey.collectAsState()
+            val geminiModel by viewModel.geminiModel.collectAsState()
+            val promptTemplate by viewModel.promptTemplate.collectAsState()
             val speechTestStatus by viewModel.speechTestStatus.collectAsState()
             val allowCount by viewModel.allowCount.collectAsState()
             val quietLabel by viewModel.quietLabel.collectAsState()
@@ -74,6 +78,10 @@ class MainActivity : ComponentActivity() {
                 rewriteEndpoint = rewriteEndpoint,
                 apiKeyConfigured = apiKeyConfigured,
                 apiKey = apiKey,
+                geminiApiKeyConfigured = geminiApiKeyConfigured,
+                geminiApiKey = geminiApiKey,
+                geminiModel = geminiModel,
+                promptTemplate = promptTemplate,
                 speechTestStatus = speechTestStatus,
                 allowCount = allowCount,
                 quietLabel = quietLabel,
@@ -94,6 +102,9 @@ class MainActivity : ComponentActivity() {
                 onCycleSpeechMode = viewModel::cycleSpeechMode,
                 onRewriteEndpointChange = viewModel::setRewriteEndpoint,
                 onSaveApiKey = viewModel::saveApiKey,
+                onGeminiModelChange = viewModel::setGeminiModel,
+                onPromptTemplateChange = viewModel::setPromptTemplate,
+                onSaveGeminiApiKey = viewModel::saveGeminiApiKey,
                 onTestSpeechMode = viewModel::testSpeechMode,
                 onClearSpeechTestStatus = viewModel::clearSpeechTestStatus,
                 onToggleBackgroundVideo = viewModel::toggleBackgroundVideo,
