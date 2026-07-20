@@ -6,7 +6,7 @@ notifications aloud when you opt in.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher (public)
 **Branch:** `main` · version `0.4.6-gemini-native-audio-dev`
-**Latest prerelease:** build locally / publish as `v0.4.6-gemini-native-audio-dev`
+**Latest prerelease:** [`v0.4.6-gemini-native-audio-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.4.6-gemini-native-audio-dev)
 
 ## Download
 
