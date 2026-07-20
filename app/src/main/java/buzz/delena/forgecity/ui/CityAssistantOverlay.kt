@@ -139,6 +139,7 @@ fun AssistantSettingsCard(
     geminiApiKey: String,
     geminiModel: String,
     promptTemplate: String,
+    speechTestText: String,
     speechTestStatus: String?,
     backgroundVideoEnabled: Boolean,
     backgroundVideoOpacity: Float,
@@ -152,6 +153,7 @@ fun AssistantSettingsCard(
     onGeminiModelChange: (String) -> Unit,
     onPromptTemplateChange: (String) -> Unit,
     onSaveGeminiApiKey: (String) -> Unit,
+    onSpeechTestTextChange: (String) -> Unit,
     onTestSpeechMode: () -> Unit,
     onClearSpeechTestStatus: () -> Unit,
     onToggleBackgroundVideo: () -> Unit,
@@ -205,6 +207,7 @@ fun AssistantSettingsCard(
                     AssistantSpeechMode.OFF -> "OFF"
                     AssistantSpeechMode.DIRECT_TTS -> "DIRECT"
                     AssistantSpeechMode.AGENT_PORTAL_TAMIL -> "PORTAL தமிழ்"
+                    AssistantSpeechMode.GEMINI_TAMIL -> "GEMINI தமிழ்"
                     AssistantSpeechMode.SMART_CASCADE -> "CASCADE Gemini→Portal→TTS"
                 },
                 color = Color(0xFFE8A15A),
@@ -213,7 +216,7 @@ fun AssistantSettingsCard(
             )
         }
         Text(
-            text = "Tap to cycle: OFF → DIRECT → PORTAL → CASCADE (Gemini, then Portal, then device TTS).",
+            text = "Tap to cycle: OFF → DIRECT → PORTAL → GEMINI → CASCADE.",
             color = Color(0x88FFF6F0),
             fontSize = 10.sp,
         )
@@ -318,6 +321,19 @@ fun AssistantSettingsCard(
                 "Do not share screenshots. Saving an empty field clears it.",
             color = Color(0x77FFF6F0),
             fontSize = 9.sp,
+        )
+        Text(
+            text = "TEST TTS text",
+            color = Color(0xFFE8A15A),
+            fontSize = 11.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(top = 6.dp),
+        )
+        RemoteMultilineField(
+            value = speechTestText,
+            onValueChange = onSpeechTestTextChange,
+            placeholder = "Custom notification text for TEST TTS",
+            minLines = 2,
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,

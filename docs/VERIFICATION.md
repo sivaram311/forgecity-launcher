@@ -297,3 +297,13 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | `testDebugUnitTest` / `lintDebug` / `assembleDebug` | PASS | versionCode 11 |
 | APK SHA-256 | `AE44CEA9E688D2115460809A02E1EDC08190BD60DE6F3F2EC5EB679A1402C491` | |
 | Realme E2E (#16) | PENDING | |
+
+## 2026-07-20 — 0.4.5 split chips + GEMINI mode + custom TEST text
+
+| Check | Result | Notes |
+|------|--------|-------|
+| ASSIST / SEARCH / DOCK chips | PASS | Independent visibility prefs |
+| `GEMINI_TAMIL` mode | PASS | Fail-closed Gemini-only; CASCADE unchanged |
+| Custom TEST TTS text | PASS | Persisted; used by all modes |
+| Unit/lint/assemble | PASS | versionCode 12 |
+| APK SHA-256 | `86E1CEDA64908B69771E614B210F743070AFDAC0D0E2A7D3D705A98D3FECC917` | |

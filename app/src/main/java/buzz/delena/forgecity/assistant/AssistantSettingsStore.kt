@@ -174,10 +174,29 @@ class AssistantSettingsStore(context: Context) {
         get() = prefs.getBoolean(KEY_LAUNCHER_CHROME_VISIBLE, LauncherChromeDefaults.VISIBLE)
         set(value) = prefs.edit().putBoolean(KEY_LAUNCHER_CHROME_VISIBLE, value).apply()
 
-    /** City Assistant panel + search + favorites dock (apps). Independent of full chrome. */
-    var assistantToolsVisible: Boolean
-        get() = prefs.getBoolean(KEY_ASSISTANT_TOOLS_VISIBLE, true)
-        set(value) = prefs.edit().putBoolean(KEY_ASSISTANT_TOOLS_VISIBLE, value).apply()
+    /** City Assistant settings panel (independent of search / dock). */
+    var assistantPanelVisible: Boolean
+        get() = prefs.getBoolean(KEY_ASSISTANT_PANEL_VISIBLE, legacyToolsDefault())
+        set(value) = prefs.edit().putBoolean(KEY_ASSISTANT_PANEL_VISIBLE, value).apply()
+
+    var searchBarVisible: Boolean
+        get() = prefs.getBoolean(KEY_SEARCH_BAR_VISIBLE, legacyToolsDefault())
+        set(value) = prefs.edit().putBoolean(KEY_SEARCH_BAR_VISIBLE, value).apply()
+
+    var dockPanelVisible: Boolean
+        get() = prefs.getBoolean(KEY_DOCK_PANEL_VISIBLE, legacyToolsDefault())
+        set(value) = prefs.edit().putBoolean(KEY_DOCK_PANEL_VISIBLE, value).apply()
+
+    var speechTestText: String
+        get() = prefs.getString(KEY_SPEECH_TEST_TEXT, SpeechTestDefaults.TEXT)
+            .orEmpty()
+            .ifBlank { SpeechTestDefaults.TEXT }
+        set(value) = prefs.edit()
+            .putString(KEY_SPEECH_TEST_TEXT, value.trim().ifBlank { SpeechTestDefaults.TEXT })
+            .apply()
+
+    private fun legacyToolsDefault(): Boolean =
+        prefs.getBoolean(KEY_ASSISTANT_TOOLS_VISIBLE, true)
 
     fun allowedPackages(): Set<String> =
         prefs.getStringSet(KEY_ALLOW, emptySet())?.toSet().orEmpty()
@@ -234,6 +253,10 @@ class AssistantSettingsStore(context: Context) {
         private const val KEY_BACKGROUND_OPACITY = "background_video_opacity"
         private const val KEY_LAUNCHER_CHROME_VISIBLE = "launcher_chrome_visible"
         private const val KEY_ASSISTANT_TOOLS_VISIBLE = "assistant_tools_visible"
+        private const val KEY_ASSISTANT_PANEL_VISIBLE = "assistant_panel_visible"
+        private const val KEY_SEARCH_BAR_VISIBLE = "search_bar_visible"
+        private const val KEY_DOCK_PANEL_VISIBLE = "dock_panel_visible"
+        private const val KEY_SPEECH_TEST_TEXT = "speech_test_text"
         private const val ANDROID_KEYSTORE = "AndroidKeyStore"
         private const val KEYSTORE_PORTAL_ALIAS = "forgecity_assistant_api_key"
         private const val KEYSTORE_GEMINI_ALIAS = "forgecity_gemini_api_key"

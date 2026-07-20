@@ -15,8 +15,8 @@ android {
         applicationId = "buzz.delena.forgecity"
         minSdk = 26
         targetSdk = 35
-        versionCode = 11
-        versionName = "0.4.4-gemini-fix-assist-chip-dev"
+        versionCode = 12
+        versionName = "0.4.5-split-chips-gemini-mode-dev"
     }
 
     buildTypes {

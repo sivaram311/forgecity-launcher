@@ -33,6 +33,26 @@ class CascadeSpeechOrchestrator(
         config: CascadeSpeechConfig,
         onStatus: ((String) -> Unit)? = null,
     ) {
+        if (tryGemini(input, config, onStatus, failMessagePrefix = "trying Portal…")) return
+        tryPortalThenDirect(input, config, onStatus)
+    }
+
+    /** Gemini-only path: no Portal / device fallback (fail closed). */
+    fun runGeminiOnly(
+        input: CascadeSpeechInput,
+        config: CascadeSpeechConfig,
+        onStatus: ((String) -> Unit)? = null,
+    ) {
+        if (tryGemini(input, config, onStatus, failMessagePrefix = "stopped")) return
+        onStatus?.invoke("GEMINI failed closed")
+    }
+
+    private fun tryGemini(
+        input: CascadeSpeechInput,
+        config: CascadeSpeechConfig,
+        onStatus: ((String) -> Unit)?,
+        failMessagePrefix: String,
+    ): Boolean {
         val prompt = PromptTemplateFormatter.format(
             template = config.promptTemplate,
             appLabel = input.appLabel,
@@ -40,28 +60,45 @@ class CascadeSpeechOrchestrator(
             text = input.body,
         )
         val geminiKey = config.geminiApiKey?.takeIf { it.isNotBlank() }
-        if (geminiKey != null) {
-            ForgeCityTtsDiagnostics.info("cascade_try", "tier=gemini")
-            when (val result = geminiClient.rewrite(geminiKey, config.geminiModel, prompt)) {
-                is GeminiRewriteResult.Success -> {
-                    speakTamil(result.tamilText, onStatus, "Gemini")
-                    return
-                }
-                is GeminiRewriteResult.Unauthorized ->
-                    onStatus?.invoke("Gemini auth failed (bad key); trying Portal…")
-                is GeminiRewriteResult.ModelUnavailable ->
-                    onStatus?.invoke("Gemini model unavailable (try gemini-2.5-flash); Portal…")
-                is GeminiRewriteResult.Timeout ->
-                    onStatus?.invoke("Gemini timeout; trying Portal…")
-                is GeminiRewriteResult.Malformed ->
-                    onStatus?.invoke("Gemini response not Tamil; trying Portal…")
-                is GeminiRewriteResult.Unavailable ->
-                    onStatus?.invoke("Gemini unavailable; trying Portal…")
-            }
-        } else {
+        if (geminiKey == null) {
             ForgeCityTtsDiagnostics.info("cascade_skip", "tier=gemini reason=no_key")
+            onStatus?.invoke("Gemini key missing; $failMessagePrefix")
+            return false
         }
+        ForgeCityTtsDiagnostics.info("cascade_try", "tier=gemini")
+        return when (val result = geminiClient.rewrite(geminiKey, config.geminiModel, prompt)) {
+            is GeminiRewriteResult.Success -> {
+                speakTamil(result.tamilText, onStatus, "Gemini")
+                true
+            }
+            is GeminiRewriteResult.Unauthorized -> {
+                onStatus?.invoke("Gemini auth failed (bad key); $failMessagePrefix")
+                false
+            }
+            is GeminiRewriteResult.ModelUnavailable -> {
+                onStatus?.invoke("Gemini model unavailable; $failMessagePrefix")
+                false
+            }
+            is GeminiRewriteResult.Timeout -> {
+                onStatus?.invoke("Gemini timeout; $failMessagePrefix")
+                false
+            }
+            is GeminiRewriteResult.Malformed -> {
+                onStatus?.invoke("Gemini response not Tamil; $failMessagePrefix")
+                false
+            }
+            is GeminiRewriteResult.Unavailable -> {
+                onStatus?.invoke("Gemini unavailable; $failMessagePrefix")
+                false
+            }
+        }
+    }
 
+    private fun tryPortalThenDirect(
+        input: CascadeSpeechInput,
+        config: CascadeSpeechConfig,
+        onStatus: ((String) -> Unit)?,
+    ) {
         val portalKey = config.portalApiKey?.takeIf { it.isNotBlank() }
         val portalEndpoint = config.portalEndpoint.takeIf { it.isNotBlank() }
         if (portalKey != null && portalEndpoint != null) {

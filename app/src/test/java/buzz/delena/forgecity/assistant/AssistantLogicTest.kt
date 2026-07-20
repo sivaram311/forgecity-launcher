@@ -106,8 +106,12 @@ class AssistantSpeechModeTest {
             AssistantSpeechMode.DIRECT_TTS.next(),
         )
         assertEquals(
-            AssistantSpeechMode.SMART_CASCADE,
+            AssistantSpeechMode.GEMINI_TAMIL,
             AssistantSpeechMode.AGENT_PORTAL_TAMIL.next(),
+        )
+        assertEquals(
+            AssistantSpeechMode.SMART_CASCADE,
+            AssistantSpeechMode.GEMINI_TAMIL.next(),
         )
         assertEquals(AssistantSpeechMode.OFF, AssistantSpeechMode.SMART_CASCADE.next())
     }
@@ -119,6 +123,26 @@ class AssistantSpeechModeTest {
             NotificationSpeechRoute.resolve(
                 AssistantSpeechMode.SMART_CASCADE,
                 portalConfigured = false,
+            ),
+        )
+    }
+
+    @Test
+    fun geminiRouteRequiresKey() {
+        assertEquals(
+            NotificationSpeechRoute.NONE,
+            NotificationSpeechRoute.resolve(
+                AssistantSpeechMode.GEMINI_TAMIL,
+                portalConfigured = true,
+                geminiConfigured = false,
+            ),
+        )
+        assertEquals(
+            NotificationSpeechRoute.GEMINI_TAMIL,
+            NotificationSpeechRoute.resolve(
+                AssistantSpeechMode.GEMINI_TAMIL,
+                portalConfigured = false,
+                geminiConfigured = true,
             ),
         )
     }

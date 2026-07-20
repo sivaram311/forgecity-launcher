@@ -16,8 +16,10 @@ class SpeechModeTestRunner(context: Context) : AutoCloseable {
     fun run(
         mode: AssistantSpeechMode,
         config: CascadeSpeechConfig,
+        testText: String,
         onStatus: (String) -> Unit,
     ) {
+        val body = testText.trim().ifBlank { SpeechTestDefaults.TEXT }
         ForgeCityTtsDiagnostics.info("test_start", "mode=$mode")
         when (mode) {
             AssistantSpeechMode.OFF -> {
@@ -26,7 +28,7 @@ class SpeechModeTestRunner(context: Context) : AutoCloseable {
             }
             AssistantSpeechMode.DIRECT_TTS -> {
                 onStatus("Testing device TTS…")
-                tts.speakDirect("ForgeCity direct speech test.") { result ->
+                tts.speakDirect(body) { result ->
                     ForgeCityTtsDiagnostics.info("test_direct_result", "result=$result")
                     onStatus(
                         if (result == AssistantTtsEngine.SpeakResult.STARTED) {
@@ -53,7 +55,7 @@ class SpeechModeTestRunner(context: Context) : AutoCloseable {
                                 notificationKey = "manual-tts-test",
                                 appLabel = "ForgeCity",
                                 title = "Speech test",
-                                body = "ForgeCity notification speech is working.",
+                                body = body,
                             ),
                         )
                     }
@@ -80,6 +82,25 @@ class SpeechModeTestRunner(context: Context) : AutoCloseable {
                     }
                 }
             }
+            AssistantSpeechMode.GEMINI_TAMIL -> {
+                if (config.geminiApiKey.isNullOrBlank()) {
+                    onStatus("GEMINI failed: key missing")
+                    return
+                }
+                onStatus("Testing Gemini Tamil rewrite…")
+                executor.execute {
+                    cascadeOrchestrator.runGeminiOnly(
+                        CascadeSpeechInput(
+                            notificationKey = "manual-gemini-test",
+                            appLabel = "ForgeCity",
+                            title = "Speech test",
+                            body = body,
+                        ),
+                        config,
+                        onStatus = onStatus,
+                    )
+                }
+            }
             AssistantSpeechMode.SMART_CASCADE -> {
                 onStatus("Testing Gemini → Portal → device cascade…")
                 executor.execute {
@@ -88,7 +109,7 @@ class SpeechModeTestRunner(context: Context) : AutoCloseable {
                             notificationKey = "manual-cascade-test",
                             appLabel = "ForgeCity",
                             title = "Speech test",
-                            body = "ForgeCity notification speech is working.",
+                            body = body,
                         ),
                         config,
                         onStatus = onStatus,

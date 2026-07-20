@@ -5,32 +5,32 @@ Apps become buildings. Habits rebuild districts. A neon city assistant can read
 notifications aloud when you opt in.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher (public)
-**Branch:** `main` · version `0.4.4-gemini-fix-assist-chip-dev`
-**Latest prerelease:** [`v0.4.4-gemini-fix-assist-chip-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.4.4-gemini-fix-assist-chip-dev)
+**Branch:** `main` · version `0.4.5-split-chips-gemini-mode-dev`
+**Latest prerelease:** [`v0.4.5-split-chips-gemini-mode-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.4.5-split-chips-gemini-mode-dev)
 
 ## Download
 
 Latest debug prerelease (sideload):
 
 - Releases: https://github.com/sivaram311/forgecity-launcher/releases
-- Tag target: `v0.4.4-gemini-fix-assist-chip-dev`
+- Tag target: `v0.4.5-split-chips-gemini-mode-dev`
 
 This is **debug-signed**. Realme P2 Pro E2E (#16) is still pending for any annotated production tag.
 
 ```powershell
-curl.exe -L -o forgecity-0.4.4-gemini-fix-assist-chip-dev-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.4.4-gemini-fix-assist-chip-dev/forgecity-0.4.4-gemini-fix-assist-chip-dev-debug.apk
-Get-FileHash .\forgecity-0.4.4-gemini-fix-assist-chip-dev-debug.apk -Algorithm SHA256
-# expect AE44CEA9E688D2115460809A02E1EDC08190BD60DE6F3F2EC5EB679A1402C491
-adb install -r .\forgecity-0.4.4-gemini-fix-assist-chip-dev-debug.apk
+curl.exe -L -o forgecity-0.4.5-split-chips-gemini-mode-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.4.5-split-chips-gemini-mode-dev/forgecity-0.4.5-split-chips-gemini-mode-dev-debug.apk
+Get-FileHash .\forgecity-0.4.5-split-chips-gemini-mode-dev-debug.apk -Algorithm SHA256
+# expect 86E1CEDA64908B69771E614B210F743070AFDAC0D0E2A7D3D705A98D3FECC917
+adb install -r .\forgecity-0.4.5-split-chips-gemini-mode-dev-debug.apk
 ```
 
-## What works in 0.4.4-gemini-fix-assist-chip-dev
+## What works in 0.4.5-split-chips-gemini-mode-dev
 
-- **Fix:** Gemini default model migrated from shut-down `gemini-2.0-flash` → `gemini-2.5-flash`
-- Clearer Gemini failure reasons (auth / model / no-Tamil / timeout)
-- **`ASSIST +/−` chip** toggles City Assistant + search + favorites dock
-- Prior SMART_CASCADE + Portal Tamil + TEST TTS + diagnostics
+- Separate chips: **`ASSIST`**, **`SEARCH`**, **`DOCK`** (+ existing `UI`)
+- Dedicated **`GEMINI தமிழ்`** mode (fail-closed) alongside **CASCADE**
+- Custom editable **TEST TTS** text field
+- Prior Gemini 2.5-flash default + Portal Tamil + diagnostics
 - Saved API key is visible in config for device setup (still encrypted at rest)
 - Safe terminal diagnostics via `adb logcat -s ForgeCityTTS`; keys and message
   content are never logged

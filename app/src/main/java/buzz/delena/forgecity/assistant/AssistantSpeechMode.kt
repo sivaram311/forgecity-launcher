@@ -4,6 +4,7 @@ enum class AssistantSpeechMode {
     OFF,
     DIRECT_TTS,
     AGENT_PORTAL_TAMIL,
+    GEMINI_TAMIL,
     SMART_CASCADE;
 
     fun next(): AssistantSpeechMode = entries[(ordinal + 1) % entries.size]
@@ -25,17 +26,21 @@ enum class NotificationSpeechRoute {
     NONE,
     DIRECT,
     AGENT_PORTAL_TAMIL,
+    GEMINI_TAMIL,
     SMART_CASCADE;
 
     companion object {
         fun resolve(
             mode: AssistantSpeechMode,
             portalConfigured: Boolean,
+            geminiConfigured: Boolean = false,
         ): NotificationSpeechRoute = when (mode) {
             AssistantSpeechMode.OFF -> NONE
             AssistantSpeechMode.DIRECT_TTS -> DIRECT
             AssistantSpeechMode.AGENT_PORTAL_TAMIL ->
                 if (portalConfigured) AGENT_PORTAL_TAMIL else NONE
+            AssistantSpeechMode.GEMINI_TAMIL ->
+                if (geminiConfigured) GEMINI_TAMIL else NONE
             AssistantSpeechMode.SMART_CASCADE -> SMART_CASCADE
         }
     }
@@ -43,4 +48,8 @@ enum class NotificationSpeechRoute {
 
 object LauncherChromeDefaults {
     const val VISIBLE = false
+}
+
+object SpeechTestDefaults {
+    const val TEXT = "ForgeCity notification speech is working."
 }

@@ -123,6 +123,7 @@ class ForgeNotificationListenerService : NotificationListenerService() {
         val route = NotificationSpeechRoute.resolve(
                 mode = settings.speechMode,
                 portalConfigured = settings.isRemoteRewriteConfigured,
+                geminiConfigured = settings.hasGeminiApiKey,
             )
         ForgeCityTtsDiagnostics.info("notification_route", "mode=${settings.speechMode} route=$route")
         when (route) {
@@ -140,6 +141,20 @@ class ForgeNotificationListenerService : NotificationListenerService() {
                     ),
                 )
             }
+            NotificationSpeechRoute.GEMINI_TAMIL -> {
+                cascadeExecutor.execute {
+                    if (!canUseGeminiSpeech()) return@execute
+                    cascadeOrchestrator?.runGeminiOnly(
+                        CascadeSpeechInput(
+                            notificationKey = notification.key,
+                            appLabel = label,
+                            title = title.orEmpty(),
+                            body = text.orEmpty(),
+                        ),
+                        settings.cascadeSpeechConfig(),
+                    )
+                }
+            }
             NotificationSpeechRoute.SMART_CASCADE -> {
                 cascadeExecutor.execute {
                     if (!canUseCascadeSpeech()) return@execute
@@ -155,6 +170,23 @@ class ForgeNotificationListenerService : NotificationListenerService() {
                 }
             }
         }
+    }
+
+    private fun canUseGeminiSpeech(): Boolean {
+        if (!settings.assistantEnabled ||
+            settings.speechMode != AssistantSpeechMode.GEMINI_TAMIL ||
+            !settings.hasGeminiApiKey ||
+            !speechBudget.allowsSpeech
+        ) {
+            return false
+        }
+        val now = Calendar.getInstance()
+        val minutes = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE)
+        return !QuietHours.isQuiet(
+            minutes,
+            settings.quietStartMinutes,
+            settings.quietEndMinutes,
+        )
     }
 
     private fun canUseCascadeSpeech(): Boolean {

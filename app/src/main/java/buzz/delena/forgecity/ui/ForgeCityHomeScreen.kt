@@ -75,7 +75,10 @@ fun ForgeCityHomeScreen(
     backgroundVideoEnabled: Boolean,
     backgroundVideoOpacity: Float,
     launcherChromeVisible: Boolean,
-    assistantToolsVisible: Boolean,
+    assistantPanelVisible: Boolean,
+    searchBarVisible: Boolean,
+    dockPanelVisible: Boolean,
+    speechTestText: String,
     showAllowlist: Boolean,
     dockMessage: String?,
     levelUpBuildingId: String?,
@@ -98,7 +101,10 @@ fun ForgeCityHomeScreen(
     onToggleBackgroundVideo: () -> Unit,
     onBackgroundVideoOpacityChange: (Float) -> Unit,
     onToggleLauncherChrome: () -> Unit,
-    onToggleAssistantTools: () -> Unit,
+    onToggleAssistantPanel: () -> Unit,
+    onToggleSearchBar: () -> Unit,
+    onToggleDockPanel: () -> Unit,
+    onSpeechTestTextChange: (String) -> Unit,
     onQuietStartEarlier: () -> Unit,
     onQuietStartLater: () -> Unit,
     onQuietEndEarlier: () -> Unit,
@@ -193,7 +199,7 @@ fun ForgeCityHomeScreen(
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                if (assistantToolsVisible) {
+                if (assistantPanelVisible) {
                     AssistantSettingsCard(
                         hasNotificationAccess = hasNotificationAccess,
                         assistantEnabled = assistantEnabled,
@@ -205,6 +211,7 @@ fun ForgeCityHomeScreen(
                         geminiApiKey = geminiApiKey,
                         geminiModel = geminiModel,
                         promptTemplate = promptTemplate,
+                        speechTestText = speechTestText,
                         speechTestStatus = speechTestStatus,
                         backgroundVideoEnabled = backgroundVideoEnabled,
                         backgroundVideoOpacity = backgroundVideoOpacity,
@@ -218,6 +225,7 @@ fun ForgeCityHomeScreen(
                         onGeminiModelChange = onGeminiModelChange,
                         onPromptTemplateChange = onPromptTemplateChange,
                         onSaveGeminiApiKey = onSaveGeminiApiKey,
+                        onSpeechTestTextChange = onSpeechTestTextChange,
                         onTestSpeechMode = onTestSpeechMode,
                         onClearSpeechTestStatus = onClearSpeechTestStatus,
                         onToggleBackgroundVideo = onToggleBackgroundVideo,
@@ -229,6 +237,8 @@ fun ForgeCityHomeScreen(
                         onOpenAllowlist = onOpenAllowlist,
                     )
                     Spacer(modifier = Modifier.height(8.dp))
+                }
+                if (searchBarVisible) {
                     SearchBar(query = query, onQueryChange = onQueryChange)
                 }
             }
@@ -251,7 +261,7 @@ fun ForgeCityHomeScreen(
         }
 
         AnimatedVisibility(
-            visible = launcherChromeVisible && assistantToolsVisible,
+            visible = launcherChromeVisible && dockPanelVisible,
             enter = fadeIn(),
             exit = fadeOut(),
             modifier = Modifier
@@ -288,7 +298,7 @@ fun ForgeCityHomeScreen(
             }
         }
 
-        if (launcherChromeVisible && assistantToolsVisible && showAllowlist) {
+        if (launcherChromeVisible && assistantPanelVisible && showAllowlist) {
             AllowlistSheet(
                 buildings = buildings.distinctBy { it.packageName },
                 isPackageAllowed = isPackageAllowed,
@@ -313,20 +323,30 @@ fun ForgeCityHomeScreen(
             )
             Spacer(modifier = Modifier.height(6.dp))
             ChromeChip(
-                label = if (assistantToolsVisible) "ASSIST −" else "ASSIST +",
+                label = if (assistantPanelVisible) "ASSIST −" else "ASSIST +",
                 contentDescription =
-                    if (assistantToolsVisible) {
-                        "Hide assistant search and apps"
-                    } else {
-                        "Show assistant search and apps"
-                    },
+                    if (assistantPanelVisible) "Hide assistant panel" else "Show assistant panel",
                 stateDescription =
-                    if (assistantToolsVisible) {
-                        "Assistant tools shown"
-                    } else {
-                        "Assistant tools hidden"
-                    },
-                onClick = onToggleAssistantTools,
+                    if (assistantPanelVisible) "Assistant panel shown" else "Assistant panel hidden",
+                onClick = onToggleAssistantPanel,
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            ChromeChip(
+                label = if (searchBarVisible) "SEARCH −" else "SEARCH +",
+                contentDescription =
+                    if (searchBarVisible) "Hide search" else "Show search",
+                stateDescription =
+                    if (searchBarVisible) "Search shown" else "Search hidden",
+                onClick = onToggleSearchBar,
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            ChromeChip(
+                label = if (dockPanelVisible) "DOCK −" else "DOCK +",
+                contentDescription =
+                    if (dockPanelVisible) "Hide favorites dock" else "Show favorites dock",
+                stateDescription =
+                    if (dockPanelVisible) "Dock shown" else "Dock hidden",
+                onClick = onToggleDockPanel,
             )
         }
     }

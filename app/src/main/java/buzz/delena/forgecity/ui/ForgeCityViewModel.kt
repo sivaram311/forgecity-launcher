@@ -103,9 +103,20 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
         MutableStateFlow(assistantSettings.launcherChromeVisible)
     val launcherChromeVisible: StateFlow<Boolean> = _launcherChromeVisible.asStateFlow()
 
-    private val _assistantToolsVisible =
-        MutableStateFlow(assistantSettings.assistantToolsVisible)
-    val assistantToolsVisible: StateFlow<Boolean> = _assistantToolsVisible.asStateFlow()
+    private val _assistantPanelVisible =
+        MutableStateFlow(assistantSettings.assistantPanelVisible)
+    val assistantPanelVisible: StateFlow<Boolean> = _assistantPanelVisible.asStateFlow()
+
+    private val _searchBarVisible =
+        MutableStateFlow(assistantSettings.searchBarVisible)
+    val searchBarVisible: StateFlow<Boolean> = _searchBarVisible.asStateFlow()
+
+    private val _dockPanelVisible =
+        MutableStateFlow(assistantSettings.dockPanelVisible)
+    val dockPanelVisible: StateFlow<Boolean> = _dockPanelVisible.asStateFlow()
+
+    private val _speechTestText = MutableStateFlow(assistantSettings.speechTestText)
+    val speechTestText: StateFlow<String> = _speechTestText.asStateFlow()
 
     private val _showAllowlist = MutableStateFlow(false)
     val showAllowlist: StateFlow<Boolean> = _showAllowlist.asStateFlow()
@@ -252,8 +263,14 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
         speechModeTestRunner.run(
             mode = assistantSettings.speechMode,
             config = assistantSettings.cascadeSpeechConfig(),
+            testText = assistantSettings.speechTestText,
             onStatus = { _speechTestStatus.value = it },
         )
+    }
+
+    fun setSpeechTestText(value: String) {
+        assistantSettings.speechTestText = value
+        _speechTestText.value = assistantSettings.speechTestText
     }
 
     fun clearSpeechTestStatus() {
@@ -281,13 +298,25 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
-    fun toggleAssistantTools() {
-        assistantSettings.assistantToolsVisible = !assistantSettings.assistantToolsVisible
-        _assistantToolsVisible.value = assistantSettings.assistantToolsVisible
-        if (!_assistantToolsVisible.value) {
+    fun toggleAssistantPanel() {
+        assistantSettings.assistantPanelVisible = !assistantSettings.assistantPanelVisible
+        _assistantPanelVisible.value = assistantSettings.assistantPanelVisible
+        if (!_assistantPanelVisible.value) {
             closeAllowlist()
+        }
+    }
+
+    fun toggleSearchBar() {
+        assistantSettings.searchBarVisible = !assistantSettings.searchBarVisible
+        _searchBarVisible.value = assistantSettings.searchBarVisible
+        if (!_searchBarVisible.value) {
             _query.value = ""
         }
+    }
+
+    fun toggleDockPanel() {
+        assistantSettings.dockPanelVisible = !assistantSettings.dockPanelVisible
+        _dockPanelVisible.value = assistantSettings.dockPanelVisible
     }
 
     fun shiftQuietStart(deltaMinutes: Int) {
