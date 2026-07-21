@@ -39,14 +39,24 @@ fun FavoritesDock(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth()
-            .height(78.dp)
+            .height(80.dp)
             .background(
                 brush = Brush.horizontalGradient(
-                    listOf(Color(0xCC2A1838), Color(0xCC1A1228), Color(0xCC302018)),
+                    listOf(
+                        Color(0xB8281838),
+                        Color(0xB81A1228),
+                        Color(0xB8302018),
+                    ),
                 ),
-                shape = RoundedCornerShape(28.dp),
+                shape = RoundedCornerShape(30.dp),
             )
-            .border(1.dp, Color(0x66E8A15A), RoundedCornerShape(28.dp))
+            .border(
+                width = 1.dp,
+                brush = Brush.horizontalGradient(
+                    listOf(Color(0x88E8A15A), Color(0x55FFF6F0), Color(0x88E8A15A)),
+                ),
+                shape = RoundedCornerShape(30.dp),
+            )
             .padding(horizontal = 14.dp),
     ) {
         repeat(slots) { index ->
@@ -55,8 +65,13 @@ fun FavoritesDock(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .size(52.dp)
-                    .background(Color(0x55302A38), CircleShape)
-                    .border(1.dp, Color(0x44FFF6F0), CircleShape)
+                    .background(
+                        brush = Brush.radialGradient(
+                            listOf(Color(0x66302A38), Color(0x44301828)),
+                        ),
+                        shape = CircleShape,
+                    )
+                    .border(1.dp, Color(0x55FFF6F0), CircleShape)
                     .then(
                         if (building != null) {
                             Modifier.clickable { onFavoriteTap(building) }
@@ -71,14 +86,14 @@ fun FavoritesDock(
                         Image(
                             bitmap = bmp,
                             contentDescription = building.label,
-                            modifier = Modifier.size(36.dp),
+                            modifier = Modifier.size(34.dp),
                         )
                     }
                 } else {
                     Text(
-                        text = "+",
+                        text = "pin",
                         color = Color(0x66FFF6F0),
-                        fontSize = 18.sp,
+                        fontSize = 11.sp,
                         textAlign = TextAlign.Center,
                     )
                 }

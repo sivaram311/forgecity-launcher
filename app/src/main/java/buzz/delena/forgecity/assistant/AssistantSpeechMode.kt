@@ -47,7 +47,8 @@ enum class NotificationSpeechRoute {
 }
 
 object LauncherChromeDefaults {
-    const val VISIBLE = false
+    /** City-first: show thin HUD (chapter pill + dock) on first run. */
+    const val VISIBLE = true
 }
 
 object SpeechTestDefaults {

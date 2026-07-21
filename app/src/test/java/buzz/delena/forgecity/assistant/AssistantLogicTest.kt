@@ -173,7 +173,7 @@ class AssistantSpeechModeTest {
     }
 
     @Test
-    fun launcherChromeDefaultsHidden() {
-        assertFalse(LauncherChromeDefaults.VISIBLE)
+    fun launcherChromeDefaultsVisibleCityFirst() {
+        assertTrue(LauncherChromeDefaults.VISIBLE)
     }
 }

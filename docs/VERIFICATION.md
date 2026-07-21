@@ -331,3 +331,14 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | Unit/lint/assemble | PASS | versionCode 14 |
 | APK SHA-256 | `C98727E5F1169E486193D6E3E1ADBF9D21AA646E76231EE841A85F5756B9B377` | |
 | Realme E2E (#16) | PENDING | |
+
+## 2026-07-21 — 0.5.0 UI polish (A–D)
+
+| Check | Result | Notes |
+|------|--------|-------|
+| City-first chrome | LANDED | Chapter pill, overflow menu, ASSIST modal sheet |
+| Local video scrims | LANDED | No full-screen mud; upper fade + chrome strips |
+| Building craft | LANDED | `CityRender` + `DistrictSilhouette`, LOD badges |
+| Motion / dock | LANDED | Pan inertia, search focus, haptics, glass dock |
+| Unit/lint/assemble | PASS | versionCode 15 · 52 tests |
+| Realme E2E (#16) | PENDING | |

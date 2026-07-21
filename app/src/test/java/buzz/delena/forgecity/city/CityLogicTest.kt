@@ -78,6 +78,19 @@ class IsoMathTest {
     }
 }
 
+class DistrictSilhouetteTest {
+    @Test
+    fun mapsEachDistrictToDistinctStyleWhereDesigned() {
+        assertEquals(RoofStyle.SPIRE, DistrictSilhouette.of(District.FORGE))
+        assertEquals(RoofStyle.GOLD_CAP, DistrictSilhouette.of(District.VAULT))
+        assertEquals(RoofStyle.ANTENNA, DistrictSilhouette.of(District.NEXUS))
+        assertEquals(RoofStyle.ANGULAR, DistrictSilhouette.of(District.ARENA))
+        assertEquals(RoofStyle.SOFT, DistrictSilhouette.of(District.GARDEN))
+        assertEquals(RoofStyle.STEPPED, DistrictSilhouette.of(District.ARCHIVE))
+        assertEquals(RoofStyle.DEFAULT, DistrictSilhouette.of(District.CUSTOM))
+    }
+}
+
 class DistrictClassifierTest {
     @Test
     fun classifiesTradingAppsIntoVault() {

@@ -1,10 +1,12 @@
 package buzz.delena.forgecity.ui
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.rememberScrollState
@@ -26,15 +28,22 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.semantics.Role
@@ -128,6 +137,9 @@ fun ForgeCityHomeScreen(
     val favorites = buildings.filter { it.isFavorite }.take(6)
     val (top, mid, bottom) = DayNightCycle.skyColors(hourOfDay)
 
+    // Slice D2: when the query resolves to a single building, fly the camera to it.
+    val focusBuildingId = if (query.isNotBlank() && filtered.size == 1) filtered.first().id else null
+
     LaunchedEffect(dockMessage) {
         if (dockMessage == null) return@LaunchedEffect
         delay(2_200)
@@ -143,36 +155,93 @@ fun ForgeCityHomeScreen(
                 ),
             ),
     ) {
+        val videoOn = ambientEnabled && backgroundVideoEnabled
         CityBackgroundVideo(
-            enabled = ambientEnabled && backgroundVideoEnabled,
+            enabled = videoOn,
             opacity = backgroundVideoOpacity,
             modifier = Modifier.fillMaxSize(),
         )
-        if (ambientEnabled && backgroundVideoEnabled) {
+
+        // Slice C1: instead of a full-screen mud scrim, fade the video into the
+        // city mid so the iso city owns the lower half while the skyline stays visible.
+        if (videoOn) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(
                         Brush.verticalGradient(
-                            listOf(
-                                Color(0xA60A0A12),
-                                Color(0x660A0A12),
-                                Color(0xB30A0A12),
+                            colorStops = arrayOf(
+                                0.0f to Color.Transparent,
+                                0.46f to Color.Transparent,
+                                0.72f to Color(0x66060510),
+                                1.0f to Color(0xCC050409),
                             ),
                         ),
                     ),
             )
         }
+
         CityCanvas(
             buildings = filtered,
             hourOfDay = hourOfDay,
             ambientEnabled = ambientEnabled,
             levelUpBuildingId = levelUpBuildingId,
+            focusBuildingId = focusBuildingId,
             onBuildingTap = onBuildingTap,
             onBuildingLongPress = onBuildingLongPress,
             onLevelUpConsumed = onLevelUpConsumed,
             modifier = Modifier.fillMaxSize(),
         )
+
+        // Slice C4: subtle vignette so the poster/gradient state reads with depth.
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.radialGradient(
+                        colors = listOf(Color.Transparent, Color(0x3305040A)),
+                        radius = 1600f,
+                    ),
+                ),
+        )
+
+        // Slice A1/C: local top scrim strip only behind the top chrome.
+        AnimatedVisibility(
+            visible = launcherChromeVisible,
+            enter = fadeIn(),
+            exit = fadeOut(),
+            modifier = Modifier.align(Alignment.TopCenter),
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(210.dp)
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(Color(0xB3070510), Color(0x00070510)),
+                        ),
+                    ),
+            )
+        }
+
+        // Slice A1/C: local bottom scrim strip only behind the favorites dock.
+        AnimatedVisibility(
+            visible = launcherChromeVisible && dockPanelVisible,
+            enter = fadeIn(),
+            exit = fadeOut(),
+            modifier = Modifier.align(Alignment.BottomCenter),
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(190.dp)
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(Color(0x00060510), Color(0xC0060510)),
+                        ),
+                    ),
+            )
+        }
 
         AnimatedVisibility(
             visible = launcherChromeVisible,
@@ -183,11 +252,10 @@ fun ForgeCityHomeScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .statusBarsPadding()
-                    .verticalScroll(rememberScrollState())
                     .padding(horizontal = 16.dp, vertical = 10.dp),
             ) {
-                ChapterCard(state)
-                Spacer(modifier = Modifier.height(10.dp))
+                ChapterPill(state)
+                Spacer(modifier = Modifier.height(8.dp))
                 ResourceStrip(state)
                 if (!hasUsageAccess) {
                     Spacer(modifier = Modifier.height(8.dp))
@@ -202,51 +270,8 @@ fun ForgeCityHomeScreen(
                             .padding(horizontal = 12.dp, vertical = 10.dp),
                     )
                 }
-                Spacer(modifier = Modifier.height(8.dp))
-                if (assistantPanelVisible) {
-                    AssistantSettingsCard(
-                        hasNotificationAccess = hasNotificationAccess,
-                        assistantEnabled = assistantEnabled,
-                        speechMode = speechMode,
-                        rewriteEndpoint = rewriteEndpoint,
-                        apiKeyConfigured = apiKeyConfigured,
-                        apiKey = apiKey,
-                        geminiApiKeyConfigured = geminiApiKeyConfigured,
-                        geminiApiKey = geminiApiKey,
-                        geminiModel = geminiModel,
-                        geminiVoice = geminiVoice,
-                        geminiLanguageCode = geminiLanguageCode,
-                        promptTemplate = promptTemplate,
-                        speechTestText = speechTestText,
-                        speechTestStatus = speechTestStatus,
-                        backgroundVideoEnabled = backgroundVideoEnabled,
-                        backgroundVideoOpacity = backgroundVideoOpacity,
-                        quietLabel = quietLabel,
-                        allowCount = allowCount,
-                        onOpenNotificationAccess = onOpenNotificationAccess,
-                        onToggleAssistant = onToggleAssistant,
-                        onCycleSpeechMode = onCycleSpeechMode,
-                        onRewriteEndpointChange = onRewriteEndpointChange,
-                        onSaveApiKey = onSaveApiKey,
-                        onGeminiModelChange = onGeminiModelChange,
-                        onGeminiVoiceChange = onGeminiVoiceChange,
-                        onGeminiLanguageCodeChange = onGeminiLanguageCodeChange,
-                        onPromptTemplateChange = onPromptTemplateChange,
-                        onSaveGeminiApiKey = onSaveGeminiApiKey,
-                        onSpeechTestTextChange = onSpeechTestTextChange,
-                        onTestSpeechMode = onTestSpeechMode,
-                        onClearSpeechTestStatus = onClearSpeechTestStatus,
-                        onToggleBackgroundVideo = onToggleBackgroundVideo,
-                        onBackgroundVideoOpacityChange = onBackgroundVideoOpacityChange,
-                        onQuietStartEarlier = onQuietStartEarlier,
-                        onQuietStartLater = onQuietStartLater,
-                        onQuietEndEarlier = onQuietEndEarlier,
-                        onQuietEndLater = onQuietEndLater,
-                        onOpenAllowlist = onOpenAllowlist,
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
                 if (searchBarVisible) {
+                    Spacer(modifier = Modifier.height(8.dp))
                     SearchBar(query = query, onQueryChange = onQueryChange)
                 }
             }
@@ -295,15 +320,52 @@ fun ForgeCityHomeScreen(
                     favorites = favorites,
                     onFavoriteTap = onFavoriteTap,
                 )
-                Text(
-                    text = "Long-press building to pin · pinch / drag city · double-tap recenter",
-                    color = Color(0x88FFF6F0),
-                    fontSize = 11.sp,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(top = 6.dp),
-                )
             }
+        }
+
+        // Slice A2: assistant settings live in a modal sheet, not the home scroll.
+        if (launcherChromeVisible && assistantPanelVisible) {
+            AssistantSettingsSheet(
+                onClose = onToggleAssistantPanel,
+                hasNotificationAccess = hasNotificationAccess,
+                assistantEnabled = assistantEnabled,
+                speechMode = speechMode,
+                rewriteEndpoint = rewriteEndpoint,
+                apiKeyConfigured = apiKeyConfigured,
+                apiKey = apiKey,
+                geminiApiKeyConfigured = geminiApiKeyConfigured,
+                geminiApiKey = geminiApiKey,
+                geminiModel = geminiModel,
+                geminiVoice = geminiVoice,
+                geminiLanguageCode = geminiLanguageCode,
+                promptTemplate = promptTemplate,
+                speechTestText = speechTestText,
+                speechTestStatus = speechTestStatus,
+                backgroundVideoEnabled = backgroundVideoEnabled,
+                backgroundVideoOpacity = backgroundVideoOpacity,
+                quietLabel = quietLabel,
+                allowCount = allowCount,
+                onOpenNotificationAccess = onOpenNotificationAccess,
+                onToggleAssistant = onToggleAssistant,
+                onCycleSpeechMode = onCycleSpeechMode,
+                onRewriteEndpointChange = onRewriteEndpointChange,
+                onSaveApiKey = onSaveApiKey,
+                onGeminiModelChange = onGeminiModelChange,
+                onGeminiVoiceChange = onGeminiVoiceChange,
+                onGeminiLanguageCodeChange = onGeminiLanguageCodeChange,
+                onPromptTemplateChange = onPromptTemplateChange,
+                onSaveGeminiApiKey = onSaveGeminiApiKey,
+                onSpeechTestTextChange = onSpeechTestTextChange,
+                onTestSpeechMode = onTestSpeechMode,
+                onClearSpeechTestStatus = onClearSpeechTestStatus,
+                onToggleBackgroundVideo = onToggleBackgroundVideo,
+                onBackgroundVideoOpacityChange = onBackgroundVideoOpacityChange,
+                onQuietStartEarlier = onQuietStartEarlier,
+                onQuietStartLater = onQuietStartLater,
+                onQuietEndEarlier = onQuietEndEarlier,
+                onQuietEndLater = onQuietEndLater,
+                onOpenAllowlist = onOpenAllowlist,
+            )
         }
 
         if (launcherChromeVisible && assistantPanelVisible && showAllowlist) {
@@ -315,82 +377,133 @@ fun ForgeCityHomeScreen(
             )
         }
 
-        Column(
-            horizontalAlignment = Alignment.End,
+        ChromeMenu(
+            launcherChromeVisible = launcherChromeVisible,
+            assistantPanelVisible = assistantPanelVisible,
+            searchBarVisible = searchBarVisible,
+            dockPanelVisible = dockPanelVisible,
+            onToggleLauncherChrome = onToggleLauncherChrome,
+            onToggleAssistantPanel = onToggleAssistantPanel,
+            onToggleSearchBar = onToggleSearchBar,
+            onToggleDockPanel = onToggleDockPanel,
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .statusBarsPadding()
                 .padding(top = 6.dp, end = 6.dp),
+        )
+    }
+}
+
+/**
+ * Slice A4: a single accessible overflow menu replacing the four text chips.
+ * Keeps the ability to hide chrome, open assistant settings, and toggle search / dock.
+ */
+@Composable
+private fun ChromeMenu(
+    launcherChromeVisible: Boolean,
+    assistantPanelVisible: Boolean,
+    searchBarVisible: Boolean,
+    dockPanelVisible: Boolean,
+    onToggleLauncherChrome: () -> Unit,
+    onToggleAssistantPanel: () -> Unit,
+    onToggleSearchBar: () -> Unit,
+    onToggleDockPanel: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Box(modifier = modifier) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .size(48.dp)
+                .background(Color(0xCC201828), RoundedCornerShape(16.dp))
+                .semantics {
+                    contentDescription = "Launcher options"
+                    stateDescription = if (expanded) "Menu open" else "Menu closed"
+                }
+                .clickable(role = Role.Button) { expanded = true },
         ) {
-            ChromeChip(
-                label = if (launcherChromeVisible) "UI −" else "UI +",
-                contentDescription = if (launcherChromeVisible) "Hide UI" else "Show UI",
-                stateDescription =
-                    if (launcherChromeVisible) "Launcher UI shown" else "Launcher UI hidden",
-                onClick = onToggleLauncherChrome,
-            )
-            Spacer(modifier = Modifier.height(6.dp))
-            ChromeChip(
-                label = if (assistantPanelVisible) "ASSIST −" else "ASSIST +",
-                contentDescription =
-                    if (assistantPanelVisible) "Hide assistant panel" else "Show assistant panel",
-                stateDescription =
-                    if (assistantPanelVisible) "Assistant panel shown" else "Assistant panel hidden",
-                onClick = onToggleAssistantPanel,
-            )
-            Spacer(modifier = Modifier.height(6.dp))
-            ChromeChip(
-                label = if (searchBarVisible) "SEARCH −" else "SEARCH +",
-                contentDescription =
-                    if (searchBarVisible) "Hide search" else "Show search",
-                stateDescription =
-                    if (searchBarVisible) "Search shown" else "Search hidden",
-                onClick = onToggleSearchBar,
-            )
-            Spacer(modifier = Modifier.height(6.dp))
-            ChromeChip(
-                label = if (dockPanelVisible) "DOCK −" else "DOCK +",
-                contentDescription =
-                    if (dockPanelVisible) "Hide favorites dock" else "Show favorites dock",
-                stateDescription =
-                    if (dockPanelVisible) "Dock shown" else "Dock hidden",
-                onClick = onToggleDockPanel,
-            )
+            Canvas(modifier = Modifier.size(20.dp)) {
+                val barColor = Color(0xFFFFF6F0)
+                val w = size.width
+                repeat(3) { i ->
+                    val y = size.height * (0.24f + i * 0.26f)
+                    drawLine(
+                        color = barColor,
+                        start = Offset(w * 0.12f, y),
+                        end = Offset(w * 0.88f, y),
+                        strokeWidth = 2.2f * density,
+                        cap = StrokeCap.Round,
+                    )
+                }
+            }
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+        ) {
+            ChromeMenuItem(
+                label = "Launcher UI",
+                enabled = launcherChromeVisible,
+            ) {
+                expanded = false
+                onToggleLauncherChrome()
+            }
+            ChromeMenuItem(
+                label = "Assistant settings",
+                enabled = assistantPanelVisible,
+            ) {
+                expanded = false
+                onToggleAssistantPanel()
+            }
+            ChromeMenuItem(
+                label = "Search",
+                enabled = searchBarVisible,
+            ) {
+                expanded = false
+                onToggleSearchBar()
+            }
+            ChromeMenuItem(
+                label = "Favorites dock",
+                enabled = dockPanelVisible,
+            ) {
+                expanded = false
+                onToggleDockPanel()
+            }
         }
     }
 }
 
 @Composable
-private fun ChromeChip(
+private fun ChromeMenuItem(
     label: String,
-    contentDescription: String,
-    stateDescription: String,
+    enabled: Boolean,
     onClick: () -> Unit,
 ) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .size(48.dp)
-            .semantics {
-                this.contentDescription = contentDescription
-                this.stateDescription = stateDescription
-            }
-            .clickable(role = Role.Button, onClick = onClick),
-    ) {
-        Text(
-            text = label,
-            color = Color(0xFFFFF6F0),
-            fontSize = 10.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .background(Color(0xCC201828), RoundedCornerShape(14.dp))
-                .padding(horizontal = 6.dp, vertical = 6.dp),
-        )
-    }
+    DropdownMenuItem(
+        text = { Text(label, fontSize = 13.sp) },
+        trailingIcon = {
+            Text(
+                text = if (enabled) "ON" else "OFF",
+                color = if (enabled) Color(0xFF4FD1C5) else Color(0x99FFF6F0),
+                fontSize = 11.sp,
+                fontWeight = FontWeight.SemiBold,
+            )
+        },
+        modifier = Modifier.semantics {
+            stateDescription = if (enabled) "$label shown" else "$label hidden"
+        },
+        onClick = onClick,
+    )
 }
 
+/**
+ * Slice A3: compact chapter pill by default; tapping expands the briefing.
+ * Expand state is intentionally in-memory only.
+ */
 @Composable
-private fun ChapterCard(state: CityState) {
+private fun ChapterPill(state: CityState) {
+    var expanded by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -398,30 +511,43 @@ private fun ChapterCard(state: CityState) {
                 brush = Brush.horizontalGradient(
                     listOf(Color(0xCC2A1838), Color(0xCC301820)),
                 ),
-                shape = RoundedCornerShape(18.dp),
+                shape = RoundedCornerShape(16.dp),
             )
-            .padding(horizontal = 14.dp, vertical = 12.dp),
+            .clickable { expanded = !expanded }
+            .animateContentSize()
+            .padding(horizontal = 14.dp, vertical = 10.dp),
     ) {
-        Text(
-            text = "ForgeCity",
-            color = Color(0xFFFFF6F0),
-            fontSize = 26.sp,
-            fontWeight = FontWeight.Bold,
-        )
-        Text(
-            text = "Chapter ${state.chapterId} · ${state.chapterTitle}",
-            color = Color(0xFFE8A15A),
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-        )
-        Spacer(modifier = Modifier.height(6.dp))
-        Text(
-            text = state.briefing,
-            color = Color(0xD9FFF6F0),
-            fontSize = 13.sp,
-            lineHeight = 18.sp,
-            maxLines = 3,
-        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = "ForgeCity",
+                color = Color(0xFFFFF6F0),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+            )
+            Spacer(modifier = Modifier.size(8.dp))
+            Text(
+                text = "Ch ${state.chapterId} · ${state.chapterTitle}",
+                color = Color(0xFFE8A15A),
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.weight(1f),
+                maxLines = 1,
+            )
+            Text(
+                text = if (expanded) "▾" else "▸",
+                color = Color(0x99FFF6F0),
+                fontSize = 13.sp,
+            )
+        }
+        if (expanded) {
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(
+                text = state.briefing,
+                color = Color(0xD9FFF6F0),
+                fontSize = 13.sp,
+                lineHeight = 18.sp,
+            )
+        }
     }
 }
 
@@ -485,33 +611,35 @@ private fun AllowlistSheet(
 @Composable
 private fun ResourceStrip(state: CityState) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
         modifier = Modifier.fillMaxWidth(),
     ) {
-        ResourceChip("Scrap", state.resources.scrap)
-        ResourceChip("Power", state.resources.power)
-        ResourceChip("Focus", state.resources.focus)
-        ResourceChip("Gold", state.resources.goldDust)
+        ResourceChip("Scrap", state.resources.scrap, Modifier.weight(1f))
+        ResourceChip("Power", state.resources.power, Modifier.weight(1f))
+        ResourceChip("Focus", state.resources.focus, Modifier.weight(1f))
+        ResourceChip("Gold", state.resources.goldDust, Modifier.weight(1f))
     }
 }
 
 @Composable
-private fun ResourceChip(label: String, value: Int) {
+private fun ResourceChip(label: String, value: Int, modifier: Modifier = Modifier) {
     val animated by animateIntAsState(
         targetValue = value,
         animationSpec = tween(durationMillis = 700),
         label = "resource-$label",
     )
-    Column(
-        modifier = Modifier
-            .background(Color(0x66302A38), RoundedCornerShape(14.dp))
-            .padding(horizontal = 10.dp, vertical = 8.dp),
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(5.dp),
+        modifier = modifier
+            .background(Color(0x66302A38), RoundedCornerShape(12.dp))
+            .padding(horizontal = 8.dp, vertical = 5.dp),
     ) {
         Text(text = label, color = Color(0xA6FFF6F0), fontSize = 10.sp)
         Text(
             text = animated.toString(),
             color = Color(0xFFFFF6F0),
-            fontSize = 14.sp,
+            fontSize = 13.sp,
             fontWeight = FontWeight.SemiBold,
         )
     }
@@ -532,8 +660,8 @@ private fun SearchBar(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(48.dp)
-                    .background(Color(0x99302A38), RoundedCornerShape(24.dp))
+                    .height(44.dp)
+                    .background(Color(0x99302A38), RoundedCornerShape(22.dp))
                     .padding(horizontal = 16.dp),
                 contentAlignment = Alignment.CenterStart,
             ) {

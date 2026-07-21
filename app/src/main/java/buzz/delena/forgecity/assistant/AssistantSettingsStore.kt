@@ -198,17 +198,27 @@ class AssistantSettingsStore(context: Context) {
         get() = prefs.getBoolean(KEY_LAUNCHER_CHROME_VISIBLE, LauncherChromeDefaults.VISIBLE)
         set(value) = prefs.edit().putBoolean(KEY_LAUNCHER_CHROME_VISIBLE, value).apply()
 
-    /** City Assistant settings panel (independent of search / dock). */
+    /**
+     * City Assistant settings sheet (independent of search / dock).
+     * City-first default: settings sheet is closed on first run (key absent).
+     */
     var assistantPanelVisible: Boolean
-        get() = prefs.getBoolean(KEY_ASSISTANT_PANEL_VISIBLE, legacyToolsDefault())
+        get() = prefs.getBoolean(KEY_ASSISTANT_PANEL_VISIBLE, false)
         set(value) = prefs.edit().putBoolean(KEY_ASSISTANT_PANEL_VISIBLE, value).apply()
 
+    /** City-first default: search hidden on first run (key absent). */
     var searchBarVisible: Boolean
-        get() = prefs.getBoolean(KEY_SEARCH_BAR_VISIBLE, legacyToolsDefault())
+        get() = prefs.getBoolean(KEY_SEARCH_BAR_VISIBLE, false)
         set(value) = prefs.edit().putBoolean(KEY_SEARCH_BAR_VISIBLE, value).apply()
 
+    /** City-first default: favorites dock on for first run (key absent). */
     var dockPanelVisible: Boolean
-        get() = prefs.getBoolean(KEY_DOCK_PANEL_VISIBLE, legacyToolsDefault())
+        get() = if (prefs.contains(KEY_DOCK_PANEL_VISIBLE)) {
+            prefs.getBoolean(KEY_DOCK_PANEL_VISIBLE, true)
+        } else {
+            // Prefer true; fall back to legacy tools key if present.
+            prefs.getBoolean(KEY_ASSISTANT_TOOLS_VISIBLE, true)
+        }
         set(value) = prefs.edit().putBoolean(KEY_DOCK_PANEL_VISIBLE, value).apply()
 
     var speechTestText: String
@@ -219,8 +229,6 @@ class AssistantSettingsStore(context: Context) {
             .putString(KEY_SPEECH_TEST_TEXT, value.trim().ifBlank { SpeechTestDefaults.TEXT })
             .apply()
 
-    private fun legacyToolsDefault(): Boolean =
-        prefs.getBoolean(KEY_ASSISTANT_TOOLS_VISIBLE, true)
 
     fun allowedPackages(): Set<String> =
         prefs.getStringSet(KEY_ALLOW, emptySet())?.toSet().orEmpty()

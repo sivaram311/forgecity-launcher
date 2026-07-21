@@ -13,15 +13,21 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -121,6 +127,140 @@ fun CityAssistantOverlay(
                     color = Color(0x88FFF6F0),
                     fontSize = 10.sp,
                     modifier = Modifier.padding(top = 4.dp),
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Slice A2: modal sheet host for the assistant settings so they no longer live
+ * in the permanent home scroll. All existing fields/callbacks are preserved.
+ */
+@Composable
+fun AssistantSettingsSheet(
+    onClose: () -> Unit,
+    hasNotificationAccess: Boolean,
+    assistantEnabled: Boolean,
+    speechMode: AssistantSpeechMode,
+    rewriteEndpoint: String,
+    apiKeyConfigured: Boolean,
+    apiKey: String,
+    geminiApiKeyConfigured: Boolean,
+    geminiApiKey: String,
+    geminiModel: String,
+    geminiVoice: String,
+    geminiLanguageCode: String,
+    promptTemplate: String,
+    speechTestText: String,
+    speechTestStatus: String?,
+    backgroundVideoEnabled: Boolean,
+    backgroundVideoOpacity: Float,
+    quietLabel: String,
+    allowCount: Int,
+    onOpenNotificationAccess: () -> Unit,
+    onToggleAssistant: () -> Unit,
+    onCycleSpeechMode: () -> Unit,
+    onRewriteEndpointChange: (String) -> Unit,
+    onSaveApiKey: (String) -> Unit,
+    onGeminiModelChange: (String) -> Unit,
+    onGeminiVoiceChange: (String) -> Unit,
+    onGeminiLanguageCodeChange: (String) -> Unit,
+    onPromptTemplateChange: (String) -> Unit,
+    onSaveGeminiApiKey: (String) -> Unit,
+    onSpeechTestTextChange: (String) -> Unit,
+    onTestSpeechMode: () -> Unit,
+    onClearSpeechTestStatus: () -> Unit,
+    onToggleBackgroundVideo: () -> Unit,
+    onBackgroundVideoOpacityChange: (Float) -> Unit,
+    onQuietStartEarlier: () -> Unit,
+    onQuietStartLater: () -> Unit,
+    onQuietEndEarlier: () -> Unit,
+    onQuietEndLater: () -> Unit,
+    onOpenAllowlist: () -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xAA000000))
+            .clickable(onClick = onClose),
+    ) {
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .fillMaxHeight(0.9f)
+                .background(
+                    Color(0xFF14101E),
+                    RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
+                )
+                .clickable(enabled = false) {}
+                .statusBarsPadding()
+                .navigationBarsPadding()
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    "City Assistant settings",
+                    color = Color(0xFFFFF6F0),
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 15.sp,
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    "Close",
+                    color = Color(0xFFE8A15A),
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier
+                        .clickable(onClick = onClose)
+                        .padding(8.dp),
+                )
+            }
+            Spacer(modifier = Modifier.height(6.dp))
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                AssistantSettingsCard(
+                    hasNotificationAccess = hasNotificationAccess,
+                    assistantEnabled = assistantEnabled,
+                    speechMode = speechMode,
+                    rewriteEndpoint = rewriteEndpoint,
+                    apiKeyConfigured = apiKeyConfigured,
+                    apiKey = apiKey,
+                    geminiApiKeyConfigured = geminiApiKeyConfigured,
+                    geminiApiKey = geminiApiKey,
+                    geminiModel = geminiModel,
+                    geminiVoice = geminiVoice,
+                    geminiLanguageCode = geminiLanguageCode,
+                    promptTemplate = promptTemplate,
+                    speechTestText = speechTestText,
+                    speechTestStatus = speechTestStatus,
+                    backgroundVideoEnabled = backgroundVideoEnabled,
+                    backgroundVideoOpacity = backgroundVideoOpacity,
+                    quietLabel = quietLabel,
+                    allowCount = allowCount,
+                    onOpenNotificationAccess = onOpenNotificationAccess,
+                    onToggleAssistant = onToggleAssistant,
+                    onCycleSpeechMode = onCycleSpeechMode,
+                    onRewriteEndpointChange = onRewriteEndpointChange,
+                    onSaveApiKey = onSaveApiKey,
+                    onGeminiModelChange = onGeminiModelChange,
+                    onGeminiVoiceChange = onGeminiVoiceChange,
+                    onGeminiLanguageCodeChange = onGeminiLanguageCodeChange,
+                    onPromptTemplateChange = onPromptTemplateChange,
+                    onSaveGeminiApiKey = onSaveGeminiApiKey,
+                    onSpeechTestTextChange = onSpeechTestTextChange,
+                    onTestSpeechMode = onTestSpeechMode,
+                    onClearSpeechTestStatus = onClearSpeechTestStatus,
+                    onToggleBackgroundVideo = onToggleBackgroundVideo,
+                    onBackgroundVideoOpacityChange = onBackgroundVideoOpacityChange,
+                    onQuietStartEarlier = onQuietStartEarlier,
+                    onQuietStartLater = onQuietStartLater,
+                    onQuietEndEarlier = onQuietEndEarlier,
+                    onQuietEndLater = onQuietEndLater,
+                    onOpenAllowlist = onOpenAllowlist,
                 )
             }
         }

@@ -9,62 +9,59 @@
 
 | Field | Value |
 |-------|-------|
-| versionName | `0.4.7-pcm-playback-fix-dev` · versionCode 14 |
-| main HEAD | `7eaa387` |
-| Latest release | [`v0.4.7-pcm-playback-fix-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.4.7-pcm-playback-fix-dev) (prerelease, debug) |
-| APK SHA-256 | `C98727E5F1169E486193D6E3E1ADBF9D21AA646E76231EE841A85F5756B9B377` |
+| versionName | `0.5.0-ui-polish-dev` · versionCode 15 |
+| Prior tip | `0.4.7-pcm-playback-fix-dev` (speech/PCM still current) |
+| Latest speech release | [`v0.4.7-pcm-playback-fix-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.4.7-pcm-playback-fix-dev) |
+| UI polish | **0.5.0 local** — city-first chrome, building craft, video scrims, motion/dock |
 
 ## Read first
 
 | Doc | Why |
 |-----|-----|
-| [ROADMAP.md](./ROADMAP.md) | Phases; P1 = Gemini native audio → Portal → DIRECT |
-| [GEMINI-SPEECH-CASCADE-SPEC.md](./GEMINI-SPEECH-CASCADE-SPEC.md) | Speech cascade product spec |
-| [OPS.md](./OPS.md) | Download, grants, on-device setup, diagnostics |
-| [VERIFICATION.md](./VERIFICATION.md) | Per-version test/lint/assemble evidence |
-| `agents/hires/SIGN-OFF-*.md` | Reviewer GO per ship |
+| [UI-POLISH-IMPL-BRIEF.md](./UI-POLISH-IMPL-BRIEF.md) | Slices A–D scope for 0.5.0 |
+| [ROADMAP.md](./ROADMAP.md) | Phases |
+| [BACKGROUND-VIDEO-SPEC.md](./BACKGROUND-VIDEO-SPEC.md) | Video contract |
+| [OPS.md](./OPS.md) | Device setup |
+| [VERIFICATION.md](./VERIFICATION.md) | Evidence |
 
-## Speech architecture (0.4.7)
+## UI architecture (0.5.0)
 
-Modes cycle: `OFF` → `DIRECT` → `PORTAL தமிழ்` → **`GEMINI AUDIO`** (fail-closed) → **`CASCADE`** (Gemini audio → Portal → device TTS).
+**Home surfaces**
 
-- **Gemini native audio TTS:** `gemini-3.1-flash-tts-preview`, `responseModalities:["AUDIO"]`, `speechConfig` voice (`Kore`) + `ta-IN`. Returns L16 PCM @ 24 kHz.
-- **Playback:** `AssistantTtsEngine.playPcm` → streamed `AudioTrack` (MODE_STREAM); falls back to `MediaPlayer` + temp WAV. `PcmAudioNormalizer` handles raw L16 or RIFF/WAV.
-- **Portal tier 2:** unchanged Tamil rewrite → device Tamil TTS.
-- **DIRECT tier 3:** `NotificationSpeechFilter.spokenLine` → device locale TTS.
+- **HOME:** day/night sky + optional video (upper fade) + isometric city + chapter pill + compact resources + favorites dock
+- **LAB:** Assistant settings in **modal sheet** (menu → Assistant settings), not permanent scroll
+- **Chrome menu:** single overflow (UI / ASSIST / SEARCH / DOCK) instead of four text chips
 
-Key files: `assistant/gemini/GeminiAudioTtsClient.kt`, `assistant/gemini/GeminiRewriteClient.kt` (legacy text), `PromptTemplateFormatter.kt`, `CascadeSpeechOrchestrator.kt`, `AssistantTtsEngine.kt` (+ `PcmAudioNormalizer`), `SpeechModeTestRunner.kt`, `AssistantSpeechMode.kt`, `AssistantSettingsStore.kt`, `ui/CityAssistantOverlay.kt`, `ui/ForgeCityViewModel.kt`.
+**City render**
 
-Config UI: Gemini key (Keystore), TTS model / voice / language, editable prompt template, Portal endpoint/key (visible), custom TEST TTS text + button. Chips: `UI` / `ASSIST` / `SEARCH` / `DOCK`.
+- `ui/cityrender/CityRender.kt` — ground plane, shaded prisms, windows, district roofs (`DistrictSilhouette` / `RoofStyle`), icon badges with LOD, gold favorite pin, level-up burst
+- `CityCanvas` — pan/zoom + **inertia**, search **focus fly-in**, haptics on pin, uses CityRender
 
-## Agent Portal (companion, tier 2)
+**Video**
 
-- PROD endpoint: `https://agent-portal.delena.buzz/api/integrations/forgecity/tamil-rewrite`
-- Header `X-ForgeCity-Key`; body exactly 5 fields (`schemaVersion`, `appLabel`, `title`, `text`, `maxChars`); `Cache-Control: no-store`.
-- Key lives in `G:\apps\agent-portal\.env` as `FORGECITY_REWRITE_API_KEY` — never commit.
+- No full-screen mud scrim; gradient fade mid→bottom + local top/bottom chrome scrims + soft vignette
+- Existing procedural `res/raw/city_background.mp4` kept (no regen required)
 
-## Recent fixes
+**Defaults (key absent)**
 
-1. Portal 400 (0.4.2): dropped invalid 6th JSON field `"store":false`.
-2. Gemini unavailable (0.4.4): dead `gemini-2.0-flash` → default `gemini-2.5-flash`; header auth.
-3. Native audio (0.4.6): text rewrite → Gemini audio + `AudioTrack`.
-4. Playback UNAVAILABLE (0.4.7): MODE_STATIC → MODE_STREAM + MediaPlayer WAV fallback.
+- Launcher chrome **on**, dock **on**, search **off**, assistant settings sheet **off**
+
+## Speech (unchanged from 0.4.7)
+
+Modes: OFF → DIRECT → PORTAL → GEMINI AUDIO → CASCADE. PCM MODE_STREAM + MediaPlayer fallback.
 
 ## Now → next
 
 | Now | Next |
 |-----|------|
-| 0.4.7 published; on-device Gemini audio playback fix awaiting user confirm | Confirm `pcm_play_started backend=...` in logcat on device |
-| Realme P2 Pro E2E (#16) still PENDING | Blocks annotated production tags |
+| 0.5.0 UI polish implemented | On-device visual GO + Realme E2E #16 still PENDING |
+| Speech still 0.4.7 tip on GitHub until 0.5.0 published | Package APK + prerelease after Reviewer GO |
 
-## Build / ship
+## Build
 
 ```powershell
 cd E:\MyWorkspace\sandbox\forgecity-launcher
 .\gradlew.bat testDebugUnitTest lintDebug assembleDebug
-# package -> dist\, write .sha256, gh release create --prerelease, upload apk + .sha256
 ```
-
-Diagnostics on device: `adb logcat -s ForgeCityTTS` (never logs keys/bodies/Tamil text).
 
 Session handoff date: 2026-07-21.
