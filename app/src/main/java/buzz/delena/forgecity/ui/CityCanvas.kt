@@ -65,6 +65,8 @@ fun CityCanvas(
     var growthId by remember { mutableStateOf<String?>(null) }
     val growth = remember { Animatable(1f) }
     var ambientPhase by remember { mutableFloatStateOf(0f) }
+    // Monotonic seconds clock for deterministic window flicker (ambient only).
+    var cityClock by remember { mutableFloatStateOf(0f) }
     var canvasSize by remember { mutableStateOf(IntSize.Zero) }
 
     val tileWidth = IsoLayout.TILE_WIDTH
@@ -128,6 +130,7 @@ fun CityCanvas(
         while (true) {
             withFrameMillis { frame ->
                 ambientPhase = (frame % 4000L) / 4000f
+                cityClock = frame / 1000f
             }
         }
     }
@@ -284,7 +287,10 @@ fun CityCanvas(
             translate(size.width / 2f + animatedOffset.value.x, size.height * 0.28f + animatedOffset.value.y)
             scale(animatedScale.value, animatedScale.value, pivot = Offset.Zero)
         }) {
-            drawGroundPlane(ambientEnabled)
+            // Continuous night intensity; preserves the existing on/off night gate.
+            val nightFactor = if (night && ambientEnabled) 1f else 0f
+            val cityTime = if (ambientEnabled) cityClock else 0f
+            drawGroundPlane(ambientEnabled, nightFactor)
             if (ambientEnabled) {
                 drawAmbientPowerGrid(ambientPhase)
             }
@@ -306,6 +312,8 @@ fun CityCanvas(
                     favorite = building.isFavorite,
                     scale = animatedScale.value,
                     icon = building.icon,
+                    nightFactor = nightFactor,
+                    timeSeconds = cityTime,
                 )
             }
 

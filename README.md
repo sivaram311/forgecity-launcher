@@ -5,25 +5,28 @@ Apps become buildings. Habits rebuild districts. A neon city assistant can read
 notifications aloud when you opt in.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher (public)
-**Branch:** `main` · version `0.5.1-gemini-audio-fix-dev`
-**Latest prerelease:** [`v0.5.1-gemini-audio-fix-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.5.1-gemini-audio-fix-dev)
+**Branch:** `main` · version `0.6.0-city-3d-dev`
+**Latest prerelease:** [`v0.6.0-city-3d-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.6.0-city-3d-dev)
 
 ## Download
 
 ```powershell
-curl.exe -L -o forgecity-0.5.1-gemini-audio-fix-dev-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.5.1-gemini-audio-fix-dev/forgecity-0.5.1-gemini-audio-fix-dev-debug.apk
-Get-FileHash .\forgecity-0.5.1-gemini-audio-fix-dev-debug.apk -Algorithm SHA256
-# expect 05D21575B597856A01989F8B15E2BD1804497294A4ECE296C188F8AFC1D52365
-adb install -r .\forgecity-0.5.1-gemini-audio-fix-dev-debug.apk
+curl.exe -L -o forgecity-0.6.0-city-3d-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.6.0-city-3d-dev/forgecity-0.6.0-city-3d-dev-debug.apk
+Get-FileHash .\forgecity-0.6.0-city-3d-dev-debug.apk -Algorithm SHA256
+# expect F637ECF048AF7DFBC921F6C074F6EABD6A3CC72C7D046BDD5578B766D9105A2A
+adb install -r .\forgecity-0.6.0-city-3d-dev-debug.apk
 ```
 
-## What works in 0.5.1-gemini-audio-fix-dev
+## What works in 0.6.0-city-3d-dev
 
-- **Fix:** Gemini native audio request matches official TTS `generateContent` shape
-  (voice-only `speechConfig`; language steered via prompt — invalid `languageCode` removed)
-- Retry on empty/server audio; larger response budget; AudioTrack prime-write
-- Plus **0.5.0** UI polish (city-first chrome, buildings, video scrims, inertia/dock)
+- **Premium low-poly 3D city pass:** gradient wall shading, roof rim light,
+  softer contact shadows, depth-shaded ground plane
+- **Emissive windows:** deterministic per-pane night glow with subtle flicker;
+  new continuous `nightFactor` + `timeSeconds` lighting model (backward compatible)
+- Roof silhouettes gain night emissive accents — shapes, hit testing, and district
+  theme unchanged
+- Plus **0.5.1** Gemini native audio fix and **0.5.0** UI polish
 - Speech modes: OFF → DIRECT → PORTAL → GEMINI AUDIO → CASCADE
 
 ## Docs

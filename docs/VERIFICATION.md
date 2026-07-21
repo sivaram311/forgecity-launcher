@@ -353,3 +353,17 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | Unit/lint/assemble | PASS | versionCode 16 |
 | APK SHA-256 | `05D21575B597856A01989F8B15E2BD1804497294A4ECE296C188F8AFC1D52365` | |
 | Realme E2E (#16) | PENDING | |
+
+## 2026-07-21 — 0.6.0 CityRender 3D visual upgrade
+
+| Check | Result | Notes |
+|------|--------|-------|
+| Lighting model | LANDED | continuous `nightFactor`/`timeSeconds`/`activityPulse`, backward-compatible defaults |
+| Building shading | LANDED | gradient walls, roof rim light, softer contact shadow |
+| Windows | LANDED | emissive night panes + deterministic flicker |
+| Roof silhouettes | LANDED | night emissive accents; shapes unchanged |
+| Ground plane | LANDED | depth gradient + night grid response |
+| Hit geometry / prism | UNCHANGED | `BuildingHitGeometry`, footprint, `DistrictSilhouette.of`, `RoofStyle` intact |
+| Unit/lint/assemble | PASS | versionCode 17 |
+| APK SHA-256 | `F637ECF048AF7DFBC921F6C074F6EABD6A3CC72C7D046BDD5578B766D9105A2A` | local dist (16.84 MB) |
+| Realme E2E (#16) | PENDING | debug prerelease; not production |

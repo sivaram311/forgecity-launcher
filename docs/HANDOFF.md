@@ -9,10 +9,10 @@
 
 | Field | Value |
 |-------|-------|
-| versionName | `0.5.1-gemini-audio-fix-dev` · versionCode 16 |
-| Latest release | [`v0.5.1-gemini-audio-fix-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.5.1-gemini-audio-fix-dev) |
-| APK SHA-256 | `05D21575B597856A01989F8B15E2BD1804497294A4ECE296C188F8AFC1D52365` |
-| Prior UI tip | [`v0.5.0-ui-polish-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.5.0-ui-polish-dev) |
+| versionName | `0.6.0-city-3d-dev` · versionCode 17 |
+| Latest release | [`v0.6.0-city-3d-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.6.0-city-3d-dev) |
+| APK SHA-256 | `F637ECF048AF7DFBC921F6C074F6EABD6A3CC72C7D046BDD5578B766D9105A2A` |
+| Prior audio tip | [`v0.5.1-gemini-audio-fix-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.5.1-gemini-audio-fix-dev) |
 
 ## Gemini audio fix (0.5.1)
 
@@ -25,7 +25,19 @@
 
 | Now | Next |
 |-----|------|
-| 0.5.1 published | Device confirm GEMINI AUDIO TEST TTS |
+| 0.6.0 city-3d published | Device visual check of 3D pass + GEMINI AUDIO TTS |
 | Realme E2E (#16) PENDING | Blocks production tags |
+
+## CityRender 3D visual upgrade (0.6.0)
+
+Premium low-poly pass in `ui/cityrender/CityRender.kt` + `ui/CityCanvas.kt`.
+Continuous lighting model: new **optional** params `nightFactor`, `timeSeconds`,
+`activityPulse` on `drawCityBuilding` (defaults keep old callers working);
+`drawGroundPlane(ambientEnabled, nightFactor=0f)`.
+Wall gradient shading, roof rim light, softer contact shadow, emissive/flicker
+windows, roof night emissive, depth-shaded ground.
+Unchanged: prism footprint, `BuildingHitGeometry`, district colors,
+`DistrictSilhouette.of`, `RoofStyle` shapes, hit testing, pressed/favorite/night gate.
+`testDebugUnitTest` + `lintDebug` + `assembleDebug` green.
 
 Session: 2026-07-21.
