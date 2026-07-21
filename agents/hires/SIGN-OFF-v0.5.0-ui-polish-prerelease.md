@@ -5,7 +5,7 @@
 | Session | 2026-07-21 grok + cursor UI polish release |
 | Reviewer | GO (lead self-review, readonly checklist) |
 | Provider | grok-build |
-| Tip SHA | (set at push; expect post-docs commit on `main`) |
+| Tip SHA | `9a022cea4830468ecd0a5612b95ca46cffbe93c6` |
 | Branch / tag | `main` → annotated `v0.5.0-ui-polish-dev` (prerelease debug) |
 | When (IST) | 2026-07-21 |
 
