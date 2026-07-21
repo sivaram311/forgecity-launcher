@@ -341,4 +341,5 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | Building craft | LANDED | `CityRender` + `DistrictSilhouette`, LOD badges |
 | Motion / dock | LANDED | Pan inertia, search focus, haptics, glass dock |
 | Unit/lint/assemble | PASS | versionCode 15 · 52 tests |
+| APK SHA-256 | `BB8FECCF655928DC5EC5D28665890CE3FC63F7422028F9E3A6327D2C062C3CFA` | local dist |
 | Realme E2E (#16) | PENDING | |
