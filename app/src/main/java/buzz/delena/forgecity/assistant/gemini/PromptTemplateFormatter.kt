@@ -1,13 +1,16 @@
 package buzz.delena.forgecity.assistant.gemini
 
 object PromptTemplateDefaults {
-    /** Prompt for Gemini native audio TTS (spoken output, not text rewrite). */
+    /**
+     * Prompt for Gemini native audio TTS (spoken output, not text rewrite).
+     * Lead with an explicit synthesize-speech preamble so the TTS classifier
+     * does not reject the request as plain text generation.
+     */
     const val TEMPLATE =
-        "Speak a clear Tamil summary of this phone notification for the listener.\n" +
-            "Rules: one short sentence, facts only from the message, no English, no labels, natural pace.\n" +
-            "App: {appLabel}\n" +
-            "Title: {title}\n" +
-            "Message: {text}\n" +
+        "Synthesize speech only (audio output, no text). Read aloud in clear Tamil.\n" +
+            "Rules: one short sentence, facts only from the message, no English labels, natural pace.\n" +
+            "#### TRANSCRIPT\n" +
+            "App: {appLabel}. Title: {title}. Message: {text}\n" +
             "Keep spoken content under {maxChars} characters."
 }
 

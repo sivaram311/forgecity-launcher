@@ -5,27 +5,26 @@ Apps become buildings. Habits rebuild districts. A neon city assistant can read
 notifications aloud when you opt in.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher (public)
-**Branch:** `main` · version `0.5.0-ui-polish-dev`
-**Latest prerelease:** [`v0.5.0-ui-polish-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.5.0-ui-polish-dev)
+**Branch:** `main` · version `0.5.1-gemini-audio-fix-dev`
+**Latest prerelease:** [`v0.5.1-gemini-audio-fix-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.5.1-gemini-audio-fix-dev)
 
 ## Download
 
 ```powershell
-curl.exe -L -o forgecity-0.5.0-ui-polish-dev-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.5.0-ui-polish-dev/forgecity-0.5.0-ui-polish-dev-debug.apk
-Get-FileHash .\forgecity-0.5.0-ui-polish-dev-debug.apk -Algorithm SHA256
-# expect BB8FECCF655928DC5EC5D28665890CE3FC63F7422028F9E3A6327D2C062C3CFA
-adb install -r .\forgecity-0.5.0-ui-polish-dev-debug.apk
+curl.exe -L -o forgecity-0.5.1-gemini-audio-fix-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.5.1-gemini-audio-fix-dev/forgecity-0.5.1-gemini-audio-fix-dev-debug.apk
+Get-FileHash .\forgecity-0.5.1-gemini-audio-fix-dev-debug.apk -Algorithm SHA256
+# expect 05D21575B597856A01989F8B15E2BD1804497294A4ECE296C188F8AFC1D52365
+adb install -r .\forgecity-0.5.1-gemini-audio-fix-dev-debug.apk
 ```
 
-## What works in 0.5.0-ui-polish-dev
+## What works in 0.5.1-gemini-audio-fix-dev
 
-- **City-first home:** chapter pill, compact resources, overflow menu (not four text chips)
-- **Assistant settings** in a modal sheet (not permanent home scroll)
-- **Building craft:** district roof silhouettes, ground plane, facade windows, LOD icon badges, gold favorite pin
-- **Video atmosphere:** local chrome scrims + mid fade (no full-screen mud); existing looping MP4
-- **Motion:** pan inertia, search fly-to match, long-press haptics, glassier dock
-- Speech stack from **0.4.7**: Gemini PCM MODE_STREAM + MediaPlayer fallback, CASCADE modes
+- **Fix:** Gemini native audio request matches official TTS `generateContent` shape
+  (voice-only `speechConfig`; language steered via prompt — invalid `languageCode` removed)
+- Retry on empty/server audio; larger response budget; AudioTrack prime-write
+- Plus **0.5.0** UI polish (city-first chrome, buildings, video scrims, inertia/dock)
+- Speech modes: OFF → DIRECT → PORTAL → GEMINI AUDIO → CASCADE
 
 ## Docs
 
@@ -33,9 +32,8 @@ adb install -r .\forgecity-0.5.0-ui-polish-dev-debug.apk
 |-----|---------|
 | [docs/HANDOFF.md](docs/HANDOFF.md) | Current tip + next actions |
 | [docs/OPS.md](docs/OPS.md) | Install, grants, diagnostics |
-| [docs/UI-POLISH-IMPL-BRIEF.md](docs/UI-POLISH-IMPL-BRIEF.md) | 0.5.0 slice scope |
+| [docs/GEMINI-SPEECH-CASCADE-SPEC.md](docs/GEMINI-SPEECH-CASCADE-SPEC.md) | Speech cascade |
 | [docs/VERIFICATION.md](docs/VERIFICATION.md) | Build evidence |
-| [docs/ROADMAP.md](docs/ROADMAP.md) | Product phases |
 
 ## Build
 

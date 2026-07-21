@@ -343,3 +343,13 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | Unit/lint/assemble | PASS | versionCode 15 · 52 tests |
 | APK SHA-256 | `BB8FECCF655928DC5EC5D28665890CE3FC63F7422028F9E3A6327D2C062C3CFA` | local dist |
 | Realme E2E (#16) | PENDING | |
+
+## 2026-07-21 — 0.5.1 Gemini audio fix
+
+| Check | Result | Notes |
+|------|--------|-------|
+| Root cause | FIXED | removed invalid speechConfig.languageCode |
+| Request body unit test | PASS | voice-only; no role/languageCode |
+| Unit/lint/assemble | PASS | versionCode 16 |
+| APK SHA-256 | `05D21575B597856A01989F8B15E2BD1804497294A4ECE296C188F8AFC1D52365` | |
+| Realme E2E (#16) | PENDING | |

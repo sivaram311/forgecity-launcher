@@ -51,10 +51,14 @@ User-editable template with placeholders:
 | API key | Android Keystore encrypted | empty |
 | TTS model | plain pref | `gemini-3.1-flash-tts-preview` |
 | Voice | plain pref | `Kore` |
-| Language | plain pref | `ta-IN` |
+| Language | plain pref | `ta-IN` (prompt hint only — **not** sent as speechConfig.languageCode) |
 | Prompt template | plain pref | see `PromptTemplateDefaults` |
 
 Prior text-only models (`gemini-2.5-flash`, etc.) are auto-migrated to the TTS default.
+
+**Request shape (0.5.1+):** `generationConfig.responseModalities=["AUDIO"]` +
+`speechConfig.voiceConfig.prebuiltVoiceConfig.voiceName` only. Language is
+steered in the user prompt (official generateContent TTS docs).
 
 HTTPS only: `generativelanguage.googleapis.com`. Key never logged. Bodies / PCM never logged.
 

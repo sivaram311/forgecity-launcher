@@ -42,6 +42,30 @@ class GeminiAudioTtsClientTest {
         assertEquals(24_000, payload!!.sampleRateHz)
         assertTrue(payload.pcm.contentEquals(pcm))
     }
+
+    @Test
+    fun requestBodyOmitsLanguageCodeAndUsesVoiceOnly() {
+        val body = GeminiAudioTtsClient().buildRequestBody(
+            prompt = "Say hello",
+            voice = "Kore",
+        )
+        assertTrue(body.contains("\"responseModalities\":[\"AUDIO\"]"))
+        assertTrue(body.contains("\"voiceName\":\"Kore\""))
+        assertTrue(body.contains("\"parts\":[{\"text\":\"Say hello\"}]"))
+        // languageCode is not a valid generateContent speechConfig field.
+        assertTrue(!body.contains("languageCode"))
+        assertTrue(!body.contains("\"role\""))
+    }
+
+    @Test
+    fun languageHintInjectedWhenPromptHasNoLanguage() {
+        val hinted = GeminiAudioTtsClient.applyLanguageHint(
+            "Notification from Chat: hi",
+            "ta-IN",
+        )
+        assertTrue(hinted.contains("Synthesize speech only"))
+        assertTrue(hinted.contains("Tamil") || hinted.contains("ta-IN"))
+    }
 }
 
 class GeminiRewriteClientTest {
@@ -94,7 +118,8 @@ class PromptTemplateFormatterTest {
             text = "Body",
         )
         assertTrue(formatted.contains("ForgeCity"))
-        assertTrue(formatted.contains("Speak a clear Tamil"))
+        assertTrue(formatted.contains("Synthesize speech only"))
+        assertTrue(formatted.contains("Tamil") || formatted.contains("TRANSCRIPT"))
     }
 }
 

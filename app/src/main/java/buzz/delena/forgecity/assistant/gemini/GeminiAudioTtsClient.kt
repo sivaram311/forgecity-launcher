@@ -13,11 +13,16 @@ import javax.net.ssl.HttpsURLConnection
 /**
  * Gemini native audio TTS via `generateContent` with `responseModalities: ["AUDIO"]`.
  * Returns raw PCM (typically audio/L16 @ 24 kHz); does not speak — caller plays bytes.
+ *
+ * Request shape matches the generateContent TTS docs:
+ * speechConfig only carries voiceConfig.prebuiltVoiceConfig.voiceName
+ * (no languageCode — language is detected from the prompt text).
  */
 class GeminiAudioTtsClient(
     private val connectTimeoutMs: Int = 8_000,
-    private val readTimeoutMs: Int = 45_000,
-    private val maxResponseBytes: Int = 3 * 1024 * 1024,
+    private val readTimeoutMs: Int = 60_000,
+    private val maxResponseBytes: Int = 12 * 1024 * 1024,
+    private val maxAttempts: Int = 2,
 ) : AutoCloseable {
     @Volatile
     private var closed = false
@@ -36,11 +41,58 @@ class GeminiAudioTtsClient(
         val modelId = normalizeTtsModel(model)
         val voiceName = voice.trim().ifBlank { DEFAULT_VOICE }
         val lang = languageCode.trim().ifBlank { DEFAULT_LANGUAGE }
+        val spokenPrompt = applyLanguageHint(prompt.trim(), lang)
         val url = validatedUrl(modelId) ?: return GeminiAudioResult.Unavailable
+
+        var last: GeminiAudioResult = GeminiAudioResult.Unavailable
+        repeat(maxAttempts) { attempt ->
+            val result = synthesizeOnce(
+                url = url,
+                apiKey = apiKey.trim(),
+                modelId = modelId,
+                prompt = spokenPrompt,
+                voiceName = voiceName,
+                attempt = attempt + 1,
+            )
+            last = result
+            when (result) {
+                is GeminiAudioResult.Success -> return result
+                // Retry transient server / empty-audio cases only.
+                is GeminiAudioResult.Unavailable,
+                is GeminiAudioResult.Malformed,
+                is GeminiAudioResult.Timeout,
+                -> {
+                    ForgeCityTtsDiagnostics.warn(
+                        "gemini_audio_retry",
+                        "attempt=${attempt + 1} result=${result::class.simpleName}",
+                    )
+                    if (attempt + 1 < maxAttempts) {
+                        try {
+                            Thread.sleep(350L * (attempt + 1))
+                        } catch (_: InterruptedException) {
+                            Thread.currentThread().interrupt()
+                            return GeminiAudioResult.Timeout
+                        }
+                    }
+                }
+                else -> return result
+            }
+        }
+        return last
+    }
+
+    private fun synthesizeOnce(
+        url: URL,
+        apiKey: String,
+        modelId: String,
+        prompt: String,
+        voiceName: String,
+        attempt: Int,
+    ): GeminiAudioResult {
         val startedAt = System.currentTimeMillis()
         ForgeCityTtsDiagnostics.info(
             "gemini_audio_start",
-            "model=$modelId voice=$voiceName lang=$lang",
+            "model=$modelId voice=$voiceName attempt=$attempt",
         )
         var connection: HttpsURLConnection? = null
         return try {
@@ -51,14 +103,14 @@ class GeminiAudioTtsClient(
             connection.readTimeout = readTimeoutMs
             connection.doOutput = true
             connection.setRequestProperty("Content-Type", "application/json; charset=utf-8")
-            connection.setRequestProperty("x-goog-api-key", apiKey.trim())
-            val payload = buildRequestBody(prompt, voiceName, lang).toByteArray(Charsets.UTF_8)
+            connection.setRequestProperty("x-goog-api-key", apiKey)
+            val payload = buildRequestBody(prompt, voiceName).toByteArray(Charsets.UTF_8)
             connection.setFixedLengthStreamingMode(payload.size)
             connection.outputStream.use { it.write(payload) }
             val status = connection.responseCode
             ForgeCityTtsDiagnostics.info(
                 "gemini_audio_http",
-                "status=$status model=$modelId elapsedMs=${System.currentTimeMillis() - startedAt}",
+                "status=$status model=$modelId attempt=$attempt elapsedMs=${System.currentTimeMillis() - startedAt}",
             )
             when (status) {
                 HttpURLConnection.HTTP_OK -> {
@@ -71,23 +123,16 @@ class GeminiAudioTtsClient(
                 -> GeminiAudioResult.Unauthorized
                 HttpURLConnection.HTTP_BAD_REQUEST -> {
                     val err = readBounded(connection.errorStream)?.toString(Charsets.UTF_8).orEmpty()
-                    when {
-                        err.contains("API_KEY_INVALID", ignoreCase = true) ||
-                            err.contains("API key not valid", ignoreCase = true) ->
-                            GeminiAudioResult.Unauthorized
-                        err.contains("not found", ignoreCase = true) ||
-                            err.contains("NOT_FOUND", ignoreCase = true) ->
-                            GeminiAudioResult.ModelUnavailable
-                        else -> {
-                            ForgeCityTtsDiagnostics.warn("gemini_audio_bad_request", "status=400")
-                            GeminiAudioResult.Unavailable
-                        }
-                    }
+                    classifyBadRequest(err)
                 }
                 HttpURLConnection.HTTP_NOT_FOUND -> GeminiAudioResult.ModelUnavailable
                 HttpURLConnection.HTTP_GATEWAY_TIMEOUT,
                 429,
                 -> GeminiAudioResult.Timeout
+                500, 502, 503 -> {
+                    ForgeCityTtsDiagnostics.warn("gemini_audio_server", "status=$status")
+                    GeminiAudioResult.Unavailable
+                }
                 else -> GeminiAudioResult.Unavailable
             }
         } catch (_: SocketTimeoutException) {
@@ -113,11 +158,14 @@ class GeminiAudioTtsClient(
         URL("https://generativelanguage.googleapis.com/v1beta/models/$encoded:generateContent")
     }.getOrNull()
 
-    private fun buildRequestBody(prompt: String, voice: String, languageCode: String): String {
+    /**
+     * Official generateContent TTS body — voice only, no languageCode field.
+     * Language is steered via the prompt text (see [applyLanguageHint]).
+     */
+    internal fun buildRequestBody(prompt: String, voice: String): String {
         val escapedPrompt = escapeJson(prompt)
         val escapedVoice = escapeJson(voice)
-        val escapedLang = escapeJson(languageCode)
-        return """{"contents":[{"role":"user","parts":[{"text":"$escapedPrompt"}]}],"generationConfig":{"responseModalities":["AUDIO"],"speechConfig":{"languageCode":"$escapedLang","voiceConfig":{"prebuiltVoiceConfig":{"voiceName":"$escapedVoice"}}}}}"""
+        return """{"contents":[{"parts":[{"text":"$escapedPrompt"}]}],"generationConfig":{"responseModalities":["AUDIO"],"speechConfig":{"voiceConfig":{"prebuiltVoiceConfig":{"voiceName":"$escapedVoice"}}}}}"""
     }
 
     private fun escapeJson(value: String): String = buildString(value.length + 8) {
@@ -138,8 +186,17 @@ class GeminiAudioTtsClient(
     }
 
     private fun parseSuccess(json: String): GeminiAudioResult {
+        val blockReason = blockReason(json)
+        if (blockReason != null) {
+            ForgeCityTtsDiagnostics.warn("gemini_audio_blocked", "reason=$blockReason")
+            return GeminiAudioResult.Unavailable
+        }
         val audio = GeminiAudioResponseParser.extract(json) ?: run {
-            ForgeCityTtsDiagnostics.warn("gemini_audio_malformed", "reason=no_inline_data")
+            val finish = finishReason(json)
+            ForgeCityTtsDiagnostics.warn(
+                "gemini_audio_malformed",
+                "reason=no_inline_data finish=${finish ?: "none"}",
+            )
             return GeminiAudioResult.Malformed
         }
         if (audio.pcm.isEmpty()) {
@@ -157,6 +214,30 @@ class GeminiAudioTtsClient(
         return GeminiAudioResult.Success(audio.pcm, audio.sampleRateHz, audio.mimeType)
     }
 
+    private fun classifyBadRequest(err: String): GeminiAudioResult = when {
+        err.contains("API_KEY_INVALID", ignoreCase = true) ||
+            err.contains("API key not valid", ignoreCase = true) ->
+            GeminiAudioResult.Unauthorized
+        err.contains("not found", ignoreCase = true) ||
+            err.contains("NOT_FOUND", ignoreCase = true) ->
+            GeminiAudioResult.ModelUnavailable
+        err.contains("PROHIBITED", ignoreCase = true) ||
+            err.contains("SAFETY", ignoreCase = true) -> {
+            ForgeCityTtsDiagnostics.warn("gemini_audio_bad_request", "status=400 class=safety")
+            GeminiAudioResult.Unavailable
+        }
+        err.contains("languageCode", ignoreCase = true) ||
+            err.contains("Unknown name", ignoreCase = true) ||
+            err.contains("INVALID_ARGUMENT", ignoreCase = true) -> {
+            ForgeCityTtsDiagnostics.warn("gemini_audio_bad_request", "status=400 class=invalid_argument")
+            GeminiAudioResult.Unavailable
+        }
+        else -> {
+            ForgeCityTtsDiagnostics.warn("gemini_audio_bad_request", "status=400")
+            GeminiAudioResult.Unavailable
+        }
+    }
+
     private fun readBounded(input: java.io.InputStream?): ByteArray? {
         if (input == null) return null
         input.use { stream ->
@@ -167,7 +248,10 @@ class GeminiAudioTtsClient(
                 val count = stream.read(buffer)
                 if (count < 0) break
                 total += count
-                if (total > maxResponseBytes) return null
+                if (total > maxResponseBytes) {
+                    ForgeCityTtsDiagnostics.warn("gemini_audio_malformed", "reason=response_too_large")
+                    return null
+                }
                 output.write(buffer, 0, count)
             }
             return output.toByteArray()
@@ -196,6 +280,57 @@ class GeminiAudioTtsClient(
         fun normalizeTtsModel(raw: String): String {
             val model = raw.trim().removePrefix("models/").ifBlank { DEFAULT_TTS_MODEL }
             return if (model.lowercase() in TEXT_ONLY_MODELS) DEFAULT_TTS_MODEL else model
+        }
+
+        /**
+         * Language is not a generateContent speechConfig field; steer via prompt.
+         * Keeps existing language preference useful without invalid API fields.
+         */
+        fun applyLanguageHint(prompt: String, languageCode: String): String {
+            val lang = languageCode.trim().ifBlank { DEFAULT_LANGUAGE }
+            val lower = prompt.lowercase()
+            // Already steers language → leave alone.
+            if (lower.contains("tamil") || lower.contains("ta-in") || lower.contains("speak in")) {
+                if (!lower.contains("synthesize speech") && !lower.contains("read aloud")) {
+                    return "Synthesize speech only (audio output, no text).\n$prompt"
+                }
+                return prompt
+            }
+            val label = when {
+                lang.startsWith("ta", ignoreCase = true) -> "Tamil (ta-IN)"
+                lang.startsWith("en", ignoreCase = true) -> "English"
+                else -> lang
+            }
+            return "Synthesize speech only (audio output, no text). Speak in $label.\n$prompt"
+        }
+
+        internal fun finishReason(json: String): String? {
+            val marker = "\"finishReason\""
+            val idx = json.indexOf(marker)
+            if (idx < 0) return null
+            return GeminiAudioResponseParser.extractJsonString(json.substring(idx), "finishReason")
+                ?: run {
+                    // bare enum sometimes unquoted in logs — keep simple string extract
+                    val after = json.indexOf(':', idx + marker.length)
+                    if (after < 0) return null
+                    val rest = json.substring(after + 1).trimStart()
+                    if (rest.startsWith("\"")) {
+                        GeminiAudioResponseParser.extractJsonString(json.substring(idx), "finishReason")
+                    } else {
+                        rest.takeWhile { it.isLetterOrDigit() || it == '_' }.ifBlank { null }
+                    }
+                }
+        }
+
+        internal fun blockReason(json: String): String? {
+            if (!json.contains("blockReason", ignoreCase = true) &&
+                !json.contains("PROMPT_BLOCKED", ignoreCase = true) &&
+                !json.contains("PROHIBITED_CONTENT", ignoreCase = true)
+            ) {
+                return null
+            }
+            return GeminiAudioResponseParser.extractJsonString(json, "blockReason")
+                ?: if (json.contains("PROHIBITED", ignoreCase = true)) "PROHIBITED" else "blocked"
         }
     }
 }
@@ -254,15 +389,39 @@ internal object GeminiAudioResponseParser {
     private val RATE_REGEX = Regex("""rate\s*=\s*(\d+)""", RegexOption.IGNORE_CASE)
 
     fun extract(json: String): GeminiAudioPayload? {
-        val region = inlineDataRegion(json) ?: json
-        val mimeType = extractJsonString(region, "mimeType")
-            ?: extractJsonString(region, "mime_type")
+        // Prefer first inlineData; fall through parts if first is text-only.
+        val regions = inlineDataRegions(json)
+        for (region in regions) {
+            val mimeType = extractJsonString(region, "mimeType")
+                ?: extractJsonString(region, "mime_type")
+                ?: "audio/L16;rate=24000"
+            val b64 = extractJsonString(region, "data") ?: continue
+            val pcm = runCatching {
+                Base64.getMimeDecoder().decode(b64)
+            }.getOrNull() ?: continue
+            if (pcm.isEmpty()) continue
+            val rate = RATE_REGEX.find(mimeType)?.groupValues?.getOrNull(1)?.toIntOrNull()
+                ?: 24_000
+            return GeminiAudioPayload(
+                pcm = pcm,
+                sampleRateHz = rate.coerceIn(8_000, 48_000),
+                mimeType = mimeType,
+            )
+        }
+        // Last resort: whole document search for data under any inlineData-ish blob.
+        val mimeType = extractJsonString(json, "mimeType")
+            ?: extractJsonString(json, "mime_type")
             ?: "audio/L16;rate=24000"
-        val b64 = extractJsonString(region, "data") ?: return null
+        if (!mimeType.contains("audio", ignoreCase = true) &&
+            !mimeType.contains("L16", ignoreCase = true)
+        ) {
+            return null
+        }
+        val b64 = extractJsonString(json, "data") ?: return null
         val pcm = runCatching {
-            // MIME decoder tolerates newlines/whitespace in API base64 payloads.
             Base64.getMimeDecoder().decode(b64)
         }.getOrNull() ?: return null
+        if (pcm.isEmpty()) return null
         val rate = RATE_REGEX.find(mimeType)?.groupValues?.getOrNull(1)?.toIntOrNull()
             ?: 24_000
         return GeminiAudioPayload(
@@ -272,25 +431,39 @@ internal object GeminiAudioResponseParser {
         )
     }
 
-    private fun inlineDataRegion(json: String): String? {
+    private fun inlineDataRegions(json: String): List<String> {
+        val out = mutableListOf<String>()
         val markers = listOf("\"inlineData\"", "\"inline_data\"")
         for (marker in markers) {
-            val start = json.indexOf(marker)
-            if (start < 0) continue
-            var brace = json.indexOf('{', start)
-            if (brace < 0) continue
-            var depth = 0
-            for (i in brace until json.length) {
-                when (json[i]) {
-                    '{' -> depth++
-                    '}' -> {
-                        depth--
-                        if (depth == 0) return json.substring(brace, i + 1)
+            var from = 0
+            while (true) {
+                val start = json.indexOf(marker, from)
+                if (start < 0) break
+                var brace = json.indexOf('{', start)
+                if (brace < 0) break
+                var depth = 0
+                var end = -1
+                for (i in brace until json.length) {
+                    when (json[i]) {
+                        '{' -> depth++
+                        '}' -> {
+                            depth--
+                            if (depth == 0) {
+                                end = i
+                                break
+                            }
+                        }
                     }
+                }
+                if (end > brace) {
+                    out += json.substring(brace, end + 1)
+                    from = end + 1
+                } else {
+                    break
                 }
             }
         }
-        return null
+        return out
     }
 
     /** Finds first JSON string value for a given key. */

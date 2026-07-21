@@ -155,19 +155,31 @@ class AssistantTtsEngine(context: Context) {
             .setSampleRate(sampleRateHz)
             .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
             .build()
+        val bufferSize = (minBuf * 4).coerceAtLeast(pcm.size.coerceAtMost(minBuf * 8))
         val track = try {
             AudioTrack.Builder()
                 .setAudioAttributes(attrs)
                 .setAudioFormat(format)
-                .setBufferSizeInBytes(minBuf * 2)
+                .setBufferSizeInBytes(bufferSize)
                 .setTransferMode(AudioTrack.MODE_STREAM)
+                .setPerformanceMode(AudioTrack.PERFORMANCE_MODE_LOW_LATENCY)
                 .build()
         } catch (e: Exception) {
-            ForgeCityTtsDiagnostics.warn(
-                "pcm_blocked",
-                "reason=track_build type=${e.javaClass.simpleName}",
-            )
-            return false
+            // PERFORMANCE_MODE_LOW_LATENCY not available on all devices — retry plain.
+            try {
+                AudioTrack.Builder()
+                    .setAudioAttributes(attrs)
+                    .setAudioFormat(format)
+                    .setBufferSizeInBytes(bufferSize)
+                    .setTransferMode(AudioTrack.MODE_STREAM)
+                    .build()
+            } catch (e2: Exception) {
+                ForgeCityTtsDiagnostics.warn(
+                    "pcm_blocked",
+                    "reason=track_build type=${e2.javaClass.simpleName}",
+                )
+                return false
+            }
         }
         if (track.state != AudioTrack.STATE_INITIALIZED) {
             track.release()
@@ -176,19 +188,33 @@ class AssistantTtsEngine(context: Context) {
         }
         synchronized(this) { pcmTrack = track }
         return try {
+            // Prime a first chunk before play() — more reliable on some ColorOS builds.
+            val firstChunk = minOf(minBuf, pcm.size)
+            var written = track.write(pcm, 0, firstChunk)
+            if (written < 0) {
+                ForgeCityTtsDiagnostics.warn("pcm_write_failed", "written=$written offset=0")
+                return false
+            }
             track.play()
-            var offset = 0
+            var offset = written.coerceAtLeast(0)
+            var stallLoops = 0
             while (offset < pcm.size) {
                 val chunk = minOf(minBuf, pcm.size - offset)
-                val written = track.write(pcm, offset, chunk)
+                written = track.write(pcm, offset, chunk)
                 if (written < 0) {
                     ForgeCityTtsDiagnostics.warn("pcm_write_failed", "written=$written offset=$offset")
                     return false
                 }
                 if (written == 0) {
+                    stallLoops++
+                    if (stallLoops > 200) {
+                        ForgeCityTtsDiagnostics.warn("pcm_write_failed", "reason=stall offset=$offset")
+                        return false
+                    }
                     Thread.sleep(10)
                     continue
                 }
+                stallLoops = 0
                 offset += written
             }
             ForgeCityTtsDiagnostics.info(
