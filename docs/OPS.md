@@ -17,30 +17,36 @@ git checkout main
 
 ## Download (prerelease debug APK)
 
-Latest Gemini native audio build:
+Latest UI polish build (**0.5.0**):
 
 ```powershell
-curl.exe -L -o forgecity-0.4.6-gemini-native-audio-dev-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.4.6-gemini-native-audio-dev/forgecity-0.4.6-gemini-native-audio-dev-debug.apk
-Get-FileHash .\forgecity-0.4.6-gemini-native-audio-dev-debug.apk -Algorithm SHA256
-adb install -r .\forgecity-0.4.6-gemini-native-audio-dev-debug.apk
+curl.exe -L -o forgecity-0.5.0-ui-polish-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.5.0-ui-polish-dev/forgecity-0.5.0-ui-polish-dev-debug.apk
+Get-FileHash .\forgecity-0.5.0-ui-polish-dev-debug.apk -Algorithm SHA256
+# expect BB8FECCF655928DC5EC5D28665890CE3FC63F7422028F9E3A6327D2C062C3CFA
+adb install -r .\forgecity-0.5.0-ui-polish-dev-debug.apk
 ```
 
 Also grant: Home role, Usage Access, Notification Access (allowlist apps before speech).
 
-### Gemini native audio (0.4.6)
+### City-first chrome (0.5.0)
 
-1. Save Gemini API key in City Assistant.
+1. Top-right **overflow menu** (hamburger) toggles: Launcher UI, Assistant settings,
+   Search, Favorites dock. Defaults: chrome + dock on; search + assistant sheet off.
+2. **Chapter pill** — tap to expand briefing.
+3. **Assistant settings** open as a **modal sheet** (menu → Assistant settings), not
+   a permanent home scroll. Background video toggle + opacity live there.
+4. Long-press a building to pin/unpin favorites (haptic). Empty dock slots show **pin**.
+5. Search (when enabled): typing a unique app name flies the camera to that building.
+
+### Gemini native audio (0.4.6+)
+
+1. Open Assistant settings sheet → save Gemini API key.
 2. Confirm model `gemini-3.1-flash-tts-preview`, voice `Kore`, language `ta-IN`.
 3. Cycle speech mode to **GEMINI AUDIO** (fail-closed) or **CASCADE** (audio → Portal → device).
 4. Edit the audio prompt template if needed; TEST TTS exercises the active mode.
-5. Logcat: `adb logcat -s ForgeCityTTS` — look for `gemini_audio_*` / `pcm_play_started`.
-
-### ASSIST chip (0.4.4)
-
-Persistent top-right **`ASSIST +` / `ASSIST −`** (below `UI +/−`) toggles City Assistant
-panel, search bar, and favorites dock independently of full chrome. City canvas
-and chapter/resources stay under the main `UI` chip.
+5. Logcat: `adb logcat -s ForgeCityTTS` — look for `gemini_audio_*` / `pcm_play_started`
+   or `pcm_play_started backend=audiotrack|mediaplayer` (0.4.7+).
 
 ### Tamil Agent Portal rewrite (0.4.0)
 
@@ -78,13 +84,14 @@ time, and TTS result. They never include API keys, notification title/body, or
 Tamil response text.
 
 For local-only speech, select `DIRECT`: ForgeCity uses the device default
-locale and makes no Agent Portal request. `OFF` is the fresh-install default.
-The launcher chrome is also hidden by default; `UI +` / `UI −` remains visible
-with a 48 dp touch target and persists the choice.
+locale and makes no Agent Portal request. `OFF` is the fresh-install default for
+speech. **0.5.0** shows launcher chrome + dock by default; use the overflow menu
+to hide panels.
 
 Spec: [TAMIL-REWRITE-SPEC.md](TAMIL-REWRITE-SPEC.md).
 
-Older: `v0.3.3-background-video-asset-dev` (SHA `B0B9EBC5…`).
+Older speech tip: `v0.4.7-pcm-playback-fix-dev` (SHA `C98727E5…`).  
+Older video tip: `v0.3.3-background-video-asset-dev` (SHA `B0B9EBC5…`).
 
 Debug-signed, prerelease. Device E2E (#16) pending; do not treat as production.
 

@@ -10,9 +10,9 @@
 | Field | Value |
 |-------|-------|
 | versionName | `0.5.0-ui-polish-dev` · versionCode 15 |
-| Prior tip | `0.4.7-pcm-playback-fix-dev` (speech/PCM still current) |
-| Latest speech release | [`v0.4.7-pcm-playback-fix-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.4.7-pcm-playback-fix-dev) |
-| UI polish | **0.5.0 local** — city-first chrome, building craft, video scrims, motion/dock |
+| Latest release | [`v0.5.0-ui-polish-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.5.0-ui-polish-dev) (prerelease, debug) |
+| APK SHA-256 | `BB8FECCF655928DC5EC5D28665890CE3FC63F7422028F9E3A6327D2C062C3CFA` |
+| Prior speech tip | [`v0.4.7-pcm-playback-fix-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.4.7-pcm-playback-fix-dev) |
 
 ## Read first
 
@@ -54,8 +54,8 @@ Modes: OFF → DIRECT → PORTAL → GEMINI AUDIO → CASCADE. PCM MODE_STREAM +
 
 | Now | Next |
 |-----|------|
-| 0.5.0 UI polish implemented | On-device visual GO + Realme E2E #16 still PENDING |
-| Speech still 0.4.7 tip on GitHub until 0.5.0 published | Package APK + prerelease after Reviewer GO |
+| 0.5.0 published (debug prerelease) | Confirm UI + video + speech on Realme P2 Pro |
+| Realme E2E (#16) still PENDING | Blocks annotated **production** tags |
 
 ## Build
 
