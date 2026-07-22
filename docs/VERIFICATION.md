@@ -367,3 +367,15 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | Unit/lint/assemble | PASS | versionCode 17 |
 | APK SHA-256 | `F637ECF048AF7DFBC921F6C074F6EABD6A3CC72C7D046BDD5578B766D9105A2A` | local dist (16.84 MB) |
 | Realme E2E (#16) | PENDING | debug prerelease; not production |
+
+## 2026-07-22 — 0.6.1 in-app TTS error / diagnostics log
+
+| Check | Result | Notes |
+|------|--------|-------|
+| Ring buffer | LANDED | `ForgeCityTtsDiagnostics` append-only, max 200 lines, `StateFlow` snapshot |
+| UI | LANDED | Assistant settings: monospace log + **COPY LOG** / **CLEAR** |
+| Privacy | PASS | still no keys / notification bodies / rewrite text |
+| Unit tests | PASS | `ForgeCityTtsDiagnosticsTest` + full `testDebugUnitTest` |
+| lint / assemble | PASS | versionCode 18 |
+| APK SHA-256 | `BE2F45E5EF46F7CD11F4B3CBB0A03A3CD0DA49E8889E7AA0A054699600568383` | local dist (~16.9 MB) |
+| Realme E2E (#16) | PENDING | debug prerelease; not production |

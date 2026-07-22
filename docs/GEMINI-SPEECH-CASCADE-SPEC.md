@@ -62,6 +62,9 @@ steered in the user prompt (official generateContent TTS docs).
 
 HTTPS only: `generativelanguage.googleapis.com`. Key never logged. Bodies / PCM never logged.
 
+**In-app diagnostics (0.6.1+):** `ForgeCityTtsDiagnostics` mirrors the same safe
+events into an append-only UI ring buffer (COPY LOG in Assistant settings).
+
 ## Privacy
 
 | Path | Data leaves device? |

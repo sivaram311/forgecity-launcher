@@ -15,8 +15,8 @@ android {
         applicationId = "buzz.delena.forgecity"
         minSdk = 26
         targetSdk = 35
-        versionCode = 17
-        versionName = "0.6.0-city-3d-dev"
+        versionCode = 18
+        versionName = "0.6.1-tts-error-log-dev"
     }
 
     buildTypes {
@@ -42,6 +42,10 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+    }
+
+    testOptions {
+        unitTests.isReturnDefaultValues = true
     }
 }
 

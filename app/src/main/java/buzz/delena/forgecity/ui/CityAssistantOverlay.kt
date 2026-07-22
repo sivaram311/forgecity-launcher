@@ -43,7 +43,10 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -154,6 +157,7 @@ fun AssistantSettingsSheet(
     promptTemplate: String,
     speechTestText: String,
     speechTestStatus: String?,
+    diagnosticsLog: String,
     backgroundVideoEnabled: Boolean,
     backgroundVideoOpacity: Float,
     quietLabel: String,
@@ -171,6 +175,7 @@ fun AssistantSettingsSheet(
     onSpeechTestTextChange: (String) -> Unit,
     onTestSpeechMode: () -> Unit,
     onClearSpeechTestStatus: () -> Unit,
+    onClearDiagnosticsLog: () -> Unit,
     onToggleBackgroundVideo: () -> Unit,
     onBackgroundVideoOpacityChange: (Float) -> Unit,
     onQuietStartEarlier: () -> Unit,
@@ -237,6 +242,7 @@ fun AssistantSettingsSheet(
                     promptTemplate = promptTemplate,
                     speechTestText = speechTestText,
                     speechTestStatus = speechTestStatus,
+                    diagnosticsLog = diagnosticsLog,
                     backgroundVideoEnabled = backgroundVideoEnabled,
                     backgroundVideoOpacity = backgroundVideoOpacity,
                     quietLabel = quietLabel,
@@ -254,6 +260,7 @@ fun AssistantSettingsSheet(
                     onSpeechTestTextChange = onSpeechTestTextChange,
                     onTestSpeechMode = onTestSpeechMode,
                     onClearSpeechTestStatus = onClearSpeechTestStatus,
+                    onClearDiagnosticsLog = onClearDiagnosticsLog,
                     onToggleBackgroundVideo = onToggleBackgroundVideo,
                     onBackgroundVideoOpacityChange = onBackgroundVideoOpacityChange,
                     onQuietStartEarlier = onQuietStartEarlier,
@@ -283,6 +290,7 @@ fun AssistantSettingsCard(
     promptTemplate: String,
     speechTestText: String,
     speechTestStatus: String?,
+    diagnosticsLog: String,
     backgroundVideoEnabled: Boolean,
     backgroundVideoOpacity: Float,
     quietLabel: String,
@@ -300,6 +308,7 @@ fun AssistantSettingsCard(
     onSpeechTestTextChange: (String) -> Unit,
     onTestSpeechMode: () -> Unit,
     onClearSpeechTestStatus: () -> Unit,
+    onClearDiagnosticsLog: () -> Unit,
     onToggleBackgroundVideo: () -> Unit,
     onBackgroundVideoOpacityChange: (Float) -> Unit,
     onQuietStartEarlier: () -> Unit,
@@ -312,10 +321,17 @@ fun AssistantSettingsCard(
     var apiKeyDraft by remember(apiKey) { mutableStateOf(apiKey) }
     var geminiKeyDraft by remember(geminiApiKey) { mutableStateOf(geminiApiKey) }
     var templateDraft by remember(promptTemplate) { mutableStateOf(promptTemplate) }
+    var copyHint by remember { mutableStateOf<String?>(null) }
+    val clipboard = LocalClipboardManager.current
     LaunchedEffect(speechTestStatus) {
         if (speechTestStatus == null) return@LaunchedEffect
         delay(8_000)
         onClearSpeechTestStatus()
+    }
+    LaunchedEffect(copyHint) {
+        if (copyHint == null) return@LaunchedEffect
+        delay(2_000)
+        copyHint = null
     }
     Column(
         modifier = modifier
@@ -517,10 +533,74 @@ fun AssistantSettingsCard(
             )
         }
         Text(
-            "Diagnosis: adb logcat -s ForgeCityTTS",
+            text = "Speech diagnostics log",
+            color = Color(0xFFE8A15A),
+            fontSize = 11.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(top = 8.dp),
+        )
+        Text(
+            text = "Append-only safe events (no keys / notification text). " +
+                "COPY → paste into chat with the agent. Also: adb logcat -s ForgeCityTTS",
             color = Color(0x77FFF6F0),
             fontSize = 9.sp,
         )
+        BasicTextField(
+            value = diagnosticsLog.ifBlank { "(empty — run TEST TTS or wait for a spoken notification)" },
+            onValueChange = {},
+            readOnly = true,
+            textStyle = TextStyle(
+                color = Color(0xFFB8F0E8),
+                fontSize = 9.sp,
+                fontFamily = FontFamily.Monospace,
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 4.dp)
+                .heightIn(min = 96.dp, max = 180.dp)
+                .background(Color(0xFF0C0A12), RoundedCornerShape(8.dp))
+                .padding(8.dp)
+                .verticalScroll(rememberScrollState()),
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(
+                text = "COPY LOG",
+                color = Color(0xFF4FD1C5),
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .clickable {
+                        val text = diagnosticsLog.trim()
+                        if (text.isEmpty()) {
+                            copyHint = "Log empty"
+                        } else {
+                            clipboard.setText(AnnotatedString(text))
+                            copyHint = "Copied — paste to agent"
+                        }
+                    }
+                    .padding(8.dp),
+            )
+            Text(
+                text = "CLEAR",
+                color = Color(0xFFE8A15A),
+                fontSize = 11.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier
+                    .clickable(onClick = onClearDiagnosticsLog)
+                    .padding(8.dp),
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            if (copyHint != null) {
+                Text(
+                    text = copyHint!!,
+                    color = Color(0xFF4FD1C5),
+                    fontSize = 9.sp,
+                )
+            }
+        }
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = "Atmosphere",

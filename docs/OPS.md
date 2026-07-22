@@ -17,14 +17,14 @@ git checkout main
 
 ## Download (prerelease debug APK)
 
-Latest Gemini audio fix (**0.5.1**):
+Latest (**0.6.1** in-app TTS error log):
 
 ```powershell
-curl.exe -L -o forgecity-0.5.1-gemini-audio-fix-dev-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.5.1-gemini-audio-fix-dev/forgecity-0.5.1-gemini-audio-fix-dev-debug.apk
-Get-FileHash .\forgecity-0.5.1-gemini-audio-fix-dev-debug.apk -Algorithm SHA256
-# expect 05D21575B597856A01989F8B15E2BD1804497294A4ECE296C188F8AFC1D52365
-adb install -r .\forgecity-0.5.1-gemini-audio-fix-dev-debug.apk
+curl.exe -L -o forgecity-0.6.1-tts-error-log-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.6.1-tts-error-log-dev/forgecity-0.6.1-tts-error-log-dev-debug.apk
+Get-FileHash .\forgecity-0.6.1-tts-error-log-dev-debug.apk -Algorithm SHA256
+# expect BE2F45E5EF46F7CD11F4B3CBB0A03A3CD0DA49E8889E7AA0A054699600568383
+adb install -r .\forgecity-0.6.1-tts-error-log-dev-debug.apk
 ```
 
 Also grant: Home role, Usage Access, Notification Access (allowlist apps before speech).
@@ -65,18 +65,21 @@ Also grant: Home role, Usage Access, Notification Access (allowlist apps before 
 3. Allowlist at least one messaging app; send a test notification.
 4. Expect Tamil TTS only; portal down / bad key / missing Tamil voice → silent.
 
-### Built-in speech test + terminal diagnostics (0.4.1)
+### Built-in speech test + diagnostics (0.4.1 → 0.6.1)
 
-1. Select `DIRECT` or `PORTAL தமிழ்`, then tap **TEST TTS**.
+1. Select a speech mode, then tap **TEST TTS**.
 2. DIRECT speaks a fixed local English test line. PORTAL sends a fixed synthetic
    test sentence (never notification content), validates the Tamil response, and
-   speaks it using `ta-IN` / `ta`.
+   speaks it using `ta-IN` / `ta`. GEMINI AUDIO / CASCADE use native audio.
 3. The status line reports rewrite/TTS success or failure. `OFF` explains that a
    speech mode must be selected.
-4. Saved API keys remain Android-Keystore encrypted at rest but are intentionally
-   visible in the config field for setup. Do not share screenshots.
+4. **0.6.1:** open the **Speech diagnostics log** box under TEST TTS. It appends
+   safe events (`I`/`W` + timestamp). Tap **COPY LOG** and paste into agent chat.
+   **CLEAR** resets the ring buffer (max 200 lines). Same events also go to logcat.
+5. Saved API keys remain Android-Keystore encrypted at rest but are intentionally
+   visible in the config field for setup. Do not share screenshots of key fields.
 
-Terminal diagnosis:
+Terminal diagnosis (optional):
 
 ```powershell
 adb logcat -c

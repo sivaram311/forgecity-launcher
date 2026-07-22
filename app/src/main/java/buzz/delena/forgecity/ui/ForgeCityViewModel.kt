@@ -8,6 +8,7 @@ import buzz.delena.forgecity.assistant.AssistantEventBridge
 import buzz.delena.forgecity.assistant.AssistantSpeechMode
 import buzz.delena.forgecity.assistant.AssistantSettingsStore
 import buzz.delena.forgecity.assistant.AssistantUiEvent
+import buzz.delena.forgecity.assistant.ForgeCityTtsDiagnostics
 import buzz.delena.forgecity.assistant.NotificationAccess
 import buzz.delena.forgecity.assistant.SpeechModeTestRunner
 import buzz.delena.forgecity.city.CityBuilding
@@ -90,6 +91,9 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
 
     private val _speechTestStatus = MutableStateFlow<String?>(null)
     val speechTestStatus: StateFlow<String?> = _speechTestStatus.asStateFlow()
+
+    /** Append-only safe TTS diagnostics for copy-paste to an agent. */
+    val diagnosticsLog: StateFlow<String> = ForgeCityTtsDiagnostics.snapshot
 
     private val _allowCount = MutableStateFlow(assistantSettings.allowedPackages().size)
     val allowCount: StateFlow<Int> = _allowCount.asStateFlow()
@@ -282,7 +286,10 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
             mode = assistantSettings.speechMode,
             config = assistantSettings.cascadeSpeechConfig(),
             testText = assistantSettings.speechTestText,
-            onStatus = { _speechTestStatus.value = it },
+            onStatus = { status ->
+                ForgeCityTtsDiagnostics.uiStatus(status)
+                _speechTestStatus.value = status
+            },
         )
     }
 
@@ -293,6 +300,10 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun clearSpeechTestStatus() {
         _speechTestStatus.value = null
+    }
+
+    fun clearDiagnosticsLog() {
+        ForgeCityTtsDiagnostics.clear()
     }
 
     fun toggleBackgroundVideo() {

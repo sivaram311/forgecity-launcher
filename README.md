@@ -5,27 +5,24 @@ Apps become buildings. Habits rebuild districts. A neon city assistant can read
 notifications aloud when you opt in.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher (public)
-**Branch:** `main` · version `0.6.0-city-3d-dev`
-**Latest prerelease:** [`v0.6.0-city-3d-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.6.0-city-3d-dev)
+**Branch:** `main` · version `0.6.1-tts-error-log-dev`
+**Latest prerelease:** [`v0.6.1-tts-error-log-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.6.1-tts-error-log-dev)
 
 ## Download
 
 ```powershell
-curl.exe -L -o forgecity-0.6.0-city-3d-dev-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.6.0-city-3d-dev/forgecity-0.6.0-city-3d-dev-debug.apk
-Get-FileHash .\forgecity-0.6.0-city-3d-dev-debug.apk -Algorithm SHA256
-# expect F637ECF048AF7DFBC921F6C074F6EABD6A3CC72C7D046BDD5578B766D9105A2A
-adb install -r .\forgecity-0.6.0-city-3d-dev-debug.apk
+curl.exe -L -o forgecity-0.6.1-tts-error-log-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.6.1-tts-error-log-dev/forgecity-0.6.1-tts-error-log-dev-debug.apk
+Get-FileHash .\forgecity-0.6.1-tts-error-log-dev-debug.apk -Algorithm SHA256
+# expect BE2F45E5EF46F7CD11F4B3CBB0A03A3CD0DA49E8889E7AA0A054699600568383
+adb install -r .\forgecity-0.6.1-tts-error-log-dev-debug.apk
 ```
 
-## What works in 0.6.0-city-3d-dev
+## What works in 0.6.1-tts-error-log-dev
 
-- **Premium low-poly 3D city pass:** gradient wall shading, roof rim light,
-  softer contact shadows, depth-shaded ground plane
-- **Emissive windows:** deterministic per-pane night glow with subtle flicker;
-  new continuous `nightFactor` + `timeSeconds` lighting model (backward compatible)
-- Roof silhouettes gain night emissive accents — shapes, hit testing, and district
-  theme unchanged
+- **In-app speech diagnostics log:** append-only safe events in Assistant settings;
+  **COPY LOG** → paste into chat with the agent (no keys / notification bodies)
+- Plus **0.6.0** premium low-poly 3D city pass
 - Plus **0.5.1** Gemini native audio fix and **0.5.0** UI polish
 - Speech modes: OFF → DIRECT → PORTAL → GEMINI AUDIO → CASCADE
 
@@ -44,5 +41,3 @@ adb install -r .\forgecity-0.6.0-city-3d-dev-debug.apk
 cd E:\MyWorkspace\sandbox\forgecity-launcher
 .\gradlew.bat testDebugUnitTest lintDebug assembleDebug
 ```
-
-Debug-signed prerelease. Realme device E2E (#16) still **PENDING** — not production.

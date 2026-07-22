@@ -58,6 +58,7 @@ class MainActivity : ComponentActivity() {
             val geminiLanguageCode by viewModel.geminiLanguageCode.collectAsState()
             val promptTemplate by viewModel.promptTemplate.collectAsState()
             val speechTestStatus by viewModel.speechTestStatus.collectAsState()
+            val diagnosticsLog by viewModel.diagnosticsLog.collectAsState()
             val allowCount by viewModel.allowCount.collectAsState()
             val quietLabel by viewModel.quietLabel.collectAsState()
             val backgroundVideoEnabled by viewModel.backgroundVideoEnabled.collectAsState()
@@ -91,6 +92,7 @@ class MainActivity : ComponentActivity() {
                 geminiLanguageCode = geminiLanguageCode,
                 promptTemplate = promptTemplate,
                 speechTestStatus = speechTestStatus,
+                diagnosticsLog = diagnosticsLog,
                 allowCount = allowCount,
                 quietLabel = quietLabel,
                 backgroundVideoEnabled = backgroundVideoEnabled,
@@ -121,6 +123,7 @@ class MainActivity : ComponentActivity() {
                 onSaveGeminiApiKey = viewModel::saveGeminiApiKey,
                 onTestSpeechMode = viewModel::testSpeechMode,
                 onClearSpeechTestStatus = viewModel::clearSpeechTestStatus,
+                onClearDiagnosticsLog = viewModel::clearDiagnosticsLog,
                 onToggleBackgroundVideo = viewModel::toggleBackgroundVideo,
                 onBackgroundVideoOpacityChange = viewModel::setBackgroundVideoOpacity,
                 onToggleLauncherChrome = viewModel::toggleLauncherChrome,
