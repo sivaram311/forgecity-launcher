@@ -4,6 +4,7 @@ import android.content.Context
 import buzz.delena.forgecity.assistant.rewrite.AgentPortalRewriteClient
 import buzz.delena.forgecity.assistant.rewrite.RewriteRequest
 import buzz.delena.forgecity.assistant.rewrite.RewriteResult
+import buzz.delena.forgecity.assistant.gemini.PromptModeValidator
 import java.util.concurrent.Executors
 
 class SpeechModeTestRunner(context: Context) : AutoCloseable {
@@ -87,6 +88,12 @@ class SpeechModeTestRunner(context: Context) : AutoCloseable {
                     onStatus("GEMINI AUDIO failed: key missing")
                     return
                 }
+                val promptCheck = PromptModeValidator.validate(mode, config.promptTemplate)
+                if (!promptCheck.ok) {
+                    ForgeCityTtsDiagnostics.warn("test_blocked", "reason=prompt_invalid")
+                    onStatus(promptCheck.message ?: "GEMINI AUDIO prompt invalid")
+                    return
+                }
                 onStatus("Testing Gemini native audio…")
                 executor.execute {
                     cascadeOrchestrator.runGeminiOnly(
@@ -102,6 +109,12 @@ class SpeechModeTestRunner(context: Context) : AutoCloseable {
                 }
             }
             AssistantSpeechMode.SMART_CASCADE -> {
+                val promptCheck = PromptModeValidator.validate(mode, config.promptTemplate)
+                if (!promptCheck.ok) {
+                    ForgeCityTtsDiagnostics.warn("test_blocked", "reason=prompt_invalid")
+                    onStatus(promptCheck.message ?: "CASCADE prompt invalid for Gemini audio")
+                    return
+                }
                 onStatus("Testing Gemini audio → Portal → device cascade…")
                 executor.execute {
                     cascadeOrchestrator.run(

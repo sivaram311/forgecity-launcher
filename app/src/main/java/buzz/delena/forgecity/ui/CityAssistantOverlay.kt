@@ -48,10 +48,14 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import buzz.delena.forgecity.assistant.AssistantSpeechMode
 import buzz.delena.forgecity.assistant.AssistantUiEvent
+import buzz.delena.forgecity.assistant.gemini.AudioPromptPresets
+import buzz.delena.forgecity.assistant.gemini.PromptModeValidator
 import kotlinx.coroutines.delay
 
 @Composable
@@ -322,7 +326,21 @@ fun AssistantSettingsCard(
     var geminiKeyDraft by remember(geminiApiKey) { mutableStateOf(geminiApiKey) }
     var templateDraft by remember(promptTemplate) { mutableStateOf(promptTemplate) }
     var copyHint by remember { mutableStateOf<String?>(null) }
+    var revealPortalKey by remember { mutableStateOf(false) }
+    var revealGeminiKey by remember { mutableStateOf(false) }
+    var diagnosticsExpanded by remember { mutableStateOf(true) }
     val clipboard = LocalClipboardManager.current
+    val promptValidation = remember(speechMode, templateDraft) {
+        PromptModeValidator.validate(speechMode, templateDraft)
+    }
+    val testEnabled = remember(speechMode, templateDraft) {
+        PromptModeValidator.canRunTest(speechMode, templateDraft)
+    }
+    val showGeminiCreds = speechMode == AssistantSpeechMode.GEMINI_TAMIL ||
+        speechMode == AssistantSpeechMode.SMART_CASCADE
+    val showPortalCreds = speechMode == AssistantSpeechMode.AGENT_PORTAL_TAMIL ||
+        speechMode == AssistantSpeechMode.SMART_CASCADE
+    val showAudioPrompt = showGeminiCreds
     LaunchedEffect(speechTestStatus) {
         if (speechTestStatus == null) return@LaunchedEffect
         delay(8_000)
@@ -380,124 +398,185 @@ fun AssistantSettingsCard(
             color = Color(0x88FFF6F0),
             fontSize = 10.sp,
         )
-        Text(
-            text = "Gemini audio prompt",
-            color = Color(0xFFE8A15A),
-            fontSize = 11.sp,
-            fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.padding(top = 6.dp),
-        )
-        RemoteMultilineField(
-            value = templateDraft,
-            onValueChange = {
-                templateDraft = it
-                onPromptTemplateChange(it)
-            },
-            placeholder = "{appLabel} {title} {text} {maxChars}",
-            minLines = 4,
-        )
-        Text(
-            text = "Placeholders: {appLabel} {title} {text} {maxChars}. Sent to Gemini TTS (native audio).",
-            color = Color(0x77FFF6F0),
-            fontSize = 9.sp,
-        )
-        Text(
-            text = "Gemini native audio",
-            color = Color(0xFFE8A15A),
-            fontSize = 11.sp,
-            fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.padding(top = 6.dp),
-        )
-        RemoteTextField(
-            value = geminiModel,
-            onValueChange = onGeminiModelChange,
-            placeholder = "gemini-3.1-flash-tts-preview",
-        )
-        RemoteTextField(
-            value = geminiVoice,
-            onValueChange = onGeminiVoiceChange,
-            placeholder = "Kore",
-        )
-        RemoteTextField(
-            value = geminiLanguageCode,
-            onValueChange = onGeminiLanguageCodeChange,
-            placeholder = "ta-IN",
-        )
-        RemoteTextField(
-            value = geminiKeyDraft,
-            onValueChange = { geminiKeyDraft = it },
-            placeholder = "Gemini API key",
-        )
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
+
+        if (showAudioPrompt) {
             Text(
-                if (geminiApiKeyConfigured) "Gemini key configured" else "No Gemini key saved",
-                color = if (geminiApiKeyConfigured) Color(0xFF4FD1C5) else Color(0x99FFF6F0),
-                fontSize = 10.sp,
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            Text(
-                "Save Gemini key",
+                text = "Speech engine — audio speak prompt",
                 color = Color(0xFFE8A15A),
                 fontSize = 11.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(top = 8.dp),
+            )
+            Text(
+                text = "Native audio needs speak-aloud text (not a rewrite script).",
+                color = Color(0x88FFF6F0),
+                fontSize = 9.sp,
+            )
+            Row(
+                horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(6.dp),
                 modifier = Modifier
-                    .clickable { onSaveGeminiApiKey(geminiKeyDraft) }
-                    .padding(8.dp),
+                    .fillMaxWidth()
+                    .padding(top = 4.dp),
+            ) {
+                AudioPromptPresets.ALL.forEach { preset ->
+                    Text(
+                        text = preset.label,
+                        color = Color(0xFF4FD1C5),
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier
+                            .background(Color(0x55302A38), RoundedCornerShape(8.dp))
+                            .clickable {
+                                templateDraft = preset.template
+                                onPromptTemplateChange(preset.template)
+                            }
+                            .padding(horizontal = 8.dp, vertical = 6.dp),
+                    )
+                }
+            }
+            RemoteMultilineField(
+                value = templateDraft,
+                onValueChange = {
+                    templateDraft = it
+                    onPromptTemplateChange(it)
+                },
+                placeholder = "Synthesize speech… #### TRANSCRIPT … {appLabel} {title} {text}",
+                minLines = 4,
             )
+            if (!promptValidation.ok && promptValidation.message != null) {
+                Text(
+                    text = promptValidation.message!!,
+                    color = Color(0xFFFF8A80),
+                    fontSize = 10.sp,
+                    modifier = Modifier.padding(top = 4.dp),
+                )
+            } else {
+                Text(
+                    text = "Placeholders OK: {appLabel} {title} {text} {maxChars}",
+                    color = Color(0x77FFF6F0),
+                    fontSize = 9.sp,
+                )
+            }
         }
-        Text(
-            text = "Agent Portal (tier 2)",
-            color = Color(0xFFE8A15A),
-            fontSize = 11.sp,
-            fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.padding(top = 6.dp),
-        )
-        RemoteTextField(
-            value = rewriteEndpoint,
-            onValueChange = onRewriteEndpointChange,
-            placeholder = "https://portal.example/api/forgecity/rewrite",
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        RemoteTextField(
-            value = apiKeyDraft,
-            onValueChange = { apiKeyDraft = it },
-            placeholder = "X-ForgeCity-Key",
-        )
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
+
+        if (showGeminiCreds) {
             Text(
-                if (apiKeyConfigured) "API key configured" else "No API key saved",
-                color = if (apiKeyConfigured) Color(0xFF4FD1C5) else Color(0x99FFF6F0),
-                fontSize = 10.sp,
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            Text(
-                "Save Portal key",
+                text = "Gemini credentials",
                 color = Color(0xFFE8A15A),
                 fontSize = 11.sp,
-                modifier = Modifier
-                    .clickable {
-                        onSaveApiKey(apiKeyDraft)
-                    }
-                    .padding(8.dp),
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(top = 8.dp),
+            )
+            RemoteTextField(
+                value = geminiModel,
+                onValueChange = onGeminiModelChange,
+                placeholder = "gemini-3.1-flash-tts-preview",
+            )
+            RemoteTextField(
+                value = geminiVoice,
+                onValueChange = onGeminiVoiceChange,
+                placeholder = "Kore",
+            )
+            RemoteTextField(
+                value = geminiLanguageCode,
+                onValueChange = onGeminiLanguageCodeChange,
+                placeholder = "ta-IN (prompt hint only)",
+            )
+            RemoteTextField(
+                value = geminiKeyDraft,
+                onValueChange = { geminiKeyDraft = it },
+                placeholder = "Gemini API key",
+                masked = !revealGeminiKey,
+            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    if (geminiApiKeyConfigured) "Gemini key configured" else "No Gemini key saved",
+                    color = if (geminiApiKeyConfigured) Color(0xFF4FD1C5) else Color(0x99FFF6F0),
+                    fontSize = 10.sp,
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    if (revealGeminiKey) "Hide" else "Reveal",
+                    color = Color(0xFF4FD1C5),
+                    fontSize = 11.sp,
+                    modifier = Modifier
+                        .clickable { revealGeminiKey = !revealGeminiKey }
+                        .padding(8.dp),
+                )
+                Text(
+                    "Save Gemini key",
+                    color = Color(0xFFE8A15A),
+                    fontSize = 11.sp,
+                    modifier = Modifier
+                        .clickable { onSaveGeminiApiKey(geminiKeyDraft) }
+                        .padding(8.dp),
+                )
+            }
+        }
+
+        if (showPortalCreds) {
+            Text(
+                text = "Agent Portal credentials",
+                color = Color(0xFFE8A15A),
+                fontSize = 11.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(top = 8.dp),
+            )
+            RemoteTextField(
+                value = rewriteEndpoint,
+                onValueChange = onRewriteEndpointChange,
+                placeholder = "https://portal.example/api/forgecity/rewrite",
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            RemoteTextField(
+                value = apiKeyDraft,
+                onValueChange = { apiKeyDraft = it },
+                placeholder = "X-ForgeCity-Key",
+                masked = !revealPortalKey,
+            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    if (apiKeyConfigured) "API key configured" else "No API key saved",
+                    color = if (apiKeyConfigured) Color(0xFF4FD1C5) else Color(0x99FFF6F0),
+                    fontSize = 10.sp,
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    if (revealPortalKey) "Hide" else "Reveal",
+                    color = Color(0xFF4FD1C5),
+                    fontSize = 11.sp,
+                    modifier = Modifier
+                        .clickable { revealPortalKey = !revealPortalKey }
+                        .padding(8.dp),
+                )
+                Text(
+                    "Save Portal key",
+                    color = Color(0xFFE8A15A),
+                    fontSize = 11.sp,
+                    modifier = Modifier
+                        .clickable { onSaveApiKey(apiKeyDraft) }
+                        .padding(8.dp),
+                )
+            }
+            Text(
+                "Keys stay Keystore-encrypted at rest. Empty save clears. Avoid screenshots.",
+                color = Color(0x77FFF6F0),
+                fontSize = 9.sp,
             )
         }
+
         Text(
-            "Saved key is visible here for setup and encrypted at rest by Android Keystore. " +
-                "Do not share screenshots. Saving an empty field clears it.",
-            color = Color(0x77FFF6F0),
-            fontSize = 9.sp,
-        )
-        Text(
-            text = "TEST TTS text",
+            text = "TEST TTS",
             color = Color(0xFFE8A15A),
             fontSize = 11.sp,
             fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.padding(top = 6.dp),
+            modifier = Modifier.padding(top = 8.dp),
         )
         RemoteMultilineField(
             value = speechTestText,
@@ -510,18 +589,18 @@ fun AssistantSettingsCard(
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text(
-                text = "Test current speech mode",
+                text = if (testEnabled) "Test current speech mode" else "Fix prompt / pick a mode",
                 color = Color(0xFFFFF6F0),
                 fontSize = 11.sp,
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(
                 text = "TEST TTS",
-                color = Color(0xFF4FD1C5),
+                color = if (testEnabled) Color(0xFF4FD1C5) else Color(0x554FD1C5),
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
-                    .clickable(onClick = onTestSpeechMode)
+                    .clickable(enabled = testEnabled, onClick = onTestSpeechMode)
                     .padding(8.dp),
             )
         }
@@ -532,75 +611,91 @@ fun AssistantSettingsCard(
                 fontSize = 10.sp,
             )
         }
-        Text(
-            text = "Speech diagnostics log",
-            color = Color(0xFFE8A15A),
-            fontSize = 11.sp,
-            fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.padding(top = 8.dp),
-        )
-        Text(
-            text = "Append-only safe events (no keys / notification text). " +
-                "COPY → paste into chat with the agent. Also: adb logcat -s ForgeCityTTS",
-            color = Color(0x77FFF6F0),
-            fontSize = 9.sp,
-        )
-        BasicTextField(
-            value = diagnosticsLog.ifBlank { "(empty — run TEST TTS or wait for a spoken notification)" },
-            onValueChange = {},
-            readOnly = true,
-            textStyle = TextStyle(
-                color = Color(0xFFB8F0E8),
-                fontSize = 9.sp,
-                fontFamily = FontFamily.Monospace,
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 4.dp)
-                .heightIn(min = 96.dp, max = 180.dp)
-                .background(Color(0xFF0C0A12), RoundedCornerShape(8.dp))
-                .padding(8.dp)
-                .verticalScroll(rememberScrollState()),
-        )
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { diagnosticsExpanded = !diagnosticsExpanded }
+                .padding(top = 8.dp),
         ) {
             Text(
-                text = "COPY LOG",
-                color = Color(0xFF4FD1C5),
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .clickable {
-                        val text = diagnosticsLog.trim()
-                        if (text.isEmpty()) {
-                            copyHint = "Log empty"
-                        } else {
-                            clipboard.setText(AnnotatedString(text))
-                            copyHint = "Copied — paste to agent"
-                        }
-                    }
-                    .padding(8.dp),
-            )
-            Text(
-                text = "CLEAR",
+                text = "Speech diagnostics log",
                 color = Color(0xFFE8A15A),
                 fontSize = 11.sp,
                 fontWeight = FontWeight.SemiBold,
-                modifier = Modifier
-                    .clickable(onClick = onClearDiagnosticsLog)
-                    .padding(8.dp),
             )
             Spacer(modifier = Modifier.weight(1f))
-            if (copyHint != null) {
-                Text(
-                    text = copyHint!!,
-                    color = Color(0xFF4FD1C5),
+            Text(
+                text = if (diagnosticsExpanded) "Hide" else "Show",
+                color = Color(0xFF4FD1C5),
+                fontSize = 10.sp,
+            )
+        }
+        if (diagnosticsExpanded) {
+            Text(
+                text = "Safe events only (no keys / notification text). COPY → paste to agent.",
+                color = Color(0x77FFF6F0),
+                fontSize = 9.sp,
+            )
+            BasicTextField(
+                value = diagnosticsLog.ifBlank { "(empty — run TEST TTS or wait for a spoken notification)" },
+                onValueChange = {},
+                readOnly = true,
+                textStyle = TextStyle(
+                    color = Color(0xFFB8F0E8),
                     fontSize = 9.sp,
+                    fontFamily = FontFamily.Monospace,
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp)
+                    .heightIn(min = 72.dp, max = 160.dp)
+                    .background(Color(0xFF0C0A12), RoundedCornerShape(8.dp))
+                    .padding(8.dp)
+                    .verticalScroll(rememberScrollState()),
+            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    text = "COPY LOG",
+                    color = Color(0xFF4FD1C5),
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .clickable {
+                            val text = diagnosticsLog.trim()
+                            if (text.isEmpty()) {
+                                copyHint = "Log empty"
+                            } else {
+                                clipboard.setText(AnnotatedString(text))
+                                copyHint = "Copied — paste to agent"
+                            }
+                        }
+                        .padding(8.dp),
                 )
+                Text(
+                    text = "CLEAR",
+                    color = Color(0xFFE8A15A),
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier
+                        .clickable(onClick = onClearDiagnosticsLog)
+                        .padding(8.dp),
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                if (copyHint != null) {
+                    Text(
+                        text = copyHint!!,
+                        color = Color(0xFF4FD1C5),
+                        fontSize = 9.sp,
+                    )
+                }
             }
         }
+
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = "Atmosphere",
@@ -696,11 +791,17 @@ private fun RemoteTextField(
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String,
+    masked: Boolean = false,
 ) {
     BasicTextField(
         value = value,
         onValueChange = onValueChange,
         singleLine = true,
+        visualTransformation = if (masked) {
+            PasswordVisualTransformation()
+        } else {
+            VisualTransformation.None
+        },
         textStyle = TextStyle(color = Color(0xFFFFF6F0), fontSize = 10.sp),
         cursorBrush = SolidColor(Color(0xFFE8A15A)),
         modifier = Modifier

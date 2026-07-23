@@ -17,17 +17,39 @@ git checkout main
 
 ## Download (prerelease debug APK)
 
-Latest (**0.6.1** in-app TTS error log):
+Latest (**0.7.0** Assistant Clarity):
 
 ```powershell
-curl.exe -L -o forgecity-0.6.1-tts-error-log-dev-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.6.1-tts-error-log-dev/forgecity-0.6.1-tts-error-log-dev-debug.apk
-Get-FileHash .\forgecity-0.6.1-tts-error-log-dev-debug.apk -Algorithm SHA256
-# expect BE2F45E5EF46F7CD11F4B3CBB0A03A3CD0DA49E8889E7AA0A054699600568383
-adb install -r .\forgecity-0.6.1-tts-error-log-dev-debug.apk
+curl.exe -L -o forgecity-0.7.0-assistant-clarity-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.7.0-assistant-clarity-dev/forgecity-0.7.0-assistant-clarity-dev-debug.apk
+Get-FileHash .\forgecity-0.7.0-assistant-clarity-dev-debug.apk -Algorithm SHA256
+# expect CA5EE2B60FF8DBF75F63A40BDA55672D799874689CA8B346FDD201F579A408FC
+adb install -r .\forgecity-0.7.0-assistant-clarity-dev-debug.apk
 ```
 
+Prior tip (**0.6.1** diagnostics): SHA
+`BE2F45E5EF46F7CD11F4B3CBB0A03A3CD0DA49E8889E7AA0A054699600568383`.
+
 Also grant: Home role, Usage Access, Notification Access (allowlist apps before speech).
+
+### Assistant Clarity (0.7.0)
+
+Neon sheet, mode-first — only the fields that match the active speech path.
+
+1. **Mode-gated fields:** Gemini key / model / voice / audio prompt appear for
+   **GEMINI AUDIO** and **CASCADE**. Portal endpoint + rewrite key appear for
+   **PORTAL** (and cascade fallthrough). DIRECT / OFF stay lean.
+2. **`PromptModeValidator`:** rewrite-style prompts (e.g. “spoken script”,
+   “translate the notification”) are rejected for GEMINI AUDIO / CASCADE.
+   Need a speak-aloud cue (“Synthesize speech”, “Read aloud”, …).
+3. **Presets:** chips load **Tamil clear**, **Kongu friend**, or **English brief**
+   (`AudioPromptPresets`) — all validator-safe for native audio.
+4. **Masked keys:** API key fields show dots by default; reveal on tap. Keystore
+   stays encrypted at rest; viewing does not re-wrap the secret.
+5. **TEST TTS:** disabled when the current mode’s audio prompt fails validation
+   (or mode is OFF). Valid DIRECT / PORTAL still run as before.
+6. **Diagnostics:** **COPY LOG** / **CLEAR** unchanged — no keys, titles, bodies,
+   or rewrite text in the ring buffer.
 
 ### City-first chrome (0.5.0)
 
@@ -65,19 +87,20 @@ Also grant: Home role, Usage Access, Notification Access (allowlist apps before 
 3. Allowlist at least one messaging app; send a test notification.
 4. Expect Tamil TTS only; portal down / bad key / missing Tamil voice → silent.
 
-### Built-in speech test + diagnostics (0.4.1 → 0.6.1)
+### Built-in speech test + diagnostics (0.4.1 → 0.7.0)
 
-1. Select a speech mode, then tap **TEST TTS**.
+1. Select a speech mode, then tap **TEST TTS** (enabled only when
+   `PromptModeValidator.canRunTest` passes — see Assistant Clarity above).
 2. DIRECT speaks a fixed local English test line. PORTAL sends a fixed synthetic
    test sentence (never notification content), validates the Tamil response, and
    speaks it using `ta-IN` / `ta`. GEMINI AUDIO / CASCADE use native audio.
 3. The status line reports rewrite/TTS success or failure. `OFF` explains that a
    speech mode must be selected.
-4. **0.6.1:** open the **Speech diagnostics log** box under TEST TTS. It appends
+4. **0.6.1+:** open the **Speech diagnostics log** box under TEST TTS. It appends
    safe events (`I`/`W` + timestamp). Tap **COPY LOG** and paste into agent chat.
    **CLEAR** resets the ring buffer (max 200 lines). Same events also go to logcat.
-5. Saved API keys remain Android-Keystore encrypted at rest but are intentionally
-   visible in the config field for setup. Do not share screenshots of key fields.
+5. **0.7.0:** keys are masked until reveal; still Keystore-encrypted at rest.
+   Do not share screenshots of revealed key fields.
 
 Terminal diagnosis (optional):
 

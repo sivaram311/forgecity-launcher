@@ -5,25 +5,26 @@ Apps become buildings. Habits rebuild districts. A neon city assistant can read
 notifications aloud when you opt in.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher (public)
-**Branch:** `main` · version `0.6.1-tts-error-log-dev`
-**Latest prerelease:** [`v0.6.1-tts-error-log-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.6.1-tts-error-log-dev)
+**Branch:** `main` · version `0.7.0-assistant-clarity-dev`
+**Latest prerelease:** [`v0.7.0-assistant-clarity-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.7.0-assistant-clarity-dev) · prior [`v0.6.1-tts-error-log-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.6.1-tts-error-log-dev)
 
 ## Download
 
 ```powershell
-curl.exe -L -o forgecity-0.6.1-tts-error-log-dev-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.6.1-tts-error-log-dev/forgecity-0.6.1-tts-error-log-dev-debug.apk
-Get-FileHash .\forgecity-0.6.1-tts-error-log-dev-debug.apk -Algorithm SHA256
-# expect BE2F45E5EF46F7CD11F4B3CBB0A03A3CD0DA49E8889E7AA0A054699600568383
-adb install -r .\forgecity-0.6.1-tts-error-log-dev-debug.apk
+curl.exe -L -o forgecity-0.7.0-assistant-clarity-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.7.0-assistant-clarity-dev/forgecity-0.7.0-assistant-clarity-dev-debug.apk
+Get-FileHash .\forgecity-0.7.0-assistant-clarity-dev-debug.apk -Algorithm SHA256
+# expect CA5EE2B60FF8DBF75F63A40BDA55672D799874689CA8B346FDD201F579A408FC
+adb install -r .\forgecity-0.7.0-assistant-clarity-dev-debug.apk
 ```
 
-## What works in 0.6.1-tts-error-log-dev
+## What works in 0.7.0-assistant-clarity-dev
 
-- **In-app speech diagnostics log:** append-only safe events in Assistant settings;
-  **COPY LOG** → paste into chat with the agent (no keys / notification bodies)
-- Plus **0.6.0** premium low-poly 3D city pass
-- Plus **0.5.1** Gemini native audio fix and **0.5.0** UI polish
+- **Assistant Clarity:** mode-gated Gemini vs Portal settings; speak-aloud prompt
+  validation (`PromptModeValidator`); presets Tamil clear / Kongu friend / English brief
+- Masked API keys with reveal; **TEST TTS** gated off when audio prompt invalid
+- Speech diagnostics: **COPY LOG** / **CLEAR** (same privacy rules as 0.6.1)
+- Plus **0.6.x** city 3D + diagnostics, **0.5.x** Gemini audio + UI polish
 - Speech modes: OFF → DIRECT → PORTAL → GEMINI AUDIO → CASCADE
 
 ## Docs

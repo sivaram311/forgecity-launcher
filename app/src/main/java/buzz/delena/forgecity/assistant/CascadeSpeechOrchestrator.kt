@@ -2,6 +2,7 @@ package buzz.delena.forgecity.assistant
 
 import buzz.delena.forgecity.assistant.gemini.GeminiAudioResult
 import buzz.delena.forgecity.assistant.gemini.GeminiAudioTtsClient
+import buzz.delena.forgecity.assistant.gemini.PromptModeValidator
 import buzz.delena.forgecity.assistant.gemini.PromptTemplateFormatter
 import buzz.delena.forgecity.assistant.rewrite.AgentPortalRewriteClient
 import buzz.delena.forgecity.assistant.rewrite.RewriteRequest
@@ -55,6 +56,15 @@ class CascadeSpeechOrchestrator(
         onStatus: ((String) -> Unit)?,
         failMessagePrefix: String,
     ): Boolean {
+        val promptCheck = PromptModeValidator.validate(
+            mode = AssistantSpeechMode.GEMINI_TAMIL,
+            template = config.promptTemplate,
+        )
+        if (!promptCheck.ok) {
+            ForgeCityTtsDiagnostics.warn("cascade_skip", "tier=gemini_audio reason=prompt_invalid")
+            onStatus?.invoke("${promptCheck.message}; $failMessagePrefix")
+            return false
+        }
         val prompt = PromptTemplateFormatter.format(
             template = config.promptTemplate,
             appLabel = input.appLabel,

@@ -6,7 +6,7 @@ story — while staying performant on Snapdragon 7s Gen 2 + Adreno 710 + 120 Hz.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher  
 **Device SoT:** `E:\MyAgent\workflow\devices\REALME-P2-PRO.md`  
-**Last updated:** 2026-07-23 (`0.6.1-tts-error-log-dev` · Grok 4.1 config/roadmap consult)
+**Last updated:** 2026-07-23 (`0.7.0-assistant-clarity-dev` · Assistant Clarity implementing)
 
 ---
 
@@ -179,6 +179,23 @@ Gemini audio is **opt-in** (notification text sent to Google when key is set).
 - Pin TEST TTS; collapse diagnostics
 - Next train theme **0.7 Assistant Clarity**; defer Kongu rewrite→audio two-step to **0.8**
 
+### Phase 3.6 — Assistant Clarity — v0.7.0 (implementing / landed source)
+
+**Theme:** Stable speech · versionCode **19** · `0.7.0-assistant-clarity-dev`  
+**Consult:** [design/GROK-LAUNCHER-CONFIG-ROADMAP.md](design/GROK-LAUNCHER-CONFIG-ROADMAP.md)
+
+| Item | Status |
+|------|--------|
+| Mode-gated Gemini vs Portal fields | 🔄 implementing / landed source |
+| `PromptModeValidator` (reject rewrite prompts for GEMINI AUDIO / CASCADE) | ✅ source |
+| Audio presets: Tamil clear / Kongu friend / English brief | ✅ source |
+| Masked API keys + reveal | 🔄 implementing / landed source |
+| TEST TTS disabled when audio prompt invalid | ✅ source (`canRunTest`) |
+| Diagnostics COPY LOG / CLEAR | ✅ carried from 0.6.1 |
+| Debug APK + SHA | ⏳ `CA5EE2B60FF8DBF75F63A40BDA55672D799874689CA8B346FDD201F579A408FC` |
+| Realme E2E | ⏳ #16 |
+| Kongu rewrite→audio two-step UI | ❌ deferred to **0.8** |
+
 ### Phase 4 — AI Agents & Polish — v0.4.0 “Symphony” (~6–8 weeks)
 
 - Five in-city agents
@@ -245,17 +262,19 @@ See `agents/crew/CREW.md` and `agents/roles/`.
 
 ## 9. Immediate next actions
 
-1. **P1 — Gemini cascade (`0.4.3`):** ship `SMART_CASCADE`, pre-template editor,
-   Gemini key/model config, TEST TTS + listener routing (G1–G4 parallel).
-2. **P0 device lab:** Realme P2 Pro E2E for immersive chrome, video, DIRECT,
-   Portal Tamil, and Gemini cascade (CONSCIOUS #16).
+1. **P0 — Assistant Clarity (`0.7.0`):** finish mode-gated UI + masked keys wire;
+   green unit/lint/assemble; fill APK SHA; tag prerelease.
+2. **P0 device lab:** Realme P2 Pro E2E for chrome, video, DIRECT, Portal Tamil,
+   Gemini cascade, and Clarity validation (CONSCIOUS #16).
 3. **Tag:** annotated production tags only after Realme device GO.
-4. **Later:** weather / quest markers / in-city agents (Phase 4).
+4. **0.8 / later:** Kongu rewrite→audio two-step; weather / quest markers /
+   in-city agents.
 
 **Rejected for launcher:** Cloudflare Workers AI / GLM remote Worker integration.
 
-**Shipped:** Portal Tamil rewrite (`0.4.0`–`0.4.2`), TTS diagnostics (`0.4.1`),
-rewrite contract fix (`0.4.2`). **In flight:** Gemini tier (`0.4.3`).
+**Shipped:** Portal Tamil (`0.4.0`–`0.4.2`), Gemini audio cascade (`0.4.3`–`0.5.1`),
+UI polish (`0.5.0`), city 3D (`0.6.0`), diagnostics log (`0.6.1`).
+**In flight:** Assistant Clarity (`0.7.0`).
 
 ---
 

@@ -390,3 +390,20 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | Pointers | PASS | ROADMAP + HANDOFF + README |
 | Code / APK | N/A | docs-only; versionCode still 18 |
 | Realme E2E (#16) | N/A | docs-only push |
+
+## 2026-07-23 — 0.7.0 Assistant Clarity
+
+| Check | Result | Notes |
+|------|--------|-------|
+| versionName / versionCode | PASS | `0.7.0-assistant-clarity-dev` · **19** |
+| Mode-gated Gemini vs Portal fields | PASS | shown only for matching speech modes |
+| `PromptModeValidator` | PASS | rewrite markers rejected for GEMINI AUDIO / CASCADE |
+| Audio presets | PASS | Tamil clear / Kongu friend / English brief |
+| Masked API keys + reveal | PASS | PasswordVisualTransformation; Reveal toggle |
+| TEST TTS gate | PASS | `canRunTest` + runner/orchestrator early skip |
+| Diagnostics COPY LOG / CLEAR | PASS | same privacy invariants as 0.6.1 |
+| `testDebugUnitTest` | PASS | includes `PromptModeValidatorTest` |
+| `lintDebug` / `assembleDebug` | PASS | versionCode 19 |
+| APK SHA-256 | `CA5EE2B60FF8DBF75F63A40BDA55672D799874689CA8B346FDD201F579A408FC` | local dist (~16.9 MB) |
+| Realme E2E (#16) | PENDING | debug prerelease; not production |
+| Reviewer #17 | PENDING | `agents/hires/SIGN-OFF-v0.7.0-assistant-clarity.md` |
