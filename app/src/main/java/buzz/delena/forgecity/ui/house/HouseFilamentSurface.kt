@@ -12,7 +12,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,6 +46,7 @@ import io.github.sceneview.rememberMainLightNode
 import io.github.sceneview.rememberModelInstance
 import io.github.sceneview.rememberModelLoader
 import io.github.sceneview.rememberView
+import buzz.delena.forgecity.house.DustMoteCloud
 import buzz.delena.forgecity.house.FilamentHouseLighting
 import buzz.delena.forgecity.house.HouseWorld
 import buzz.delena.forgecity.house.character.CharacterRole
@@ -54,9 +58,9 @@ private const val HOUSE_ASSET = "filament/house_shell.glb"
 private const val CHAR_ASSET = "filament/char_idle.glb"
 
 /**
- * Filament house HOME — 0.10.2 BlueHourInterior (Grok realism vs Production House).
+ * Filament house HOME — 0.10.3 Adreno dust (Grok next realism slice).
  *
- * TextureSurface + fog + dual lights + exposure + upgraded procedural GLB.
+ * Shadows on HIGH budget, floating dust motes, window-fill pulse.
  */
 @Composable
 fun HouseFilamentSurface(
@@ -74,13 +78,15 @@ fun HouseFilamentSurface(
     val activeCharacters = remember(maxCharacters) {
         DefaultIdleHouseCharacters.take(maxCharacters.coerceAtLeast(0))
     }
+    val dustCount = DustMoteCloud.countFor(allowsSoftShadows, ambientEnabled)
+    val dustSeeds = remember(dustCount) { DustMoteCloud.seeds(dustCount) }
+    var timeSec by remember { mutableFloatStateOf(0f) }
 
     val engine = rememberEngine()
     val modelLoader = rememberModelLoader(engine)
     val view = rememberView(engine)
     val environmentLoader = rememberEnvironmentLoader(engine)
 
-    // Neutral IBL from SceneView assets; day/night mood driven by lights + fog + exposure.
     val environment = rememberEnvironment(environmentLoader)
     SideEffect {
         environment.indirectLight?.intensity = lighting.iblIntensity
@@ -93,7 +99,6 @@ fun HouseFilamentSurface(
     }
     SideEffect {
         cameraNode.setExposure(lighting.exposure)
-        // Tint sky each mode without rebuilding Environment (4.15 has no env key).
         runCatching {
             environment.skybox?.setColor(
                 floatArrayOf(lighting.skyTopR, lighting.skyTopG, lighting.skyTopB, 1f),
@@ -115,13 +120,12 @@ fun HouseFilamentSurface(
         isShadowCaster = allowsSoftShadows
     }
 
-    // Apply fog + mild bloom after RenderQuality preset (keyed SideEffect).
     SideEffect {
+        runCatching { view.setShadowingEnabled(allowsSoftShadows) }
         try {
             view.fogOptions = view.fogOptions.apply {
                 enabled = ambientEnabled
                 density = lighting.fogDensity
-                // Filament linear-ish depth fog; distance is near plane of fog.
                 distance = 2.5f
                 maximumOpacity = if (night) 0.55f else 0.40f
                 color[0] = lighting.fogColorR
@@ -129,7 +133,6 @@ fun HouseFilamentSurface(
                 color[2] = lighting.fogColorB
             }
         } catch (_: Throwable) {
-            // Older bindings may lack fog — lighting still upgrades mood.
         }
         try {
             view.bloomOptions = view.bloomOptions.apply {
@@ -145,6 +148,9 @@ fun HouseFilamentSurface(
         allowsSoftShadows -> RenderQuality.Default
         else -> RenderQuality.Performance
     }
+    val fillPulse = DustMoteCloud.windowPulse(timeSec)
+    val fillIntensity =
+        (if (ambientEnabled) lighting.fillIntensity else lighting.fillIntensity * 0.3f) * fillPulse
 
     Box(modifier = modifier.fillMaxSize()) {
         SceneView(
@@ -155,13 +161,18 @@ fun HouseFilamentSurface(
             view = view,
             environment = environment,
             mainLightNode = mainLight,
-            fillLightNode = null, // custom warm fill via LightNode in DSL
+            fillLightNode = null,
             cameraNode = cameraNode,
             cameraManipulator = cameraManipulator,
             renderQuality = quality,
             autoCenterContent = false,
             autoFitContent = false,
             isOpaque = true,
+            onFrame = { nanos ->
+                val t = nanos / 1_000_000_000f
+                // Throttle dust/window pulse updates ~30 Hz to limit Compose churn on Adreno 710.
+                if (t - timeSec >= 0.033f) timeSec = t
+            },
             onTouchEvent = { event, hit ->
                 if (event.action != MotionEvent.ACTION_UP) return@SceneView false
                 val id = hit?.node?.name ?: return@SceneView false
@@ -174,10 +185,9 @@ fun HouseFilamentSurface(
                 true
             },
         ) {
-            // Warm window fill (3000K-ish) — Grok MUST-SHIP dual light.
             LightNode(
                 type = LightManager.Type.DIRECTIONAL,
-                intensity = if (ambientEnabled) lighting.fillIntensity else lighting.fillIntensity * 0.3f,
+                intensity = fillIntensity,
                 direction = Direction(lighting.fillDirX, lighting.fillDirY, lighting.fillDirZ),
                 color = colorOf(if (night) Color(0xFFFFC978) else Color(0xFFFFE0B0)),
             )
@@ -187,6 +197,23 @@ fun HouseFilamentSurface(
                     modelInstance = instance,
                     autoAnimate = false,
                     position = Position(x = 0f, y = 0f, z = 0f),
+                )
+            }
+
+            val dustMat = remember {
+                materialLoader.createColorInstance(
+                    color = Color(0x66FFF6E8),
+                    metallic = 0f,
+                    roughness = 1f,
+                )
+            }
+            dustSeeds.forEachIndexed { index, mote ->
+                val (x, y, z) = DustMoteCloud.positionAt(mote, timeSec)
+                CubeNode(
+                    size = Size(0.035f),
+                    materialInstance = dustMat,
+                    position = Position(x = x, y = y, z = z),
+                    apply = { name = "dust_$index" },
                 )
             }
 

@@ -9,9 +9,9 @@
 
 | Field | Value |
 |-------|-------|
-| versionName | `0.10.2-blue-hour-interior-dev` · versionCode **24** |
-| Latest release | [`v0.10.2-blue-hour-interior-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.10.2-blue-hour-interior-dev) |
-| APK SHA-256 | `7C8232254E87C0ADA998C8498665844480F502AD1B1A83915C6E2F16C8384597` |
+| versionName | `0.10.3-adreno-dust-dev` · versionCode **25** |
+| Latest release | [`v0.10.3-adreno-dust-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.10.3-adreno-dust-dev) |
+| APK SHA-256 | `870C19820A8BF6EA9ABCE179EB24E4F80B7D7282DBE4C7B9E0779827CF1CC7C7` |
 | Prior tip | [`v0.10.0-filament-house-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.10.0-filament-house-dev) · SHA `3D958C94…` |
 
 ## Waves complete (0.8 → 0.10)

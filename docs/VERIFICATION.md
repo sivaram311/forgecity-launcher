@@ -477,3 +477,12 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | assemble | PASS | SHA `7C8232254E87C0ADA998C8498665844480F502AD1B1A83915C6E2F16C8384597` |
 | #16 E2E | PENDING | no ADB device |
 
+
+## 2026-07-23 — 0.10.3 Adreno dust
+| Check | Result | Notes |
+|------|--------|-------|
+| Dust/shadows/pulse | PASS | DustMoteCloud 32/64 |
+| versionCode | PASS | **25** |
+| SHA | PASS | `870C19820A8BF6EA9ABCE179EB24E4F80B7D7282DBE4C7B9E0779827CF1CC7C7` |
+| #16 | PENDING | |
+

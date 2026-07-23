@@ -253,6 +253,23 @@ class MeshBuilder:
             glow, material=MAT_WINDOW,
         )
 
+    def add_floor_lamp(self, cx: float, cz: float) -> None:
+        pole_h = 1.45
+        pole_r = 0.018
+        shade = rgba(0xFFFFB040)
+        metal = rgba(0xFF4A4E54)
+        self.add_box(
+            cx - pole_r, FLOOR_T, cz - pole_r,
+            cx + pole_r, FLOOR_T + pole_h, cz + pole_r,
+            metal,
+        )
+        y0 = FLOOR_T + pole_h
+        self.add_box(
+            cx - 0.1, y0, cz - 0.1,
+            cx + 0.1, y0 + 0.12, cz + 0.1,
+            shade, material=MAT_WINDOW,
+        )
+
     def add_table_chairs(
         self,
         cx: float,
@@ -355,7 +372,7 @@ class MeshBuilder:
                     metallicFactor=0.0,
                     roughnessFactor=0.35,
                 ),
-                emissiveFactor=[0.85, 0.72, 0.45],
+                emissiveFactor=[0.95, 0.80, 0.50],
                 doubleSided=True,
             ),
         }
@@ -412,6 +429,7 @@ def _add_cable_runs(mb: MeshBuilder) -> None:
     mb.add_box(2.88, FLOOR_T, 3.05, 2.88 + w, FLOOR_T + h, 5.95, cable)
     mb.add_box(0.05, FLOOR_T, 3.05, 2.88, FLOOR_T + h, 3.05 + d, cable)
     mb.add_box(3.05, FLOOR_T, 3.05, 3.05 + d, FLOOR_T + h, 5.95, cable)
+    mb.add_box(3.05, FLOOR_T, 6.0, 3.05 + d, FLOOR_T + h, 8.85, cable)
 
 
 def _add_furniture(mb: MeshBuilder) -> None:
@@ -426,7 +444,9 @@ def _add_furniture(mb: MeshBuilder) -> None:
     mb.add_box(0.35, FLOOR_T + 0.9, 2.15, 2.65, FLOOR_T + 0.95, 2.75, rgba(0xFF9A9088))
 
     mb.add_table_chairs(5.0, 1.6, 1.1, 0.7, wood, seat)
+    mb.add_floor_lamp(3.55, 0.75)
     mb.add_table_chairs(5.0, 4.5, 1.0, 0.55, wood, seat)
+    mb.add_floor_lamp(6.35, 3.55)
 
     mb.add_box(0.4, FLOOR_T, 7.0, 2.5, FLOOR_T + 0.45, 8.2, wood)
     mb.add_box(0.5, FLOOR_T + 0.45, 7.1, 2.4, FLOOR_T + 0.55, 8.1, linen)
