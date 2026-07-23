@@ -486,3 +486,9 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | SHA | PASS | `870C19820A8BF6EA9ABCE179EB24E4F80B7D7282DBE4C7B9E0779827CF1CC7C7` |
 | #16 | PENDING | |
 
+
+## 2026-07-23 — 0.10.4 white-screen exposure fix
+| Check | Result | Notes |
+| exposure API | PASS | f-stop/shutter/ISO |
+| SHA | PASS | `AF48EEA7D44FD3838724D45C68D65FC8ECBC719D7411577C36B73F87F55E7224` |
+

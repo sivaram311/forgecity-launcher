@@ -58,9 +58,9 @@ private const val HOUSE_ASSET = "filament/house_shell.glb"
 private const val CHAR_ASSET = "filament/char_idle.glb"
 
 /**
- * Filament house HOME — 0.10.3 Adreno dust (Grok next realism slice).
+ * Filament house HOME — 0.10.4 white-screen exposure fix (Grok).
  *
- * Shadows on HIGH budget, floating dust motes, window-fill pulse.
+ * Bare setExposure(1.x) EV blew the frame white while orbit still worked.
  */
 @Composable
 fun HouseFilamentSurface(
@@ -95,10 +95,11 @@ fun HouseFilamentSurface(
     val cameraNode = rememberCameraNode(engine) {
         position = Position(x = 4.5f, y = 9.2f, z = 12.2f)
         lookAt(Position(x = 4.5f, y = 0.6f, z = 4.5f))
-        setExposure(lighting.exposure)
+        // Photographic exposure — NEVER bare EV float (1.15 blew the frame to white).
+        setExposure(lighting.aperture, lighting.shutterSpeed, lighting.iso)
     }
     SideEffect {
-        cameraNode.setExposure(lighting.exposure)
+        cameraNode.setExposure(lighting.aperture, lighting.shutterSpeed, lighting.iso)
         runCatching {
             environment.skybox?.setColor(
                 floatArrayOf(lighting.skyTopR, lighting.skyTopG, lighting.skyTopB, 1f),
@@ -136,8 +137,8 @@ fun HouseFilamentSurface(
         }
         try {
             view.bloomOptions = view.bloomOptions.apply {
-                enabled = ambientEnabled
-                strength = if (allowsSoftShadows) lighting.bloomStrength else lighting.bloomStrength * 0.5f
+                enabled = ambientEnabled && lighting.bloomEnabled
+                strength = lighting.bloomStrength
             }
         } catch (_: Throwable) {
         }

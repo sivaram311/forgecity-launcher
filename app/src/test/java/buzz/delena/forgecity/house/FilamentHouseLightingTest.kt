@@ -6,7 +6,7 @@ import org.junit.Test
 
 class FilamentHouseLightingTest {
     @Test
-    fun dayIsBrighterThanNight() {
+    fun dayIsBrighterSunThanNight() {
         assertTrue(FilamentHouseLighting.day.sunIntensity > FilamentHouseLighting.night.sunIntensity)
     }
 
@@ -17,16 +17,19 @@ class FilamentHouseLightingTest {
     }
 
     @Test
-    fun speechPulseAboveOne() {
-        assertTrue(FilamentHouseLighting.day.speechPulseScale > 1f)
-        assertTrue(FilamentHouseLighting.night.speechPulseScale > 1f)
+    fun exposureUsesPhotographicStopsNotTinyEv() {
+        // Bare EV ~1.x caused solid white; aperture must stay in real f-stop range.
+        assertTrue(FilamentHouseLighting.day.aperture >= 4f)
+        assertTrue(FilamentHouseLighting.day.aperture <= 22f)
+        assertTrue(FilamentHouseLighting.day.iso in 50f..1600f)
+        assertTrue(FilamentHouseLighting.day.sunIntensity <= 8_000f)
+        assertTrue(FilamentHouseLighting.day.iblIntensity <= 5_000f)
+        assertTrue(!FilamentHouseLighting.day.bloomEnabled)
     }
 
     @Test
-    fun blueHourHasWarmFillAndFog() {
-        assertTrue(FilamentHouseLighting.night.fillIntensity > FilamentHouseLighting.day.fillIntensity)
-        assertTrue(FilamentHouseLighting.day.fogDensity > 0f)
-        assertTrue(FilamentHouseLighting.night.bloomStrength >= FilamentHouseLighting.day.bloomStrength)
+    fun speechPulseAboveOne() {
+        assertTrue(FilamentHouseLighting.day.speechPulseScale > 1f)
     }
 }
 

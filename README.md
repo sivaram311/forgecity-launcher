@@ -1,25 +1,16 @@
 ﻿# ForgeCity Launcher
 
-Warm Filament house HOME (Adreno dust / BlueHourInterior) for Realme P2 Pro.
-
-**Repo:** https://github.com/sivaram311/forgecity-launcher
-**Branch:** `main` · `0.10.3-adreno-dust-dev`
-**Latest:** [`v0.10.3-adreno-dust-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.10.3-adreno-dust-dev)
+**Latest:** [`v0.10.4-white-screen-fix-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.10.4-white-screen-fix-dev) · vc **26**
 
 ## Download
-
 ```powershell
-curl.exe -L -o forgecity-0.10.3-adreno-dust-dev-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.10.3-adreno-dust-dev/forgecity-0.10.3-adreno-dust-dev-debug.apk
-Get-FileHash .\forgecity-0.10.3-adreno-dust-dev-debug.apk -Algorithm SHA256
-# expect 870C19820A8BF6EA9ABCE179EB24E4F80B7D7282DBE4C7B9E0779827CF1CC7C7
+curl.exe -L -o forgecity-0.10.4-white-screen-fix-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.10.4-white-screen-fix-dev/forgecity-0.10.4-white-screen-fix-dev-debug.apk
+Get-FileHash .\forgecity-0.10.4-white-screen-fix-dev-debug.apk -Algorithm SHA256
+# expect AF48EEA7D44FD3838724D45C68D65FC8ECBC719D7411577C36B73F87F55E7224
 ```
 
-## 0.10.3
+## 0.10.4 fix
+White screen + orbit worked = over-exposure. `setExposure(1.15)` was EV100 (near daylight blowout). Now uses photographic f-stop/shutter/ISO; lowered sun/IBL; bloom off by day.
 
-- Dust motes (32/64) + window-fill pulse + HIGH-tier shadows
-- Floor lamps / brighter windows in GLB
-- Grok: `docs/design/GROK-FILAMENT-0.10.3.md`
-- #16 E2E still PENDING
-
-Prior: 0.10.2 BlueHourInterior · 0.10.1 TextureSurface fix
+Grok: `docs/design/GROK-WHITE-SCREEN.md`
