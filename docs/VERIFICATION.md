@@ -438,3 +438,18 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | APK SHA-256 | `D8E66EA9442B9C7F7747FCCA9DCBE3FFE454FA3F886648EEEDE842D461154A7F` | |
 | Filament/glTF | DEFERRED | not in 0.9 |
 | Realme E2E (#16) | PENDING | use DEVICE-E2E-HOUSE-CHECKLIST.md |
+
+## 2026-07-23 — 0.10.0 Filament house (Wave 4)
+
+| Check | Result | Notes |
+|------|--------|-------|
+| versionName / versionCode | PASS | `0.10.0-filament-house-dev` · **22** |
+| SceneView / Filament stack | LANDED | SceneView `4.15.0`; Kotlin `2.3.21` · KSP `2.3.10` |
+| glTF assets | LANDED | `app/src/main/assets/filament/house_shell.glb`, `char_idle.glb` via `tools/generate_house_assets.py` |
+| Filament surface + lighting | LANDED | `HouseFilamentSurface.kt`, `FilamentHouseLighting.kt`, `HouseWorld.kt` |
+| Feature flag | PASS | `HouseFeatureFlags.useFilamentHouse=true` |
+| Fallbacks | PASS | procedural `HouseHomeSurface` if flag false; CityCanvas if house off |
+| Grok ship docs | FILED | `docs/design/GROK-FILAMENT-SHIP.md`, `GROK-FILAMENT-LIGHTING.md` |
+| `testDebugUnitTest` / lint / assemble | PASS | prerelease waiver OK without device |
+| APK SHA-256 | PASS | `3D958C94EA50A82C85A0EF4F01BA6B7AF2C1BB6D5ADCB13BD0C5C6371293D9C2` · `forgecity-0.10.0-filament-house-dev-debug.apk` |
+| Realme E2E (#16) | PENDING | DEVICE-E2E-HOUSE-CHECKLIST.md; prerelease waiver OK |

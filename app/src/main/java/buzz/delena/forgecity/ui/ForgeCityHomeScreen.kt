@@ -64,6 +64,7 @@ import buzz.delena.forgecity.house.HouseFeatureFlags
 import buzz.delena.forgecity.house.HouseRoom as DomainHouseRoom
 import buzz.delena.forgecity.house.PlaceableApp
 import buzz.delena.forgecity.ui.background.CityBackgroundVideo
+import buzz.delena.forgecity.ui.house.HouseFilamentSurface
 import buzz.delena.forgecity.ui.house.HouseHomeSurface
 import buzz.delena.forgecity.ui.house.HouseLabelMarker
 import kotlinx.coroutines.delay
@@ -204,21 +205,38 @@ fun ForgeCityHomeScreen(
         }
 
         if (houseMode) {
-            HouseHomeSurface(
-                markers = houseMarkers,
-                ambientEnabled = ambientEnabled,
-                allowsSoftShadows = allowsSoftShadows,
-                maxCharacters = maxCharacters,
-                assistantSpeaking = assistantSpeaking,
-                night = DayNightCycle.isNight(hourOfDay),
-                onMarkerTap = { marker ->
-                    filtered.firstOrNull { it.id == marker.id }?.let(onBuildingTap)
-                },
-                onMarkerLongPress = { marker ->
-                    filtered.firstOrNull { it.id == marker.id }?.let(onBuildingLongPress)
-                },
-                modifier = Modifier.fillMaxSize(),
-            )
+            val night = DayNightCycle.isNight(hourOfDay)
+            val onTap: (HouseLabelMarker) -> Unit = { marker ->
+                filtered.firstOrNull { it.id == marker.id }?.let(onBuildingTap)
+            }
+            val onLong: (HouseLabelMarker) -> Unit = { marker ->
+                filtered.firstOrNull { it.id == marker.id }?.let(onBuildingLongPress)
+            }
+            if (HouseFeatureFlags.useFilamentHouse) {
+                HouseFilamentSurface(
+                    markers = houseMarkers,
+                    ambientEnabled = ambientEnabled,
+                    allowsSoftShadows = allowsSoftShadows,
+                    maxCharacters = maxCharacters,
+                    assistantSpeaking = assistantSpeaking,
+                    night = night,
+                    onMarkerTap = onTap,
+                    onMarkerLongPress = onLong,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            } else {
+                HouseHomeSurface(
+                    markers = houseMarkers,
+                    ambientEnabled = ambientEnabled,
+                    allowsSoftShadows = allowsSoftShadows,
+                    maxCharacters = maxCharacters,
+                    assistantSpeaking = assistantSpeaking,
+                    night = night,
+                    onMarkerTap = onTap,
+                    onMarkerLongPress = onLong,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
         } else {
             CityCanvas(
                 buildings = filtered,

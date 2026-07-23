@@ -17,7 +17,17 @@ git checkout main
 
 ## Download (prerelease debug APK)
 
-Latest (**0.9.0** house characters):
+Tip (**0.10.0** Filament house) — tag `v0.10.0-filament-house-dev` not published yet:
+
+```powershell
+.\gradlew.bat assembleDebug
+# rename dist artifact to forgecity-0.10.0-filament-house-dev-debug.apk
+Get-FileHash .\forgecity-0.10.0-filament-house-dev-debug.apk -Algorithm SHA256
+# expect 3D958C94EA50A82C85A0EF4F01BA6B7AF2C1BB6D5ADCB13BD0C5C6371293D9C2
+adb install -r .\forgecity-0.10.0-filament-house-dev-debug.apk
+```
+
+Published prior (**0.9.0** procedural house):
 
 ```powershell
 curl.exe -L -o forgecity-0.9.0-3d-house-characters-dev-debug.apk `
@@ -27,7 +37,7 @@ Get-FileHash .\forgecity-0.9.0-3d-house-characters-dev-debug.apk -Algorithm SHA2
 adb install -r .\forgecity-0.9.0-3d-house-characters-dev-debug.apk
 ```
 
-Prior tip (**0.8.0** house Wave 1): SHA
+Older tip (**0.8.0** house Wave 1): SHA
 `C14D5E2CCE7F5C29387CB1BC88BD15E5228BADC0219F88D4936B8D6F7F0AAF3E`.
 
 Also grant: Home role, Usage Access, Notification Access (allowlist apps before speech).

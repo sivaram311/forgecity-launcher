@@ -9,12 +9,12 @@
 
 | Field | Value |
 |-------|-------|
-| versionName | `0.9.0-3d-house-characters-dev` · versionCode 21 |
-| Latest release | [`v0.9.0-3d-house-characters-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.9.0-3d-house-characters-dev) |
-| APK SHA-256 | `D8E66EA9442B9C7F7747FCCA9DCBE3FFE454FA3F886648EEEDE842D461154A7F` |
-| Prior tip | [`v0.8.0-3d-house-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.8.0-3d-house-dev) |
+| versionName | `0.10.0-filament-house-dev` · versionCode **22** |
+| Latest release | [`v0.9.0-3d-house-characters-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.9.0-3d-house-characters-dev) — **`v0.10.0-filament-house-dev` tag pending** |
+| APK SHA-256 | `3D958C94EA50A82C85A0EF4F01BA6B7AF2C1BB6D5ADCB13BD0C5C6371293D9C2` |
+| Prior tip | [`v0.9.0-3d-house-characters-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.9.0-3d-house-characters-dev) · SHA `D8E66EA9…` |
 
-## Waves complete (0.8 → 0.9)
+## Waves complete (0.8 → 0.10)
 
 | Wave | Landed |
 |------|--------|
@@ -22,14 +22,17 @@
 | 1 | Procedural house + placement engine |
 | 2 | Vault annex, furniture, idle characters, house/city toggle, budget caps, assistant speech pulse |
 | 3 | `HousePerfBudget`, DEVICE-E2E-HOUSE-CHECKLIST (#16 still needs Realme) |
+| 4 | **Filament** SceneView `4.15.0` · glTF assets · `HouseFilamentSurface` / `FilamentHouseLighting` / `HouseWorld` · `useFilamentHouse=true` |
 
-**Still not Filament/glTF** — procedural Compose path per Wave 1 decision. Filament remains future if perf allows.
+**Fallbacks:** procedural `HouseHomeSurface` when `useFilamentHouse=false`; CityCanvas when house toggle off.
+
+**Grok:** [design/GROK-FILAMENT-SHIP.md](design/GROK-FILAMENT-SHIP.md) · [design/GROK-FILAMENT-LIGHTING.md](design/GROK-FILAMENT-LIGHTING.md)
 
 ## Now → next
 
 | Now | Next |
 |-----|------|
-| 0.9.0 characters train | Device #16 using `docs/DEVICE-E2E-HOUSE-CHECKLIST.md` |
-| Optional Filament | Only after #16 + thermal evidence |
+| 0.10.0 Filament train on `main` | Tag `v0.10.0-filament-house-dev` + fill APK SHA |
+| Compile + unit PASS | Device #16 using `docs/DEVICE-E2E-HOUSE-CHECKLIST.md` (prerelease waiver OK) |
 
 Session: 2026-07-23.

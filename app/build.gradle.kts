@@ -15,8 +15,8 @@ android {
         applicationId = "buzz.delena.forgecity"
         minSdk = 26
         targetSdk = 35
-        versionCode = 21
-        versionName = "0.9.0-3d-house-characters-dev"
+        versionCode = 22
+        versionName = "0.10.0-filament-house-dev"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -76,6 +76,8 @@ dependencies {
     implementation("androidx.room:room-ktx:2.7.2")
     ksp("androidx.room:room-compiler:2.7.2")
     implementation("androidx.work:work-runtime-ktx:2.10.2")
+    // Filament via SceneView Compose (4.15 pairs with Kotlin 2.3; 4.25 needs 2.4)
+    implementation("io.github.sceneview:sceneview:4.15.0")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
     testImplementation("junit:junit:4.13.2")

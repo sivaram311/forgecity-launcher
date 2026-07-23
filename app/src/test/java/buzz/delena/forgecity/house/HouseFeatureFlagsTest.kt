@@ -8,6 +8,7 @@ class HouseFeatureFlagsTest {
     @Test
     fun wave1EnablesHouseSurfaceAndKeepsVideoOff() {
         assertTrue(HouseFeatureFlags.use3dHouse)
+        assertTrue(HouseFeatureFlags.useFilamentHouse)
         assertFalse(HouseFeatureFlags.useCityVideo)
     }
 }

@@ -6,7 +6,7 @@ story — while staying performant on Snapdragon 7s Gen 2 + Adreno 710 + 120 Hz.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher  
 **Device SoT:** `E:\MyAgent\workflow\devices\REALME-P2-PRO.md`  
-**Last updated:** 2026-07-23 (`0.7.0-assistant-clarity-dev` · Assistant Clarity implementing)
+**Last updated:** 2026-07-23 (`0.10.0-filament-house-dev` · Filament house landed)
 
 ---
 
@@ -183,11 +183,11 @@ Gemini audio is **opt-in** (notification text sent to Google when key is set).
 
 **Theme:** Stable speech · versionCode **19** · `0.7.0-assistant-clarity-dev` — published
 
-### Phase 3.7 — Realistic 3D House HOME — v0.8.0 (Wave 0/1 landed)
+### Phase 3.7 — Realistic 3D House HOME — v0.8.0 → v0.10.0 (landed)
 
 **Consult:** [design/GROK-3D-HOUSE-LAUNCHER-PLAN.md](design/GROK-3D-HOUSE-LAUNCHER-PLAN.md)  
 **Parallel exec:** [design/3D-HOUSE-PARALLEL-EXEC.md](design/3D-HOUSE-PARALLEL-EXEC.md)  
-**versionCode 20** · `0.8.0-3d-house-dev`
+**Filament ship:** [design/GROK-FILAMENT-SHIP.md](design/GROK-FILAMENT-SHIP.md) · [design/GROK-FILAMENT-LIGHTING.md](design/GROK-FILAMENT-LIGHTING.md)
 
 | Wave | Focus | Status |
 |------|--------|--------|
@@ -195,8 +195,12 @@ Gemini audio is **opt-in** (notification text sent to Google when key is set).
 | Wave 1 | Rooms/placement + HouseHomeSurface | ✅ procedural Compose |
 | Wave 2 | Vault + furniture + characters + house/city toggle + speech pulse | ✅ `0.9.0` |
 | Wave 3 | HousePerfBudget + DEVICE-E2E-HOUSE-CHECKLIST | ✅ code/docs; #16 device soak pending |
+| Wave 4 | Filament SceneView + glTF assets + lighting | ✅ **`0.10.0`** · versionCode **22** · `0.10.0-filament-house-dev` |
 
-**Stack:** procedural Compose house through 0.9; Filament/SceneView remains optional later.
+**Stack (0.10):** SceneView `4.15.0` (Filament); Kotlin `2.3.21` · KSP `2.3.10`.  
+**Assets:** `app/src/main/assets/filament/house_shell.glb`, `char_idle.glb` (`tools/generate_house_assets.py`).  
+**Code:** `HouseFilamentSurface.kt`, `FilamentHouseLighting.kt`, `HouseWorld.kt`; `HouseFeatureFlags.useFilamentHouse=true`.  
+**Fallbacks:** procedural `HouseHomeSurface` if flag false; CityCanvas if house off.
 
 ### Phase 4 — AI Agents & Polish — v0.4.0 “Symphony” (~6–8 weeks)
 
@@ -208,7 +212,7 @@ Gemini audio is **opt-in** (notification text sent to Google when key is set).
 
 ### Phase 5 — Advanced & Release — v1.0.0 (~8–12 weeks)
 
-- Optional Filament path (only if profiling allows)
+- Filament perf pass on Realme (#16 thermal/FPS evidence)
 - Backup / optional cloud sync
 - Public beta / Play or sideload focus
 - Custom districts
@@ -264,19 +268,17 @@ See `agents/crew/CREW.md` and `agents/roles/`.
 
 ## 9. Immediate next actions
 
-1. **P0 — Assistant Clarity (`0.7.0`):** finish mode-gated UI + masked keys wire;
-   green unit/lint/assemble; fill APK SHA; tag prerelease.
-2. **P0 device lab:** Realme P2 Pro E2E for chrome, video, DIRECT, Portal Tamil,
-   Gemini cascade, and Clarity validation (CONSCIOUS #16).
-3. **Tag:** annotated production tags only after Realme device GO.
-4. **0.8 / later:** Kongu rewrite→audio two-step; weather / quest markers /
-   in-city agents.
+1. **P0 device lab:** Realme P2 Pro E2E (#16) on Filament house using
+   `docs/DEVICE-E2E-HOUSE-CHECKLIST.md` — thermal/FPS + house soak.
+2. **Tag:** publish `v0.10.0-filament-house-dev` debug APK + SHA; annotated production
+   tags only after Realme device GO.
+3. **Later:** Kongu rewrite→audio two-step; weather / quest markers / in-city agents.
 
 **Rejected for launcher:** Cloudflare Workers AI / GLM remote Worker integration.
 
 **Shipped:** Portal Tamil (`0.4.0`–`0.4.2`), Gemini audio cascade (`0.4.3`–`0.5.1`),
 UI polish (`0.5.0`), city 3D (`0.6.0`), diagnostics log (`0.6.1`).
-**In flight:** Assistant Clarity (`0.7.0`).
+**In flight:** Filament house device evidence (`0.10.0`).
 
 ---
 
