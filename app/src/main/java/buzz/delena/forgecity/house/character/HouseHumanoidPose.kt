@@ -7,6 +7,7 @@ enum class HumanoidAction {
     IDLE,
     TALK,
     WALK,
+    SIT,
 }
 
 /**
@@ -62,16 +63,25 @@ object HouseHumanoidPose {
     }
 
     fun defaultAction(character: IdleHouseCharacter, assistantSpeaking: Boolean): HumanoidAction =
-        when {
-            character.role == CharacterRole.ASSISTANT && assistantSpeaking -> HumanoidAction.TALK
-            character.id == "npc_workshop" -> HumanoidAction.WALK
-            character.role == CharacterRole.MAYOR -> HumanoidAction.IDLE
-            else -> HumanoidAction.IDLE
-        }
+        HouseCharacterMotion.sample(character, timeSec = 0f, assistantSpeaking).action
 
     fun compute(action: HumanoidAction, timeSec: Float, phase: Float = 0f, intensity: Float = 1f): HumanoidPose {
         val t = timeSec + phase
         val i = intensity
+        if (action == HumanoidAction.SIT) {
+            return HumanoidPose(
+                bodyY = sin(t * 1.0f) * 0.004f,
+                bodyYawDeg = radToDeg(sin(t * 0.4f) * 0.02f),
+                headPitchDeg = radToDeg(0.08f + sin(t * 1.5f) * 0.03f),
+                headYawDeg = radToDeg(sin(t * 0.55f) * 0.1f),
+                armLXDeg = radToDeg(0.35f),
+                armLZDeg = radToDeg(-0.2f),
+                armRXDeg = radToDeg(0.35f + sin(t * 1.2f) * 0.05f),
+                armRZDeg = radToDeg(0.2f),
+                legLXDeg = radToDeg(1.25f),
+                legRXDeg = radToDeg(1.25f),
+            )
+        }
         val bodyY = if (action == HumanoidAction.WALK) {
             kotlin.math.abs(sin(t * 6f)) * 0.025f * i
         } else {
@@ -102,7 +112,7 @@ object HouseHumanoidPose {
                 radToDeg(sin(t * 1.1f + 1f) * 0.08f),
                 radToDeg(-0.12f),
             )
-            HumanoidAction.IDLE -> Quad(
+            HumanoidAction.IDLE, HumanoidAction.SIT -> Quad(
                 radToDeg(sin(t * 1.1f) * 0.08f),
                 radToDeg(0.12f),
                 radToDeg(sin(t * 1.1f + 1f) * 0.08f),

@@ -51,13 +51,14 @@ import buzz.delena.forgecity.house.FilamentHouseLighting
 import buzz.delena.forgecity.house.HouseFacadeFinishing
 import buzz.delena.forgecity.house.HouseWorld
 import buzz.delena.forgecity.house.character.DefaultIdleHouseCharacters
+import buzz.delena.forgecity.house.character.HouseCharacterMotion
 import buzz.delena.forgecity.house.character.HouseHumanoidPose
 import kotlin.math.roundToInt
 
 private const val HOUSE_ASSET = "filament/house_shell.glb"
 
 /**
- * Filament house HOME — 0.11.2 set dressing (cables/props/ceiling) + soft sphere dust.
+ * Filament house HOME — 0.12 open-roof dollhouse + room patrols/sit loops.
  */
 @Composable
 fun HouseFilamentSurface(
@@ -109,8 +110,9 @@ fun HouseFilamentSurface(
     }
 
     val cameraNode = rememberCameraNode(engine) {
-        position = Position(x = 4.5f, y = 9.2f, z = 12.2f)
-        lookAt(Position(x = 4.5f, y = 0.6f, z = 4.5f))
+        // High dollhouse orbit — clear of wall tops; open roof shows interiors.
+        position = Position(x = 4.5f, y = 11.5f, z = 13.5f)
+        lookAt(Position(x = 4.5f, y = 0.35f, z = 4.2f))
         setExposure(baseLighting.aperture, baseLighting.shutterSpeed, baseLighting.iso)
     }
     SideEffect {
@@ -125,7 +127,7 @@ fun HouseFilamentSurface(
 
     val cameraManipulator = rememberCameraManipulator(
         orbitHomePosition = cameraNode.worldPosition,
-        targetPosition = Position(x = 4.5f, y = 0.6f, z = 4.5f),
+        targetPosition = Position(x = 4.5f, y = 0.35f, z = 4.2f),
     )
 
     val sunColor = daySample?.sunColor ?: if (night) Color(0xFFB8C4E0) else Color(0xFFFFF2DC)
@@ -305,18 +307,19 @@ fun HouseFilamentSurface(
 
             activeCharacters.forEach { character ->
                 val room = HouseWorld.roomById(character.roomId) ?: return@forEach
-                val (x, y, z) = HouseWorld.positionInRoom(room, character.nx, character.ny, y = 0f)
-                val action = HouseHumanoidPose.defaultAction(character, assistantSpeaking)
+                val motion = HouseCharacterMotion.sample(character, timeSec, assistantSpeaking)
+                val (x, _, z) = HouseWorld.positionInRoom(room, motion.nx, motion.nz, y = 0f)
                 val pose = HouseHumanoidPose.compute(
-                    action = action,
+                    action = motion.action,
                     timeSec = timeSec,
                     phase = character.phaseOffset * 6.28f,
                 )
                 HouseHumanoidNode(
                     look = HouseHumanoidPose.lookFor(character.role),
                     pose = pose,
-                    worldPosition = Position(x = x, y = y, z = z),
+                    worldPosition = Position(x = x, y = motion.y, z = z),
                     nodeName = character.id,
+                    yawDeg = motion.yawDeg,
                 )
             }
         }

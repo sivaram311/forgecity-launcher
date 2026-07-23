@@ -21,16 +21,22 @@ class HouseHumanoidPoseTest {
     }
 
     @Test
-    fun assistantTalksWhenSpeaking() {
+    fun assistantSitsOrTalks() {
         val assist = DefaultIdleHouseCharacters.first { it.role == CharacterRole.ASSISTANT }
         assertEquals(
             HumanoidAction.TALK,
             HouseHumanoidPose.defaultAction(assist, assistantSpeaking = true),
         )
         assertEquals(
-            HumanoidAction.IDLE,
+            HumanoidAction.SIT,
             HouseHumanoidPose.defaultAction(assist, assistantSpeaking = false),
         )
+    }
+
+    @Test
+    fun sitFoldsLegs() {
+        val sit = HouseHumanoidPose.compute(HumanoidAction.SIT, 0.5f)
+        assertTrue(sit.legLXDeg > 40f)
     }
 
     @Test

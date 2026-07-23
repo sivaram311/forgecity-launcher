@@ -128,8 +128,8 @@ PH has clap SFX + mute. Optional later for ForgeCity (door soft click, assistant
 | 3 | **Window emissive pulse + corner rim strips** | Facade finishing | S | **0.11.0 LANDED** |
 | 4 | **Droop cables + 1 hero prop set per room** | Set dressing | M | **0.11.2 LANDED** |
 | 5 | **Points/sphere dust** (replace cube motes) | Air | S | **0.11.2 LANDED** |
-| 6 | Ceiling + picture frames + corner AO | Interior finish | M | **0.11.2 LANDED** |
-| 7 | Room patrols / sit loops | Life | M | 0.12 |
+| 6 | Ceiling + picture frames + corner AO | Interior finish | M | **0.11.2 LANDED** (0.12: open-roof cove, no sealed slab) |
+| 7 | Room patrols / sit loops | Life | M | **0.12.0 LANDED** |
 | 8 | Custom Filament fresnel / HDR IBL | Photoreal ceiling | L / defer | 0.12+ |
 
 **Do not prioritize:** Mixamo/skinned meshes, 2K textures, SSR, many dynamic lights — Adreno 710 + APK size.

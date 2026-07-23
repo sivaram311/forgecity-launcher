@@ -682,26 +682,32 @@ def _add_cable_runs(mb: MeshBuilder) -> None:
 
 
 def _add_ceilings(mb: MeshBuilder) -> None:
-    """Thin ceiling planes + light trays (0.11.2 interior finish)."""
-    ceil = rgba(0xFFE8E2D8)
+    """
+    Open-roof dollhouse finish (0.12): perimeter coves + light trays only.
+    Full ceiling slabs sealed the orbit view — rooms must stay readable from above.
+    """
+    cove = rgba(0xFFE0D8CC)
     tray = rgba(0xFFD4C8B4)
+    band = 0.14
+    y0 = WALL_H - 0.05
+    y1 = WALL_H
     for room in ROOMS:
-        inset = 0.06
-        y0 = WALL_H - 0.04
-        mb.add_box(
-            room.min_x + inset, y0, room.min_z + inset,
-            room.max_x - inset, WALL_H, room.max_z - inset,
-            ceil,
-        )
-        # Shallow light tray along longer axis
+        x0, x1 = room.min_x + 0.04, room.max_x - 0.04
+        z0, z1 = room.min_z + 0.04, room.max_z - 0.04
+        # Four perimeter cove strips (open center)
+        mb.add_box(x0, y0, z0, x1, y1, z0 + band, cove)
+        mb.add_box(x0, y0, z1 - band, x1, y1, z1, cove)
+        mb.add_box(x0, y0, z0 + band, x0 + band, y1, z1 - band, cove)
+        mb.add_box(x1 - band, y0, z0 + band, x1, y1, z1 - band, cove)
+        # Light tray along longer axis (does not seal)
         cx = (room.min_x + room.max_x) * 0.5
         cz = (room.min_z + room.max_z) * 0.5
         if room.max_x - room.min_x >= room.max_z - room.min_z:
-            half = (room.max_x - room.min_x) * 0.28
-            mb.add_box(cx - half, y0 - 0.03, cz - 0.08, cx + half, y0, cz + 0.08, tray)
+            half = (room.max_x - room.min_x) * 0.22
+            mb.add_box(cx - half, y0 - 0.04, cz - 0.06, cx + half, y0, cz + 0.06, tray)
         else:
-            half = (room.max_z - room.min_z) * 0.28
-            mb.add_box(cx - 0.08, y0 - 0.03, cz - half, cx + 0.08, y0, cz + half, tray)
+            half = (room.max_z - room.min_z) * 0.22
+            mb.add_box(cx - 0.06, y0 - 0.04, cz - half, cx + 0.06, y0, cz + half, tray)
 
 
 def _add_picture_frame(

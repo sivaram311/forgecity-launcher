@@ -20,6 +20,7 @@ fun io.github.sceneview.SceneScope.HouseHumanoidNode(
     pose: HumanoidPose,
     worldPosition: Position,
     nodeName: String,
+    yawDeg: Float = 0f,
 ) {
     val skinMat = remember(nodeName, look.skin) {
         materialLoader.createColorInstance(Color(look.skin), metallic = 0.02f, roughness = 0.75f)
@@ -37,6 +38,7 @@ fun io.github.sceneview.SceneScope.HouseHumanoidNode(
     val hipY = HouseHumanoidPose.HIP_Y
     Node(
         position = worldPosition,
+        rotation = Rotation(y = yawDeg),
         scale = Scale(look.scale),
         apply = { name = nodeName },
     ) {
