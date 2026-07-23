@@ -15,8 +15,8 @@ android {
         applicationId = "buzz.delena.forgecity"
         minSdk = 26
         targetSdk = 35
-        versionCode = 32
-        versionName = "0.14.0-ibl-fresnel-dev"
+        versionCode = 33
+        versionName = "0.15.0-face-siva-dev"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

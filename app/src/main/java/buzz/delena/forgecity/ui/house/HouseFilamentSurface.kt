@@ -54,7 +54,9 @@ import buzz.delena.forgecity.house.HouseFacadeFinishing
 import buzz.delena.forgecity.house.HouseWorld
 import buzz.delena.forgecity.house.character.DefaultIdleHouseCharacters
 import buzz.delena.forgecity.house.character.HouseCharacterMotion
+import buzz.delena.forgecity.house.character.HouseFaceAssets
 import buzz.delena.forgecity.house.character.HouseHumanoidPose
+import io.github.sceneview.texture.ImageTexture
 import kotlin.math.roundToInt
 
 private const val HOUSE_ASSET = "filament/house_shell.glb"
@@ -266,6 +268,21 @@ fun HouseFilamentSurface(
                     roughness = 1f,
                 )
             }
+            // One shared face texture for all humanoids (assets/faces/siva.png).
+            val sharedFaceMat = remember {
+                runCatching {
+                    val tex = ImageTexture.Builder()
+                        .bitmap(materialLoader.context.assets, HouseFaceAssets.SHARED_FACE)
+                        .build(engine)
+                    materialLoader.createTextureInstance(
+                        texture = tex,
+                        isOpaque = false,
+                        metallic = 0f,
+                        roughness = 0.55f,
+                        reflectance = 0.04f,
+                    )
+                }.getOrNull()
+            }
             val dustRadius = DustMoteCloud.radiusFor(allowsSoftShadows)
             dustSeeds.forEachIndexed { index, mote ->
                 val (x, y, z) = DustMoteCloud.positionAt(mote, timeSec)
@@ -349,6 +366,7 @@ fun HouseFilamentSurface(
                     worldPosition = Position(x = x, y = motion.y, z = z),
                     nodeName = character.id,
                     yawDeg = motion.yawDeg,
+                    faceMaterial = sharedFaceMat,
                 )
             }
         }

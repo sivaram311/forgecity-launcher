@@ -9,16 +9,16 @@
 
 | Field | Value |
 |-------|-------|
-| versionName | `0.14.0-ibl-fresnel-dev` · versionCode **32** |
-| Latest release | [`v0.14.0-ibl-fresnel-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.14.0-ibl-fresnel-dev) |
-| APK SHA-256 | `534386BC68F1A77381E8ACFE17B8BF8EB98D154F4FDDD8FFCEBD28C2C276C4D1` |
-| Prior tip | [`v0.13.0-tts-catalog-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.13.0-tts-catalog-dev) |
+| versionName | `0.15.0-face-siva-dev` · versionCode **33** |
+| Latest release | [`v0.15.0-face-siva-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.15.0-face-siva-dev) |
+| APK SHA-256 | `E207352E29F1B8048A086F0ACEF2D051E7415BC41277DAC71216EC63FA28F244` |
+| Prior tip | [`v0.14.0-ibl-fresnel-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.14.0-ibl-fresnel-dev) |
 
 ## Now → next
 
 | Now | Next |
 |-----|------|
-| 0.14 HDR IBL + reflectance fresnel (gap #8) | Device #16 Realme soak |
-| PH visual backlog 1–8 | LANDED (Adreno-safe stand-ins) |
+| 0.15 shared `siva.png` face card on all humanoids | Device #16 Realme soak |
+| Per-role faces | Optional later |
 
 Session: 2026-07-23.

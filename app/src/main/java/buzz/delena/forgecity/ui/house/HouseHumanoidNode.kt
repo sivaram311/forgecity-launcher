@@ -3,17 +3,21 @@ package buzz.delena.forgecity.ui.house
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import com.google.android.filament.MaterialInstance
 import io.github.sceneview.math.Position
 import io.github.sceneview.math.Rotation
 import io.github.sceneview.math.Scale
+import io.github.sceneview.math.Size
+import io.github.sceneview.texture.ImageTexture
 import buzz.delena.forgecity.house.FilamentHouseIbl
+import buzz.delena.forgecity.house.character.HouseFaceAssets
 import buzz.delena.forgecity.house.character.HouseHumanoidPose
 import buzz.delena.forgecity.house.character.HumanoidLook
 import buzz.delena.forgecity.house.character.HumanoidPose
 
 /**
  * Jointed capsule humanoid (Production House Humanoid.tsx port) for SceneScope.
- * Capsule torso/limbs + sphere head/hair; pose from [HouseHumanoidPose].
+ * Capsule torso/limbs + sphere head/hair + shared PNG face card; pose from [HouseHumanoidPose].
  */
 @Composable
 fun io.github.sceneview.SceneScope.HouseHumanoidNode(
@@ -22,6 +26,7 @@ fun io.github.sceneview.SceneScope.HouseHumanoidNode(
     worldPosition: Position,
     nodeName: String,
     yawDeg: Float = 0f,
+    faceMaterial: MaterialInstance? = null,
 ) {
     val skinMat = remember(nodeName, look.skin) {
         materialLoader.createColorInstance(
@@ -55,6 +60,21 @@ fun io.github.sceneview.SceneScope.HouseHumanoidNode(
             reflectance = FilamentHouseIbl.CLOTH_REFLECTANCE,
         )
     }
+    val fallbackFaceMat = remember {
+        runCatching {
+            val tex = ImageTexture.Builder()
+                .bitmap(materialLoader.context.assets, HouseFaceAssets.SHARED_FACE)
+                .build(engine)
+            materialLoader.createTextureInstance(
+                texture = tex,
+                isOpaque = false,
+                metallic = 0f,
+                roughness = 0.55f,
+                reflectance = 0.04f,
+            )
+        }.getOrNull()
+    }
+    val localFaceMat = faceMaterial ?: fallbackFaceMat
 
     val hipY = HouseHumanoidPose.HIP_Y
     Node(
@@ -74,7 +94,7 @@ fun io.github.sceneview.SceneScope.HouseHumanoidNode(
                 materialInstance = topMat,
                 position = Position(y = hipY + 0.35f),
             )
-            // Head + hair
+            // Head + hair + face card
             Node(
                 position = Position(y = hipY + 0.72f),
                 rotation = Rotation(x = pose.headPitchDeg, y = pose.headYawDeg),
@@ -85,6 +105,15 @@ fun io.github.sceneview.SceneScope.HouseHumanoidNode(
                     materialInstance = hairMat,
                     position = Position(y = 0.1f),
                 )
+                localFaceMat?.let { face ->
+                    // Flat portrait card in front of the head sphere (shared siva.png).
+                    CubeNode(
+                        size = Size(0.20f, 0.20f, 0.012f),
+                        materialInstance = face,
+                        position = Position(y = 0.01f, z = 0.125f),
+                        apply = { name = "${nodeName}_face" },
+                    )
+                }
             }
             // Arms (pivot at shoulder; capsule hangs down)
             Node(
