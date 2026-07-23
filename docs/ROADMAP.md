@@ -196,11 +196,25 @@ Gemini audio is **opt-in** (notification text sent to Google when key is set).
 | Wave 2 | Vault + furniture + characters + house/city toggle + speech pulse | ✅ `0.9.0` |
 | Wave 3 | HousePerfBudget + DEVICE-E2E-HOUSE-CHECKLIST | ✅ code/docs; #16 device soak pending |
 | Wave 4 | Filament SceneView + glTF assets + lighting | ✅ **`0.10.0`** · versionCode **22** · `0.10.0-filament-house-dev` |
+| Wave 5 | PH gap 1–7: humanoids, day-cycle, set dressing, open-roof, patrols | ✅ **`0.11`–`0.12`** · tip `0.12.0-patrol-openroof-dev` |
 
-**Stack (0.10):** SceneView `4.15.0` (Filament); Kotlin `2.3.21` · KSP `2.3.10`.  
-**Assets:** `app/src/main/assets/filament/house_shell.glb`, `char_idle.glb` (`tools/generate_house_assets.py`).  
-**Code:** `HouseFilamentSurface.kt`, `FilamentHouseLighting.kt`, `HouseWorld.kt`; `HouseFeatureFlags.useFilamentHouse=true`.  
-**Fallbacks:** procedural `HouseHomeSurface` if flag false; CityCanvas if house off.
+**Stack (0.10+):** SceneView `4.15.0` (Filament); Kotlin `2.3.21` · KSP `2.3.10`.  
+**Assets:** `app/src/main/assets/filament/house_shell.glb` (+ role GLBs).  
+**Code:** `HouseFilamentSurface.kt`, `HouseHumanoidNode`, `HouseCharacterMotion`; `HouseFeatureFlags.useFilamentHouse=true`.  
+**Fallbacks:** procedural `HouseHomeSurface` if flag false; CityCanvas if house off.  
+**Gap SoT:** [design/GAP-VS-PRODUCTION-HOUSE.md](design/GAP-VS-PRODUCTION-HOUSE.md)
+
+### Phase 3.8 — TTS catalog — v0.13.0 (landed)
+
+**Theme:** Speech controls · versionCode **31** · `0.13.0-tts-catalog-dev` — published  
+**Consult:** [design/GROK-0.13-TTS-CATALOG.md](design/GROK-0.13-TTS-CATALOG.md)
+
+| Item | Status |
+|------|--------|
+| Curated Gemini TTS model dropdown | ✅ |
+| 30 prebuilt voices + Random / Random ♀ / Random ♂ | ✅ resolve each speak |
+| Named prompt template library (Save as / pick / delete) | ✅ |
+| #16 Realme E2E | PENDING |
 
 ### Phase 4 — AI Agents & Polish — v0.4.0 “Symphony” (~6–8 weeks)
 
@@ -241,7 +255,8 @@ See `agents/crew/CREW.md` and `agents/roles/`.
 | QA & Optimization | Battery/thermal/a11y gates |
 
 **Suggested next crew task:** Realme P2 Pro E2E (#16) against
-`v0.3.3-background-video-asset-dev` covering loop, thermal, and battery.
+`v0.13.0-tts-catalog-dev` (speech catalog + open-roof house), covering TTS random
+voice, template pick, and house FPS/thermal.
 
 ---
 

@@ -495,7 +495,40 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 
 ## 2026-07-23 — 0.10.5 wall + character
 | Check | Result | Notes |
+|------|--------|-------|
 | wall bands/moldings | PASS | house_shell 114504 B |
 | character GLBs | PASS | mayor/assist/npc |
 | SHA | PASS | `66BE9AAAF0881AB9D8C72AA894F4D7366353F36CB22F9F64757DB24C70F5CBFB` |
+
+## 2026-07-23 — 0.11.0 humanoid + day-cycle
+| Check | Result | Notes |
+|------|--------|-------|
+| Jointed humanoids | PASS | idle/talk/walk capsule nodes |
+| Day-cycle | PASS | FilamentDayCycle ~120s |
+| SHA | PASS | `E09408908541924FA99B0A1A2D1452795F41377E3DDDE67AFFBAB3D080FBE1A6` |
+| #16 | PENDING | |
+
+## 2026-07-23 — 0.11.2 set dressing
+| Check | Result | Notes |
+|------|--------|-------|
+| Cables/props/dust/AO | PASS | gap backlog 4–6 |
+| SHA | PASS | `79342FD2A70D9EB47BA85956E4465F61E0E554662D51D3CA226BABF20C88B9AF` |
+
+## 2026-07-23 — 0.12.0 open-roof + patrols
+| Check | Result | Notes |
+|------|--------|-------|
+| Open roof | PASS | perimeter coves only (sealed ceilings removed) |
+| Patrol/sit | PASS | HouseCharacterMotion |
+| SHA | PASS | `4DDFFF4F12CDF0FE30948A4A861392612290E06F9E7C86B5EED8063FF4AD0E54` |
+
+## 2026-07-23 — 0.13.0 TTS catalog
+| Check | Result | Notes |
+|------|--------|-------|
+| Model/voice catalog | PASS | 3 TTS models · 30 voices · Random/F/M |
+| Template library | PASS | JSON seed + Save as / pick / delete (cap 50) |
+| Resolve-at-speak | PASS | `GeminiVoiceResolver` in cascade |
+| versionCode | PASS | **31** · `0.13.0-tts-catalog-dev` |
+| Unit tests | PASS | catalog / resolver / codec |
+| SHA | PASS | `ADA35CC0C54CC77C15C362675D8BE6D4FCD333F091F4A6471E4EAD699447DC78` |
+| #16 E2E | PENDING | no device soak this ship |
 

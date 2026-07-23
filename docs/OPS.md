@@ -17,30 +17,32 @@ git checkout main
 
 ## Download (prerelease debug APK)
 
-Tip (**0.10.0** Filament house) — tag `v0.10.0-filament-house-dev` not published yet:
+Tip (**0.13.0** TTS catalog) — tag `v0.13.0-tts-catalog-dev`:
 
 ```powershell
-.\gradlew.bat assembleDebug
-# rename dist artifact to forgecity-0.10.0-filament-house-dev-debug.apk
-Get-FileHash .\forgecity-0.10.0-filament-house-dev-debug.apk -Algorithm SHA256
-# expect 3D958C94EA50A82C85A0EF4F01BA6B7AF2C1BB6D5ADCB13BD0C5C6371293D9C2
-adb install -r .\forgecity-0.10.0-filament-house-dev-debug.apk
+curl.exe -L -o forgecity-0.13.0-tts-catalog-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.13.0-tts-catalog-dev/forgecity-0.13.0-tts-catalog-dev-debug.apk
+Get-FileHash .\forgecity-0.13.0-tts-catalog-dev-debug.apk -Algorithm SHA256
+# expect ADA35CC0C54CC77C15C362675D8BE6D4FCD333F091F4A6471E4EAD699447DC78
+adb install -r .\forgecity-0.13.0-tts-catalog-dev-debug.apk
 ```
 
-Published prior (**0.9.0** procedural house):
-
-```powershell
-curl.exe -L -o forgecity-0.9.0-3d-house-characters-dev-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.9.0-3d-house-characters-dev/forgecity-0.9.0-3d-house-characters-dev-debug.apk
-Get-FileHash .\forgecity-0.9.0-3d-house-characters-dev-debug.apk -Algorithm SHA256
-# expect D8E66EA9442B9C7F7747FCCA9DCBE3FFE454FA3F886648EEEDE842D461154A7F
-adb install -r .\forgecity-0.9.0-3d-house-characters-dev-debug.apk
-```
-
-Older tip (**0.8.0** house Wave 1): SHA
-`C14D5E2CCE7F5C29387CB1BC88BD15E5228BADC0219F88D4936B8D6F7F0AAF3E`.
+Prior house tip (**0.12.0** open-roof + patrols): tag `v0.12.0-patrol-openroof-dev` · SHA `4DDFFF4F…0E54`.
 
 Also grant: Home role, Usage Access, Notification Access (allowlist apps before speech).
+
+### TTS catalog (0.13.0)
+
+1. Open Assistant settings → speech mode **GEMINI AUDIO** or **CASCADE**.
+2. **Model** dropdown: curated TTS models (default `gemini-3.1-flash-tts-preview`).
+3. **Voice** dropdown: 30 prebuilt voices, plus **Random** / **Random female** / **Random male**
+   (concrete voice picked on every Gemini audio speak; mode is what persists).
+4. **Template** dropdown: pick a named speak-aloud prompt; **Save as…** adds a new named
+   entry (cap 50); **Delete** removes (library keeps ≥1). Builtin chips still jump to
+   Tamil clear / Kongu friend / English brief.
+5. Language field remains a **prompt hint** only.
+6. TEST TTS; logcat `adb logcat -s ForgeCityTTS` — look for `gemini_voice_resolved` then
+   `gemini_audio_ok`.
 
 ### Assistant Clarity (0.7.0)
 
@@ -52,8 +54,8 @@ Neon sheet, mode-first — only the fields that match the active speech path.
 2. **`PromptModeValidator`:** rewrite-style prompts (e.g. “spoken script”,
    “translate the notification”) are rejected for GEMINI AUDIO / CASCADE.
    Need a speak-aloud cue (“Synthesize speech”, “Read aloud”, …).
-3. **Presets:** chips load **Tamil clear**, **Kongu friend**, or **English brief**
-   (`AudioPromptPresets`) — all validator-safe for native audio.
+3. **Presets / library:** chips + named template library (0.13+) load validator-safe
+   speak-aloud bodies (`AudioPromptPresets` + user Save as).
 4. **Masked keys:** API key fields show dots by default; reveal on tap. Keystore
    stays encrypted at rest; viewing does not re-wrap the secret.
 5. **TEST TTS:** disabled when the current mode’s audio prompt fails validation
@@ -74,13 +76,13 @@ Neon sheet, mode-first — only the fields that match the active speech path.
 ### Gemini native audio (0.5.1+)
 
 1. Open Assistant settings sheet → save Gemini API key.
-2. Confirm model `gemini-3.1-flash-tts-preview`, voice `Kore`. Language field is a
+2. Confirm **model** / **voice** via dropdowns (0.13+). Language field is a
    **prompt hint** only (API auto-detects language from text; do not expect a
    separate `languageCode` in the JSON body).
 3. Cycle speech mode to **GEMINI AUDIO** (fail-closed) or **CASCADE**.
-4. Prefer a template that starts with “Synthesize speech only…” (default does).
-5. TEST TTS; logcat: `adb logcat -s ForgeCityTTS` → `gemini_audio_ok` then
-   `pcm_play_started backend=audiotrack|mediaplayer`.
+4. Prefer a template that starts with “Synthesize speech only…” (library default does).
+5. TEST TTS; logcat: `adb logcat -s ForgeCityTTS` → `gemini_voice_resolved` /
+   `gemini_audio_ok` then `pcm_play_started backend=audiotrack|mediaplayer`.
 
 **0.5.1 fix:** invalid `speechConfig.languageCode` removed (was causing Gemini fail).
 
