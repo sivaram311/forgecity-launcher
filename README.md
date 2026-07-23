@@ -1,21 +1,20 @@
 ﻿# ForgeCity Launcher
 
-**Latest:** [`v0.15.0-face-siva-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.15.0-face-siva-dev) · vc **33**
+**Latest:** [`v0.15.1-face-front-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.15.1-face-front-dev) · vc **34**
 
 ## Download
 ```powershell
-curl.exe -L -o forgecity-0.15.0-face-siva-dev-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.15.0-face-siva-dev/forgecity-0.15.0-face-siva-dev-debug.apk
-Get-FileHash .\forgecity-0.15.0-face-siva-dev-debug.apk -Algorithm SHA256
-# expect E207352E29F1B8048A086F0ACEF2D051E7415BC41277DAC71216EC63FA28F244
+curl.exe -L -o forgecity-0.15.1-face-front-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.15.1-face-front-dev/forgecity-0.15.1-face-front-dev-debug.apk
+Get-FileHash .\forgecity-0.15.1-face-front-dev-debug.apk -Algorithm SHA256
+# expect 977CCF820F37CC74F77282764A2FCBB849D9CBA02161A08D89E0D7B5BD96AF0E
 ```
 
+## 0.15.1 (face front fix)
+- Face card moved to **front of head** (−Z + 180° yaw); was on the back in 0.15.0
+
 ## 0.15.0 (shared face card)
-- All house humanoids show **`faces/siva.png`** (256×256) as a face card on the head
-- One shared Filament texture (Adreno-safe)
+- All house humanoids show **`faces/siva.png`** (256×256) as a face card
 
 ## 0.14.0 (gap #8 — IBL + fresnel stand-ins)
 - Soft **256×128 HDR IBL** · reflectance + rim light
-
-## 0.13.0 (TTS catalog)
-- Gemini model/voice dropdowns + random modes + prompt template library

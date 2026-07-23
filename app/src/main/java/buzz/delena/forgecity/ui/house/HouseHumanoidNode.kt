@@ -106,11 +106,12 @@ fun io.github.sceneview.SceneScope.HouseHumanoidNode(
                     position = Position(y = 0.1f),
                 )
                 localFaceMat?.let { face ->
-                    // Flat portrait card in front of the head sphere (shared siva.png).
+                    // Flat portrait card on the face (−Z local; +Z was the back of the head).
                     CubeNode(
                         size = Size(0.20f, 0.20f, 0.012f),
                         materialInstance = face,
-                        position = Position(y = 0.01f, z = 0.125f),
+                        position = Position(y = 0.01f, z = -0.125f),
+                        rotation = Rotation(y = 180f),
                         apply = { name = "${nodeName}_face" },
                     )
                 }
