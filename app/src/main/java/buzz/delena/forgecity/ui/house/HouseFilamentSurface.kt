@@ -1,19 +1,37 @@
 package buzz.delena.forgecity.ui.house
 
 import android.view.MotionEvent
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.google.android.filament.MaterialInstance
 import io.github.sceneview.RenderQuality
 import io.github.sceneview.SceneView
+import io.github.sceneview.SurfaceType
 import io.github.sceneview.math.Direction
 import io.github.sceneview.math.Position
 import io.github.sceneview.math.Scale
 import io.github.sceneview.math.Size
+import io.github.sceneview.rememberCameraManipulator
 import io.github.sceneview.rememberCameraNode
 import io.github.sceneview.rememberEngine
 import io.github.sceneview.rememberEnvironment
@@ -26,15 +44,17 @@ import buzz.delena.forgecity.house.HouseWorld
 import buzz.delena.forgecity.house.character.CharacterRole
 import buzz.delena.forgecity.house.character.DefaultIdleHouseCharacters
 import buzz.delena.forgecity.house.character.IdleHouseCharacter
+import kotlin.math.roundToInt
 
 private const val HOUSE_ASSET = "filament/house_shell.glb"
 private const val CHAR_ASSET = "filament/char_idle.glb"
 
 /**
- * Filament / SceneView 3D house HOME (0.10.0).
+ * Filament / SceneView 3D house HOME.
  *
- * Loads GLB shell + idle characters; day/night from [FilamentHouseLighting].
- * App markers are colored cubes; taps resolve via node [name] = building id.
+ * Uses [SurfaceType.TextureSurface] so the scene renders **inline** in Compose
+ * (default SurfaceView draws behind opaque parents and appears blank).
+ * Small Compose chips keep app launch taps reliable without blocking orbit.
  */
 @Composable
 fun HouseFilamentSurface(
@@ -52,7 +72,6 @@ fun HouseFilamentSurface(
     val activeCharacters = remember(maxCharacters) {
         DefaultIdleHouseCharacters.take(maxCharacters.coerceAtLeast(0))
     }
-    val markerById = remember(markers) { markers.associateBy { it.id } }
 
     val engine = rememberEngine()
     val modelLoader = rememberModelLoader(engine)
@@ -60,9 +79,13 @@ fun HouseFilamentSurface(
     val environment = rememberEnvironment(environmentLoader)
 
     val cameraNode = rememberCameraNode(engine) {
-        position = Position(x = 4.5f, y = 10.5f, z = 13.5f)
-        lookAt(Position(x = 4.5f, y = 0.4f, z = 4.5f))
+        position = Position(x = 4.5f, y = 9.5f, z = 12.5f)
+        lookAt(Position(x = 4.5f, y = 0.5f, z = 4.5f))
     }
+    val cameraManipulator = rememberCameraManipulator(
+        orbitHomePosition = cameraNode.worldPosition,
+        targetPosition = Position(x = 4.5f, y = 0.5f, z = 4.5f),
+    )
 
     val mainLight = rememberMainLightNode(engine) {
         intensity = if (ambientEnabled) lighting.sunIntensity else lighting.sunIntensity * 0.35f
@@ -75,6 +98,7 @@ fun HouseFilamentSurface(
     Box(modifier = modifier.fillMaxSize()) {
         SceneView(
             modifier = Modifier.fillMaxSize(),
+            surfaceType = SurfaceType.TextureSurface,
             engine = engine,
             modelLoader = modelLoader,
             environmentLoader = environmentLoader,
@@ -82,18 +106,19 @@ fun HouseFilamentSurface(
             mainLightNode = mainLight,
             fillLightNode = null,
             cameraNode = cameraNode,
-            cameraManipulator = null,
+            cameraManipulator = cameraManipulator,
             renderQuality = if (allowsSoftShadows) {
                 RenderQuality.Default
             } else {
                 RenderQuality.Performance
             },
+            autoCenterContent = false,
             autoFitContent = false,
             isOpaque = true,
             onTouchEvent = { event, hit ->
                 if (event.action != MotionEvent.ACTION_UP) return@SceneView false
                 val id = hit?.node?.name ?: return@SceneView false
-                val marker = markerById[id] ?: return@SceneView false
+                val marker = markers.firstOrNull { it.id == id } ?: return@SceneView false
                 if (event.eventTime - event.downTime > 450L) {
                     onMarkerLongPress(marker)
                 } else {
@@ -145,7 +170,106 @@ fun HouseFilamentSurface(
                 )
             }
         }
+
+        HouseMarkerChips(
+            markers = markers,
+            onMarkerTap = onMarkerTap,
+            onMarkerLongPress = onMarkerLongPress,
+            modifier = Modifier.fillMaxSize(),
+        )
     }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun HouseMarkerChips(
+    markers: List<HouseLabelMarker>,
+    onMarkerTap: (HouseLabelMarker) -> Unit,
+    onMarkerLongPress: (HouseLabelMarker) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val density = LocalDensity.current
+    BoxWithConstraints(modifier = modifier) {
+        val widthPx = constraints.maxWidth.toFloat()
+        val heightPx = constraints.maxHeight.toFloat()
+        val layout = remember(widthPx, heightPx) { houseLayoutForHit(widthPx, heightPx) }
+        markers.forEach { marker ->
+            val cell = layout.cellById(marker.roomId) ?: return@forEach
+            val cx = cell.left + cell.width * marker.nx.coerceIn(0.12f, 0.88f)
+            val cy = cell.top + cell.height * marker.ny.coerceIn(0.18f, 0.82f)
+            val chipPx = minOf(cell.width, cell.height) * 0.22f
+            val chipDp = with(density) { chipPx.toDp() }.coerceAtLeast(36.dp)
+            Box(
+                modifier = Modifier
+                    .offset {
+                        IntOffset(
+                            (cx - chipPx / 2f).roundToInt(),
+                            (cy - chipPx / 2f).roundToInt(),
+                        )
+                    }
+                    .size(chipDp)
+                    .clip(CircleShape)
+                    .combinedClickable(
+                        onClick = { onMarkerTap(marker) },
+                        onLongClick = { onMarkerLongPress(marker) },
+                    ),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = marker.label.take(10),
+                    color = Color(0xFFF6E7D0),
+                    fontSize = 10.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+        }
+    }
+}
+
+private data class HitLayout(
+    val origin: Offset,
+    val mainW: Float,
+    val cellW: Float,
+    val cellH: Float,
+    val vaultW: Float,
+) {
+    fun cellById(id: String): Rect? {
+        val (col, row) = when (id) {
+            "kitchen" -> 0 to 0
+            "living" -> 1 to 0
+            "hallway" -> 0 to 1
+            "office" -> 1 to 1
+            "bedroom" -> 0 to 2
+            "workshop" -> 1 to 2
+            "vault" -> 2 to 1
+            else -> return null
+        }
+        if (col == 2) {
+            val left = origin.x + mainW
+            val top = origin.y + cellH
+            return Rect(left, top, left + vaultW, top + cellH)
+        }
+        val left = origin.x + col * cellW
+        val top = origin.y + row * cellH
+        return Rect(left, top, left + cellW, top + cellH)
+    }
+}
+
+private fun houseLayoutForHit(width: Float, height: Float): HitLayout {
+    val padX = width * 0.06f
+    val padY = height * 0.10f
+    val houseW = width - padX * 2f
+    val houseH = height - padY * 2f
+    val vaultW = houseW * 0.22f
+    val mainW = houseW - vaultW
+    return HitLayout(
+        origin = Offset(padX, padY),
+        mainW = mainW,
+        cellW = mainW / 2f,
+        cellH = houseH / 3f,
+        vaultW = vaultW,
+    )
 }
 
 @Composable

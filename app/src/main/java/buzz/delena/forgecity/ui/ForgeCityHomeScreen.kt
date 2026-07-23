@@ -40,11 +40,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.semantics.Role
@@ -172,7 +174,18 @@ fun ForgeCityHomeScreen(
                 Brush.verticalGradient(
                     if (houseMode) houseBackdrop else listOf(Color(top), Color(mid), Color(bottom)),
                 ),
-            ),
+            )
+            // Draw vignette on the same node so it cannot steal pointer events from house/city.
+            .drawWithContent {
+                drawContent()
+                drawRect(
+                    brush = Brush.radialGradient(
+                        colors = listOf(Color.Transparent, Color(0x3305040A)),
+                        center = center,
+                        radius = size.minDimension * 0.85f,
+                    ),
+                )
+            },
     ) {
         // House mode must not force city video; compile flag gates the Media3 path.
         val videoOn = !houseMode &&
@@ -250,18 +263,6 @@ fun ForgeCityHomeScreen(
                 modifier = Modifier.fillMaxSize(),
             )
         }
-
-        // Slice C4: subtle vignette so the poster/gradient state reads with depth.
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.radialGradient(
-                        colors = listOf(Color.Transparent, Color(0x3305040A)),
-                        radius = 1600f,
-                    ),
-                ),
-        )
 
         // Slice A1/C: local top scrim strip only behind the top chrome.
         AnimatedVisibility(

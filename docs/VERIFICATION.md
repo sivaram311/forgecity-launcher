@@ -453,3 +453,15 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | `testDebugUnitTest` / lint / assemble | PASS | prerelease waiver OK without device |
 | APK SHA-256 | PASS | `3D958C94EA50A82C85A0EF4F01BA6B7AF2C1BB6D5ADCB13BD0C5C6371293D9C2` · `forgecity-0.10.0-filament-house-dev-debug.apk` |
 | Realme E2E (#16) | PENDING | DEVICE-E2E-HOUSE-CHECKLIST.md; prerelease waiver OK |
+
+## 2026-07-23 — 0.10.1 Filament fullscreen / function fix
+
+| Check | Result | Notes |
+|------|--------|-------|
+| versionName / versionCode | PASS | `0.10.1-filament-fix-dev` · **23** |
+| TextureSurface + immersive | PASS | blank-scene + non-fullscreen root causes |
+| Vignette hit-steal | PASS | drawWithContent; no overlay Box |
+| Marker chips / orbit | PASS | chips + cameraManipulator |
+| assembleDebug | PASS | SHA `1CEB353D9B6F4D0F6B21390A25436CA97568F1D36D286C909896544A7C541116` |
+| Realme E2E (#16) | PENDING | no ADB device |
+
