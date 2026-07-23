@@ -195,6 +195,15 @@ class AssistantSettingsStore(context: Context) {
             .putFloat(KEY_BACKGROUND_OPACITY, value.coerceIn(0.4f, 1f))
             .apply()
 
+    /**
+     * User preference for House HOME vs City HOME.
+     * Effective house mode = [buzz.delena.forgecity.house.HouseFeatureFlags.use3dHouse] && this.
+     * Default true matches the Wave-1 house surface when the compile flag is on.
+     */
+    var houseHomeEnabled: Boolean
+        get() = prefs.getBoolean(KEY_HOUSE_HOME_ENABLED, true)
+        set(value) = prefs.edit().putBoolean(KEY_HOUSE_HOME_ENABLED, value).apply()
+
     var launcherChromeVisible: Boolean
         get() = prefs.getBoolean(KEY_LAUNCHER_CHROME_VISIBLE, LauncherChromeDefaults.VISIBLE)
         set(value) = prefs.edit().putBoolean(KEY_LAUNCHER_CHROME_VISIBLE, value).apply()
@@ -286,6 +295,7 @@ class AssistantSettingsStore(context: Context) {
         private const val KEY_QUIET_END = "quiet_end"
         private const val KEY_BACKGROUND_VIDEO = "background_video_enabled"
         private const val KEY_BACKGROUND_OPACITY = "background_video_opacity"
+        private const val KEY_HOUSE_HOME_ENABLED = "house_home_enabled"
         private const val KEY_LAUNCHER_CHROME_VISIBLE = "launcher_chrome_visible"
         private const val KEY_ASSISTANT_TOOLS_VISIBLE = "assistant_tools_visible"
         private const val KEY_ASSISTANT_PANEL_VISIBLE = "assistant_panel_visible"

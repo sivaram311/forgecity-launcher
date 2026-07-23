@@ -50,6 +50,12 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
     private val _ambientEnabled = MutableStateFlow(animationBudget.allowsAmbient)
     val ambientEnabled: StateFlow<Boolean> = _ambientEnabled.asStateFlow()
 
+    private val _allowsSoftShadows = MutableStateFlow(animationBudget.allowsSoftShadows)
+    val allowsSoftShadows: StateFlow<Boolean> = _allowsSoftShadows.asStateFlow()
+
+    private val _maxCharacters = MutableStateFlow(animationBudget.maxActiveCharacters)
+    val maxCharacters: StateFlow<Int> = _maxCharacters.asStateFlow()
+
     private val _hasUsageAccess = MutableStateFlow(harvester.hasUsageAccess())
     val hasUsageAccess: StateFlow<Boolean> = _hasUsageAccess.asStateFlow()
 
@@ -108,6 +114,10 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
     private val _backgroundVideoOpacity =
         MutableStateFlow(assistantSettings.backgroundVideoOpacity)
     val backgroundVideoOpacity: StateFlow<Float> = _backgroundVideoOpacity.asStateFlow()
+
+    private val _houseHomeEnabled =
+        MutableStateFlow(assistantSettings.houseHomeEnabled)
+    val houseHomeEnabled: StateFlow<Boolean> = _houseHomeEnabled.asStateFlow()
 
     private val _launcherChromeVisible =
         MutableStateFlow(assistantSettings.launcherChromeVisible)
@@ -177,6 +187,8 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
     fun refreshEnvironment() {
         _hourOfDay.value = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
         _ambientEnabled.value = animationBudget.allowsAmbient
+        _allowsSoftShadows.value = animationBudget.allowsSoftShadows
+        _maxCharacters.value = animationBudget.maxActiveCharacters
         _hasUsageAccess.value = harvester.hasUsageAccess()
         _hasNotificationAccess.value = NotificationAccess.hasAccess(getApplication())
         _assistantEnabled.value = assistantSettings.assistantEnabled
@@ -194,6 +206,7 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
         _quietLabel.value = formatQuietLabel()
         _backgroundVideoEnabled.value = assistantSettings.backgroundVideoEnabled
         _backgroundVideoOpacity.value = assistantSettings.backgroundVideoOpacity
+        _houseHomeEnabled.value = assistantSettings.houseHomeEnabled
     }
 
     fun harvestNow(force: Boolean = false) {
@@ -310,6 +323,11 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
         assistantSettings.backgroundVideoEnabled =
             !assistantSettings.backgroundVideoEnabled
         _backgroundVideoEnabled.value = assistantSettings.backgroundVideoEnabled
+    }
+
+    fun toggleHouseHome() {
+        assistantSettings.houseHomeEnabled = !assistantSettings.houseHomeEnabled
+        _houseHomeEnabled.value = assistantSettings.houseHomeEnabled
     }
 
     fun setBackgroundVideoOpacity(opacity: Float) {

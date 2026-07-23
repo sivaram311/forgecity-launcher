@@ -33,6 +33,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,6 +59,7 @@ import buzz.delena.forgecity.city.CityBuilding
 import buzz.delena.forgecity.city.CityState
 import buzz.delena.forgecity.city.DayNightCycle
 import buzz.delena.forgecity.house.AppPlacementEngine
+import buzz.delena.forgecity.house.AssistantHouseBridge
 import buzz.delena.forgecity.house.HouseFeatureFlags
 import buzz.delena.forgecity.house.HouseRoom as DomainHouseRoom
 import buzz.delena.forgecity.house.PlaceableApp
@@ -73,6 +75,8 @@ fun ForgeCityHomeScreen(
     query: String,
     hourOfDay: Int,
     ambientEnabled: Boolean,
+    allowsSoftShadows: Boolean,
+    maxCharacters: Int,
     hasUsageAccess: Boolean,
     hasNotificationAccess: Boolean,
     assistantEnabled: Boolean,
@@ -92,6 +96,7 @@ fun ForgeCityHomeScreen(
     quietLabel: String,
     backgroundVideoEnabled: Boolean,
     backgroundVideoOpacity: Float,
+    houseHomeEnabled: Boolean,
     launcherChromeVisible: Boolean,
     assistantPanelVisible: Boolean,
     searchBarVisible: Boolean,
@@ -120,6 +125,7 @@ fun ForgeCityHomeScreen(
     onClearSpeechTestStatus: () -> Unit,
     onClearDiagnosticsLog: () -> Unit,
     onToggleBackgroundVideo: () -> Unit,
+    onToggleHouseHome: () -> Unit,
     onBackgroundVideoOpacityChange: (Float) -> Unit,
     onToggleLauncherChrome: () -> Unit,
     onToggleAssistantPanel: () -> Unit,
@@ -143,13 +149,14 @@ fun ForgeCityHomeScreen(
         query.isBlank() || it.label.contains(query, ignoreCase = true)
     }
     val favorites = buildings.filter { it.isFavorite }.take(6)
-    val houseMode = HouseFeatureFlags.use3dHouse
+    val houseMode = HouseFeatureFlags.use3dHouse && houseHomeEnabled
     val (top, mid, bottom) = DayNightCycle.skyColors(hourOfDay)
     val houseBackdrop = listOf(Color(0xFF1A1410), Color(0xFF2C2118), Color(0xFF1E1612))
 
     // Slice D2: when the query resolves to a single building, fly the camera to it.
     val focusBuildingId = if (query.isNotBlank() && filtered.size == 1) filtered.first().id else null
     val houseMarkers = remember(filtered) { demoHouseMarkers(filtered) }
+    val assistantSpeaking by AssistantHouseBridge.speaking.collectAsState()
 
     LaunchedEffect(dockMessage) {
         if (dockMessage == null) return@LaunchedEffect
@@ -200,9 +207,15 @@ fun ForgeCityHomeScreen(
             HouseHomeSurface(
                 markers = houseMarkers,
                 ambientEnabled = ambientEnabled,
+                allowsSoftShadows = allowsSoftShadows,
+                maxCharacters = maxCharacters,
+                assistantSpeaking = assistantSpeaking,
                 night = DayNightCycle.isNight(hourOfDay),
                 onMarkerTap = { marker ->
                     filtered.firstOrNull { it.id == marker.id }?.let(onBuildingTap)
+                },
+                onMarkerLongPress = { marker ->
+                    filtered.firstOrNull { it.id == marker.id }?.let(onBuildingLongPress)
                 },
                 modifier = Modifier.fillMaxSize(),
             )
@@ -299,7 +312,11 @@ fun ForgeCityHomeScreen(
                 }
                 if (searchBarVisible) {
                     Spacer(modifier = Modifier.height(8.dp))
-                    SearchBar(query = query, onQueryChange = onQueryChange)
+                    SearchBar(
+                        query = query,
+                        onQueryChange = onQueryChange,
+                        hint = if (houseMode) "Search apps" else "Search buildings",
+                    )
                 }
             }
         }
@@ -371,6 +388,8 @@ fun ForgeCityHomeScreen(
                 diagnosticsLog = diagnosticsLog,
                 backgroundVideoEnabled = backgroundVideoEnabled,
                 backgroundVideoOpacity = backgroundVideoOpacity,
+                houseHomeToggleVisible = HouseFeatureFlags.use3dHouse,
+                houseHomeEnabled = houseHomeEnabled,
                 quietLabel = quietLabel,
                 allowCount = allowCount,
                 onOpenNotificationAccess = onOpenNotificationAccess,
@@ -388,6 +407,7 @@ fun ForgeCityHomeScreen(
                 onClearSpeechTestStatus = onClearSpeechTestStatus,
                 onClearDiagnosticsLog = onClearDiagnosticsLog,
                 onToggleBackgroundVideo = onToggleBackgroundVideo,
+                onToggleHouseHome = onToggleHouseHome,
                 onBackgroundVideoOpacityChange = onBackgroundVideoOpacityChange,
                 onQuietStartEarlier = onQuietStartEarlier,
                 onQuietStartLater = onQuietStartLater,
@@ -678,6 +698,7 @@ private fun ResourceChip(label: String, value: Int, modifier: Modifier = Modifie
 private fun SearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
+    hint: String = "Search buildings",
 ) {
     BasicTextField(
         value = query,
@@ -695,7 +716,7 @@ private fun SearchBar(
                 contentAlignment = Alignment.CenterStart,
             ) {
                 if (query.isEmpty()) {
-                    Text("Search buildings", color = Color(0x99FFF6F0), fontSize = 15.sp)
+                    Text(hint, color = Color(0x99FFF6F0), fontSize = 15.sp)
                 }
                 inner()
             }
@@ -729,12 +750,13 @@ private fun demoHouseMarkers(buildings: List<CityBuilding>): List<HouseLabelMark
     }
 }
 
-/** Wave-1 floor plan has 6 cells; Vault domain room shares Office visually for now. */
+/** Map domain rooms onto Wave-2 floor-plan ids (Vault is a visible east annex). */
 private fun uiRoomId(room: DomainHouseRoom): String = when (room) {
     DomainHouseRoom.KITCHEN -> "kitchen"
     DomainHouseRoom.LIVING -> "living"
     DomainHouseRoom.HALLWAY -> "hallway"
-    DomainHouseRoom.OFFICE, DomainHouseRoom.VAULT -> "office"
+    DomainHouseRoom.OFFICE -> "office"
     DomainHouseRoom.BEDROOM -> "bedroom"
     DomainHouseRoom.WORKSHOP -> "workshop"
+    DomainHouseRoom.VAULT -> "vault"
 }

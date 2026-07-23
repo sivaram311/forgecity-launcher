@@ -191,12 +191,12 @@ Gemini audio is **opt-in** (notification text sent to Google when key is set).
 
 | Wave | Focus | Status |
 |------|--------|--------|
-| Wave 0 | FeatureFlag + video default off + versionCode 20 | ✅ |
-| Wave 1 | Rooms/placement + HouseHomeSurface + AnimationBudget tiers | ✅ procedural Compose |
-| Wave 2 | Filament/glTF + characters | pending |
-| Wave 3 | Device perf / #16 | pending |
+| Wave 0 | FeatureFlag + video default off + versionCode 20 | ✅ `0.8.0` |
+| Wave 1 | Rooms/placement + HouseHomeSurface | ✅ procedural Compose |
+| Wave 2 | Vault + furniture + characters + house/city toggle + speech pulse | ✅ `0.9.0` |
+| Wave 3 | HousePerfBudget + DEVICE-E2E-HOUSE-CHECKLIST | ✅ code/docs; #16 device soak pending |
 
-**Stack:** Wave 1 = procedural Compose house; Filament/SceneView remains long-term per Grok.
+**Stack:** procedural Compose house through 0.9; Filament/SceneView remains optional later.
 
 ### Phase 4 — AI Agents & Polish — v0.4.0 “Symphony” (~6–8 weeks)
 

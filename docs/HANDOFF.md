@@ -9,28 +9,27 @@
 
 | Field | Value |
 |-------|-------|
-| versionName | `0.8.0-3d-house-dev` · versionCode 20 |
-| Latest release | [`v0.8.0-3d-house-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.8.0-3d-house-dev) |
-| APK SHA-256 | `C14D5E2CCE7F5C29387CB1BC88BD15E5228BADC0219F88D4936B8D6F7F0AAF3E` |
-| Prior tip | [`v0.7.0-assistant-clarity-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.7.0-assistant-clarity-dev) |
+| versionName | `0.9.0-3d-house-characters-dev` · versionCode 21 |
+| Latest release | [`v0.9.0-3d-house-characters-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.9.0-3d-house-characters-dev) |
+| APK SHA-256 | `D8E66EA9442B9C7F7747FCCA9DCBE3FFE454FA3F886648EEEDE842D461154A7F` |
+| Prior tip | [`v0.8.0-3d-house-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.8.0-3d-house-dev) |
 
-## 3D House Wave 0/1 (0.8.0)
+## Waves complete (0.8 → 0.9)
 
-- **House HOME on:** procedural Compose floor-plan (`HouseHomeSurface`); `HouseFeatureFlags.use3dHouse=true`
-- **City video off:** `useCityVideo=false`; new installs default background video off
-- **Placement:** `AppPlacementEngine` + district→room map; apps as tappable room markers
-- **Budget:** `AnimationBudget` quality tiers (HIGH/MEDIUM/LOW) for later Filament/characters
-- **Fallback:** set `use3dHouse=false` to restore CityCanvas
-- **Plan:** [design/GROK-3D-HOUSE-LAUNCHER-PLAN.md](design/GROK-3D-HOUSE-LAUNCHER-PLAN.md)
+| Wave | Landed |
+|------|--------|
+| 0 | Flags, video default off, version train |
+| 1 | Procedural house + placement engine |
+| 2 | Vault annex, furniture, idle characters, house/city toggle, budget caps, assistant speech pulse |
+| 3 | `HousePerfBudget`, DEVICE-E2E-HOUSE-CHECKLIST (#16 still needs Realme) |
 
-Still pending vs Grok full vision: Filament/glTF, characters, Vault room cell, #16 device E2E.
+**Still not Filament/glTF** — procedural Compose path per Wave 1 decision. Filament remains future if perf allows.
 
 ## Now → next
 
 | Now | Next |
 |-----|------|
-| 0.8.0 Wave 1 house published | Device: tap app markers in rooms; flip flag if need city |
-| Filament + characters | Wave 2/3 per Grok plan |
-| Realme E2E (#16) PENDING | Blocks production tags |
+| 0.9.0 characters train | Device #16 using `docs/DEVICE-E2E-HOUSE-CHECKLIST.md` |
+| Optional Filament | Only after #16 + thermal evidence |
 
 Session: 2026-07-23.

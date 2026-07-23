@@ -17,18 +17,18 @@ git checkout main
 
 ## Download (prerelease debug APK)
 
-Latest (**0.8.0** 3D house Wave 1):
+Latest (**0.9.0** house characters):
 
 ```powershell
-curl.exe -L -o forgecity-0.8.0-3d-house-dev-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.8.0-3d-house-dev/forgecity-0.8.0-3d-house-dev-debug.apk
-Get-FileHash .\forgecity-0.8.0-3d-house-dev-debug.apk -Algorithm SHA256
-# expect C14D5E2CCE7F5C29387CB1BC88BD15E5228BADC0219F88D4936B8D6F7F0AAF3E
-adb install -r .\forgecity-0.8.0-3d-house-dev-debug.apk
+curl.exe -L -o forgecity-0.9.0-3d-house-characters-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.9.0-3d-house-characters-dev/forgecity-0.9.0-3d-house-characters-dev-debug.apk
+Get-FileHash .\forgecity-0.9.0-3d-house-characters-dev-debug.apk -Algorithm SHA256
+# expect D8E66EA9442B9C7F7747FCCA9DCBE3FFE454FA3F886648EEEDE842D461154A7F
+adb install -r .\forgecity-0.9.0-3d-house-characters-dev-debug.apk
 ```
 
-Prior tip (**0.7.0** Assistant Clarity): SHA
-`CA5EE2B60FF8DBF75F63A40BDA55672D799874689CA8B346FDD201F579A408FC`.
+Prior tip (**0.8.0** house Wave 1): SHA
+`C14D5E2CCE7F5C29387CB1BC88BD15E5228BADC0219F88D4936B8D6F7F0AAF3E`.
 
 Also grant: Home role, Usage Access, Notification Access (allowlist apps before speech).
 

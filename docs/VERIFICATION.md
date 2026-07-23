@@ -423,3 +423,18 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | APK SHA-256 | `C14D5E2CCE7F5C29387CB1BC88BD15E5228BADC0219F88D4936B8D6F7F0AAF3E` | local dist |
 | Filament / characters | PENDING | Wave 2+ |
 | Realme E2E (#16) | PENDING | debug prerelease |
+
+## 2026-07-23 — 0.9.0 3D House Wave 2/3 characters
+
+| Check | Result | Notes |
+|------|--------|-------|
+| versionCode | PASS | **21** · `0.9.0-3d-house-characters-dev` |
+| Vault annex + furniture | PASS | procedural Compose |
+| Idle characters + budget cap | PASS | mayor/assistant/NPC |
+| House/City settings toggle | PASS | `house_home_enabled` |
+| Assistant speech pulse | PASS | `AssistantHouseBridge` |
+| HousePerfBudget + checklist | PASS | #16 physical soak still open |
+| Unit/lint/assemble | PASS | |
+| APK SHA-256 | `D8E66EA9442B9C7F7747FCCA9DCBE3FFE454FA3F886648EEEDE842D461154A7F` | |
+| Filament/glTF | DEFERRED | not in 0.9 |
+| Realme E2E (#16) | PENDING | use DEVICE-E2E-HOUSE-CHECKLIST.md |

@@ -44,6 +44,8 @@ class MainActivity : ComponentActivity() {
             val query by viewModel.query.collectAsState()
             val hour by viewModel.hourOfDay.collectAsState()
             val ambient by viewModel.ambientEnabled.collectAsState()
+            val allowsSoftShadows by viewModel.allowsSoftShadows.collectAsState()
+            val maxCharacters by viewModel.maxCharacters.collectAsState()
             val usage by viewModel.hasUsageAccess.collectAsState()
             val notif by viewModel.hasNotificationAccess.collectAsState()
             val assistant by viewModel.assistantEnabled.collectAsState()
@@ -63,6 +65,7 @@ class MainActivity : ComponentActivity() {
             val quietLabel by viewModel.quietLabel.collectAsState()
             val backgroundVideoEnabled by viewModel.backgroundVideoEnabled.collectAsState()
             val backgroundVideoOpacity by viewModel.backgroundVideoOpacity.collectAsState()
+            val houseHomeEnabled by viewModel.houseHomeEnabled.collectAsState()
             val launcherChromeVisible by viewModel.launcherChromeVisible.collectAsState()
             val assistantPanelVisible by viewModel.assistantPanelVisible.collectAsState()
             val searchBarVisible by viewModel.searchBarVisible.collectAsState()
@@ -78,6 +81,8 @@ class MainActivity : ComponentActivity() {
                 query = query,
                 hourOfDay = hour,
                 ambientEnabled = ambient,
+                allowsSoftShadows = allowsSoftShadows,
+                maxCharacters = maxCharacters,
                 hasUsageAccess = usage,
                 hasNotificationAccess = notif,
                 assistantEnabled = assistant,
@@ -97,6 +102,7 @@ class MainActivity : ComponentActivity() {
                 quietLabel = quietLabel,
                 backgroundVideoEnabled = backgroundVideoEnabled,
                 backgroundVideoOpacity = backgroundVideoOpacity,
+                houseHomeEnabled = houseHomeEnabled,
                 launcherChromeVisible = launcherChromeVisible,
                 assistantPanelVisible = assistantPanelVisible,
                 searchBarVisible = searchBarVisible,
@@ -125,6 +131,7 @@ class MainActivity : ComponentActivity() {
                 onClearSpeechTestStatus = viewModel::clearSpeechTestStatus,
                 onClearDiagnosticsLog = viewModel::clearDiagnosticsLog,
                 onToggleBackgroundVideo = viewModel::toggleBackgroundVideo,
+                onToggleHouseHome = viewModel::toggleHouseHome,
                 onBackgroundVideoOpacityChange = viewModel::setBackgroundVideoOpacity,
                 onToggleLauncherChrome = viewModel::toggleLauncherChrome,
                 onToggleAssistantPanel = viewModel::toggleAssistantPanel,

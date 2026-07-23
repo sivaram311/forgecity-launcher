@@ -164,6 +164,8 @@ fun AssistantSettingsSheet(
     diagnosticsLog: String,
     backgroundVideoEnabled: Boolean,
     backgroundVideoOpacity: Float,
+    houseHomeToggleVisible: Boolean = false,
+    houseHomeEnabled: Boolean = true,
     quietLabel: String,
     allowCount: Int,
     onOpenNotificationAccess: () -> Unit,
@@ -181,6 +183,7 @@ fun AssistantSettingsSheet(
     onClearSpeechTestStatus: () -> Unit,
     onClearDiagnosticsLog: () -> Unit,
     onToggleBackgroundVideo: () -> Unit,
+    onToggleHouseHome: () -> Unit = {},
     onBackgroundVideoOpacityChange: (Float) -> Unit,
     onQuietStartEarlier: () -> Unit,
     onQuietStartLater: () -> Unit,
@@ -249,6 +252,8 @@ fun AssistantSettingsSheet(
                     diagnosticsLog = diagnosticsLog,
                     backgroundVideoEnabled = backgroundVideoEnabled,
                     backgroundVideoOpacity = backgroundVideoOpacity,
+                    houseHomeToggleVisible = houseHomeToggleVisible,
+                    houseHomeEnabled = houseHomeEnabled,
                     quietLabel = quietLabel,
                     allowCount = allowCount,
                     onOpenNotificationAccess = onOpenNotificationAccess,
@@ -266,6 +271,7 @@ fun AssistantSettingsSheet(
                     onClearSpeechTestStatus = onClearSpeechTestStatus,
                     onClearDiagnosticsLog = onClearDiagnosticsLog,
                     onToggleBackgroundVideo = onToggleBackgroundVideo,
+                    onToggleHouseHome = onToggleHouseHome,
                     onBackgroundVideoOpacityChange = onBackgroundVideoOpacityChange,
                     onQuietStartEarlier = onQuietStartEarlier,
                     onQuietStartLater = onQuietStartLater,
@@ -297,6 +303,8 @@ fun AssistantSettingsCard(
     diagnosticsLog: String,
     backgroundVideoEnabled: Boolean,
     backgroundVideoOpacity: Float,
+    houseHomeToggleVisible: Boolean = false,
+    houseHomeEnabled: Boolean = true,
     quietLabel: String,
     allowCount: Int,
     onOpenNotificationAccess: () -> Unit,
@@ -314,6 +322,7 @@ fun AssistantSettingsCard(
     onClearSpeechTestStatus: () -> Unit,
     onClearDiagnosticsLog: () -> Unit,
     onToggleBackgroundVideo: () -> Unit,
+    onToggleHouseHome: () -> Unit = {},
     onBackgroundVideoOpacityChange: (Float) -> Unit,
     onQuietStartEarlier: () -> Unit,
     onQuietStartLater: () -> Unit,
@@ -703,6 +712,9 @@ fun AssistantSettingsCard(
             fontSize = 11.sp,
             fontWeight = FontWeight.SemiBold,
         )
+        if (houseHomeToggleVisible) {
+            SettingRow("3D House home", houseHomeEnabled, onToggleHouseHome)
+        }
         SettingRow("Background Video", backgroundVideoEnabled, onToggleBackgroundVideo)
         Row(
             verticalAlignment = Alignment.CenterVertically,

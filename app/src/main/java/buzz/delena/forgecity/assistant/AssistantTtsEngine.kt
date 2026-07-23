@@ -9,6 +9,8 @@ import android.media.AudioTrack
 import android.media.MediaPlayer
 import android.os.Build
 import android.speech.tts.TextToSpeech
+import buzz.delena.forgecity.house.AssistantHouseBridge
+import buzz.delena.forgecity.house.AssistantPresenceState
 import java.io.File
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -106,16 +108,17 @@ class AssistantTtsEngine(context: Context) {
                     "bytes=${normalized.pcm.size} rateHz=${normalized.sampleRateHz} wav=${normalized.hadWavHeader}",
                 )
                 requestFocus()
+                val speakMs = pcmDurationMs(normalized.pcm.size, normalized.sampleRateHz)
                 if (playViaAudioTrack(normalized.pcm, normalized.sampleRateHz)) {
                     reported = true
-                    callback?.invoke(SpeakResult.STARTED)
+                    notifySpeakStarted(callback, speakMs)
                     waitForPcmDuration(normalized.pcm.size, normalized.sampleRateHz)
                     return@execute
                 }
                 ForgeCityTtsDiagnostics.warn("pcm_audiotrack_failed", "trying=mediaplayer")
                 if (playViaMediaPlayer(normalized.pcm, normalized.sampleRateHz)) {
                     reported = true
-                    callback?.invoke(SpeakResult.STARTED)
+                    notifySpeakStarted(callback, speakMs)
                     waitForPcmDuration(normalized.pcm.size, normalized.sampleRateHz)
                     return@execute
                 }
@@ -132,6 +135,7 @@ class AssistantTtsEngine(context: Context) {
             } finally {
                 stopPlaybackLocked()
                 abandonFocus()
+                AssistantHouseBridge.clear()
             }
         }
     }
@@ -260,10 +264,12 @@ class AssistantTtsEngine(context: Context) {
         }
     }
 
+    private fun pcmDurationMs(byteCount: Int, sampleRateHz: Int): Long =
+        ((byteCount / 2.0) / sampleRateHz * 1000.0).toLong().coerceAtLeast(50L) + 120L
+
     private fun waitForPcmDuration(byteCount: Int, sampleRateHz: Int) {
-        val durationMs = ((byteCount / 2.0) / sampleRateHz * 1000.0).toLong().coerceAtLeast(50L)
         try {
-            Thread.sleep(durationMs + 120L)
+            Thread.sleep(pcmDurationMs(byteCount, sampleRateHz))
         } catch (_: InterruptedException) {
             Thread.currentThread().interrupt()
         }
@@ -292,8 +298,21 @@ class AssistantTtsEngine(context: Context) {
                 "tts_speak_result",
                 "localeCandidates=${locales.joinToString { it.toLanguageTag() }} result=$result",
             )
-            callback?.invoke(result)
+            if (result == SpeakResult.STARTED) {
+                notifySpeakStarted(callback)
+            } else {
+                callback?.invoke(result)
+            }
         }
+    }
+
+    /** House pulse only — never forwards utterance / notification text. */
+    private fun notifySpeakStarted(
+        callback: ((SpeakResult) -> Unit)?,
+        durationMs: Long = AssistantPresenceState.DEFAULT_SPEAK_MS,
+    ) {
+        AssistantHouseBridge.onSpeakStarted(durationMs)
+        callback?.invoke(SpeakResult.STARTED)
     }
 
     @Synchronized
@@ -327,6 +346,7 @@ class AssistantTtsEngine(context: Context) {
         tts?.stop()
         stopPlaybackLocked()
         abandonFocus()
+        AssistantHouseBridge.clear()
     }
 
     @Synchronized
