@@ -8,8 +8,14 @@ class DustMoteCloudTest {
     @Test
     fun countGatesOnBudget() {
         assertEquals(0, DustMoteCloud.countFor(allowsSoftShadows = true, ambientEnabled = false))
-        assertEquals(64, DustMoteCloud.countFor(allowsSoftShadows = true, ambientEnabled = true))
-        assertEquals(32, DustMoteCloud.countFor(allowsSoftShadows = false, ambientEnabled = true))
+        assertEquals(72, DustMoteCloud.countFor(allowsSoftShadows = true, ambientEnabled = true))
+        assertEquals(40, DustMoteCloud.countFor(allowsSoftShadows = false, ambientEnabled = true))
+    }
+
+    @Test
+    fun softSphereRadius() {
+        assertTrue(DustMoteCloud.radiusFor(true) < 0.02f)
+        assertTrue(DustMoteCloud.radiusFor(false) <= DustMoteCloud.radiusFor(true))
     }
 
     @Test

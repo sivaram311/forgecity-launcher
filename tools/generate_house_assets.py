@@ -628,13 +628,174 @@ def _add_exterior_windows(mb: MeshBuilder) -> None:
             mb.add_window_x(plane, center, half, y0, y1, outward)
 
 
+def _droop_span(
+    a: tuple[float, float, float],
+    b: tuple[float, float, float],
+    sag: float,
+    samples: int = 10,
+) -> list[tuple[float, float, float]]:
+    """Parabolic mid-span droop (Production House CableRun gravity feel)."""
+    pts: list[tuple[float, float, float]] = []
+    for i in range(samples + 1):
+        t = i / samples
+        x = a[0] + (b[0] - a[0]) * t
+        y = a[1] + (b[1] - a[1]) * t - sag * 4.0 * t * (1.0 - t)
+        z = a[2] + (b[2] - a[2]) * t
+        pts.append((x, y, z))
+    return pts
+
+
+def _add_cable_chain(
+    mb: MeshBuilder,
+    waypoints: list[tuple[float, float, float]],
+    sag: float = 0.10,
+    radius: float = 0.016,
+) -> None:
+    cable = rgba(0xFF1A1816)
+    samples: list[tuple[float, float, float]] = []
+    for i in range(len(waypoints) - 1):
+        span = _droop_span(waypoints[i], waypoints[i + 1], sag=sag, samples=8)
+        if i > 0:
+            span = span[1:]
+        samples.extend(span)
+    for x, y, z in samples:
+        mb.add_box(x - radius, y - radius, z - radius, x + radius, y + radius, z + radius, cable)
+
+
 def _add_cable_runs(mb: MeshBuilder) -> None:
-    cable = rgba(0xFF2A2420)
-    h, w, d = 0.025, 0.06, 0.04
-    mb.add_box(2.88, FLOOR_T, 3.05, 2.88 + w, FLOOR_T + h, 5.95, cable)
-    mb.add_box(0.05, FLOOR_T, 3.05, 2.88, FLOOR_T + h, 3.05 + d, cable)
-    mb.add_box(3.05, FLOOR_T, 3.05, 3.05 + d, FLOOR_T + h, 5.95, cable)
-    mb.add_box(3.05, FLOOR_T, 6.0, 3.05 + d, FLOOR_T + h, 8.85, cable)
+    # Hallway → office → workshop droops (replaces axis-aligned plank cables).
+    _add_cable_chain(
+        mb,
+        [(0.25, 0.08, 3.25), (1.6, 0.06, 4.5), (2.85, 0.07, 5.7)],
+        sag=0.11,
+    )
+    _add_cable_chain(
+        mb,
+        [(2.95, 0.08, 3.4), (4.5, 0.05, 4.5), (6.4, 0.07, 5.6)],
+        sag=0.12,
+    )
+    _add_cable_chain(
+        mb,
+        [(3.2, 0.08, 6.15), (4.8, 0.04, 7.4), (6.3, 0.07, 8.6)],
+        sag=0.10,
+    )
+
+
+def _add_ceilings(mb: MeshBuilder) -> None:
+    """Thin ceiling planes + light trays (0.11.2 interior finish)."""
+    ceil = rgba(0xFFE8E2D8)
+    tray = rgba(0xFFD4C8B4)
+    for room in ROOMS:
+        inset = 0.06
+        y0 = WALL_H - 0.04
+        mb.add_box(
+            room.min_x + inset, y0, room.min_z + inset,
+            room.max_x - inset, WALL_H, room.max_z - inset,
+            ceil,
+        )
+        # Shallow light tray along longer axis
+        cx = (room.min_x + room.max_x) * 0.5
+        cz = (room.min_z + room.max_z) * 0.5
+        if room.max_x - room.min_x >= room.max_z - room.min_z:
+            half = (room.max_x - room.min_x) * 0.28
+            mb.add_box(cx - half, y0 - 0.03, cz - 0.08, cx + half, y0, cz + 0.08, tray)
+        else:
+            half = (room.max_z - room.min_z) * 0.28
+            mb.add_box(cx - 0.08, y0 - 0.03, cz - half, cx + 0.08, y0, cz + half, tray)
+
+
+def _add_picture_frame(
+    mb: MeshBuilder,
+    x0: float,
+    y0: float,
+    z0: float,
+    x1: float,
+    y1: float,
+    z1: float,
+    art: tuple[float, float, float, float],
+) -> None:
+    frame = rgba(0xFF3A3228)
+    # Outer frame
+    mb.add_box(x0, y0, z0, x1, y1, z1, frame)
+    # Inset art
+    inset = 0.03
+    ax0, ay0, az0 = x0 + inset, y0 + inset, z0
+    ax1, ay1, az1 = x1 - inset, y1 - inset, z1
+    if abs(x1 - x0) < abs(z1 - z0):
+        # Frame on X wall — push art along X
+        mid = (x0 + x1) * 0.5
+        mb.add_box(mid - 0.005, ay0, z0 + inset, mid + 0.005, ay1, z1 - inset, art)
+    else:
+        mid = (z0 + z1) * 0.5
+        mb.add_box(x0 + inset, ay0, mid - 0.005, x1 - inset, ay1, mid + 0.005, art)
+
+
+def _add_pictures(mb: MeshBuilder) -> None:
+    # Living south wall
+    _add_picture_frame(mb, 4.6, 1.15, 0.08, 5.6, 1.85, 0.12, rgba(0xFF6B8F71))
+    # Office west wall
+    _add_picture_frame(mb, 3.08, 1.2, 4.1, 3.12, 1.9, 5.0, rgba(0xFF4A6FA5))
+    # Bedroom east wall
+    _add_picture_frame(mb, 2.88, 1.15, 6.8, 2.92, 1.8, 7.6, rgba(0xFFB07060))
+    # Hallway
+    _add_picture_frame(mb, 0.08, 1.25, 4.2, 0.12, 1.85, 4.9, rgba(0xFF8A7A5A))
+
+
+def _add_corner_ao(mb: MeshBuilder) -> None:
+    """Fake floor-corner AO wedges (dark, short)."""
+    ao = rgba(0xFF2A241E)
+    h = 0.35
+    t = 0.07
+    for room in ROOMS:
+        corners = (
+            (room.min_x, room.min_z),
+            (room.max_x, room.min_z),
+            (room.min_x, room.max_z),
+            (room.max_x, room.max_z),
+        )
+        for cx, cz in corners:
+            mb.add_box(cx - t * 0.5, FLOOR_T, cz - t * 0.5, cx + t * 0.5, FLOOR_T + h, cz + t * 0.5, ao)
+
+
+def _add_hero_props(mb: MeshBuilder) -> None:
+    """One readable prop per room (0.11.1 set dressing)."""
+    metal = rgba(0xFF6A6E74)
+    copper = rgba(0xFFB87333)
+    pot = rgba(0xFF4A3A2A)
+    leaf = rgba(0xFF3D6B3A)
+    screen = rgba(0xFF1A2430)
+    plastic = rgba(0xFF2C333C)
+    slate = rgba(0xFF1E1E1E)
+    chalk = rgba(0xFFE8E4D8)
+
+    # Kitchen — kettle on counter
+    mb.add_box(1.35, 0.95, 2.35, 1.55, 1.12, 2.55, copper)
+    mb.add_box(1.38, 1.12, 2.38, 1.52, 1.18, 2.52, metal)
+    mb.add_box(1.48, 1.05, 2.52, 1.62, 1.08, 2.58, copper)
+
+    # Living — potted plant
+    mb.add_box(6.15, FLOOR_T, 0.45, 6.45, FLOOR_T + 0.22, 0.75, pot)
+    mb.add_box(6.22, FLOOR_T + 0.22, 0.52, 6.38, FLOOR_T + 0.55, 0.68, leaf)
+    mb.add_box(6.18, FLOOR_T + 0.50, 0.48, 6.42, FLOOR_T + 0.72, 0.72, leaf)
+
+    # Office — laptop on desk
+    mb.add_box(4.7, 0.76, 4.25, 5.3, 0.80, 4.65, plastic)
+    mb.add_box(4.75, 0.80, 4.30, 5.25, 1.05, 4.35, screen)
+
+    # Bedroom — switch plate + small dresser box already; add kettle-like lamp base done via pillow
+    mb.add_box(2.35, 0.55, 7.2, 2.55, 0.72, 7.4, rgba(0xFFEDE4D4))
+    mb.add_box(2.40, 0.72, 7.25, 2.50, 0.78, 7.35, rgba(0xFFFFC978), material=MAT_WINDOW)
+
+    # Workshop — toolbox
+    mb.add_box(3.6, FLOOR_T, 7.15, 4.35, FLOOR_T + 0.28, 7.55, rgba(0xFFC45C26))
+    mb.add_box(3.7, FLOOR_T + 0.28, 7.25, 4.25, FLOOR_T + 0.35, 7.45, metal)
+
+    # Hallway — clap slate / clapper (PH nod)
+    mb.add_box(1.15, FLOOR_T, 4.55, 1.55, FLOOR_T + 0.04, 4.85, slate)
+    mb.add_box(1.18, FLOOR_T + 0.04, 4.58, 1.52, FLOOR_T + 0.06, 4.82, chalk)
+
+    # Vault — lock bar across chest
+    mb.add_box(7.7, 0.58, 4.55, 8.3, 0.66, 4.75, metal)
 
 
 def _add_furniture(mb: MeshBuilder) -> None:
@@ -698,6 +859,10 @@ def build_house_shell() -> MeshBuilder:
     _add_exterior_windows(mb)
     _add_cable_runs(mb)
     _add_furniture(mb)
+    _add_hero_props(mb)
+    _add_pictures(mb)
+    _add_corner_ao(mb)
+    _add_ceilings(mb)
 
     return mb
 

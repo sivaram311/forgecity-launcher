@@ -4,8 +4,8 @@ import kotlin.math.sin
 import kotlin.random.Random
 
 /**
- * Production-House-style dust motes for Filament (Grok 0.10.3).
- * Tiny cubes floated in [onFrame]; count capped for Adreno 710.
+ * Soft sphere dust motes (0.11.1 — replaces chunky cubes).
+ * Count capped for Adreno 710; radius tiny so they read as air, not snow.
  */
 data class DustMote(
     val baseX: Float,
@@ -17,11 +17,15 @@ data class DustMote(
 )
 
 object DustMoteCloud {
-    /** HIGH budget: 64 · MEDIUM/LOW: 32 · disabled: 0 */
+    /** HIGH budget: 72 · MEDIUM/LOW: 40 · disabled: 0 */
     fun countFor(allowsSoftShadows: Boolean, ambientEnabled: Boolean): Int {
         if (!ambientEnabled) return 0
-        return if (allowsSoftShadows) 64 else 32
+        return if (allowsSoftShadows) 72 else 40
     }
+
+    /** Sphere radius in meters — soft motes, not bouncing cubes. */
+    fun radiusFor(allowsSoftShadows: Boolean): Float =
+        if (allowsSoftShadows) 0.014f else 0.011f
 
     fun seeds(count: Int, seed: Long = 42L): List<DustMote> {
         if (count <= 0) return emptyList()
@@ -40,7 +44,8 @@ object DustMoteCloud {
 
     fun positionAt(mote: DustMote, timeSec: Float): Triple<Float, Float, Float> {
         val rise = ((timeSec * mote.speed) + mote.phase) % 2.4f
-        val x = mote.baseX + sin(timeSec * 0.15f + mote.phase) * mote.drift
+        val wind = sin(timeSec * 0.15f) * 0.02f
+        val x = mote.baseX + sin(timeSec * 0.15f + mote.phase) * mote.drift + wind
         val y = mote.baseY + rise
         val z = mote.baseZ + sin(timeSec * 0.11f + mote.phase * 0.7f) * mote.drift * 0.8f
         return Triple(x, y, z)

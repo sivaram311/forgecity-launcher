@@ -9,10 +9,10 @@
 
 | Field | Value |
 |-------|-------|
-| versionName | `0.11.0-humanoid-daycycle-dev` · versionCode **28** |
-| Latest release | [`v0.11.0-humanoid-daycycle-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.11.0-humanoid-daycycle-dev) |
-| APK SHA-256 | `E09408908541924FA99B0A1A2D1452795F41377E3DDDE67AFFBAB3D080FBE1A6` |
-| Prior tip | [`v0.10.5-wall-character-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.10.5-wall-character-dev) · SHA `66BE9AAA…` |
+| versionName | `0.11.2-set-dressing-dev` · versionCode **29** |
+| Latest release | [`v0.11.2-set-dressing-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.11.2-set-dressing-dev) |
+| APK SHA-256 | `79342FD2A70D9EB47BA85956E4465F61E0E554662D51D3CA226BABF20C88B9AF` |
+| Prior tip | [`v0.11.0-humanoid-daycycle-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.11.0-humanoid-daycycle-dev) · SHA `E0940890…` |
 
 ## Waves complete (0.8 → 0.11)
 
@@ -24,6 +24,7 @@
 | 3 | `HousePerfBudget`, DEVICE-E2E-HOUSE-CHECKLIST (#16 still needs Realme) |
 | 4 | **Filament** SceneView `4.15.0` · glTF assets · lighting/dust/walls |
 | 5 | **0.11** jointed capsule humanoids + day-cycle + window/rim finishing |
+| 6 | **0.11.2** droop cables, hero props, sphere dust, ceilings/pictures/AO |
 
 **Fallbacks:** procedural `HouseHomeSurface` when `useFilamentHouse=false`; CityCanvas when house toggle off.
 
@@ -33,7 +34,7 @@
 
 | Now | Next |
 |-----|------|
-| 0.11.0 humanoid + day-cycle | 0.11.1 droop cables + hero props + softer dust |
+| 0.11.2 set dressing (gap 4–6) | 0.12 room patrols / sit loops |
 | Compile + unit PASS | Device #16 using `docs/DEVICE-E2E-HOUSE-CHECKLIST.md` (prerelease waiver OK) |
 
 Session: 2026-07-23.

@@ -1,14 +1,20 @@
 ﻿# ForgeCity Launcher
 
-**Latest:** [`v0.11.0-humanoid-daycycle-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.11.0-humanoid-daycycle-dev) · vc **28**
+**Latest:** [`v0.11.2-set-dressing-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.11.2-set-dressing-dev) · vc **29**
 
 ## Download
 ```powershell
-curl.exe -L -o forgecity-0.11.0-humanoid-daycycle-dev-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.11.0-humanoid-daycycle-dev/forgecity-0.11.0-humanoid-daycycle-dev-debug.apk
-Get-FileHash .\forgecity-0.11.0-humanoid-daycycle-dev-debug.apk -Algorithm SHA256
-# expect E09408908541924FA99B0A1A2D1452795F41377E3DDDE67AFFBAB3D080FBE1A6
+curl.exe -L -o forgecity-0.11.2-set-dressing-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.11.2-set-dressing-dev/forgecity-0.11.2-set-dressing-dev-debug.apk
+Get-FileHash .\forgecity-0.11.2-set-dressing-dev-debug.apk -Algorithm SHA256
+# expect 79342FD2A70D9EB47BA85956E4465F61E0E554662D51D3CA226BABF20C88B9AF
 ```
+
+## 0.11.2 (set dressing — gap backlog 4–6)
+- Droop cable chains (parabolic mid-span) hallway→office→workshop
+- Hero props: kettle, plant, laptop, slate, toolbox, vault lock bar
+- Soft **sphere** dust (not cubes); ceilings + picture frames + corner AO
+- Gap plan: `docs/design/GAP-VS-PRODUCTION-HOUSE.md`
 
 ## 0.11.0 (PH-like humanoids + day-cycle)
 - Jointed capsule humanoids (idle / talk / walk) — Production House `Humanoid.tsx` port

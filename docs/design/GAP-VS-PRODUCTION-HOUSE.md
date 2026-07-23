@@ -126,9 +126,9 @@ PH has clap SFX + mute. Optional later for ForgeCity (door soft click, assistant
 | 1 | **Jointed humanoid + actions** (capsule limbs, idle/talk/walk) | Characters like PH | L | **0.11.0 LANDED** |
 | 2 | **Day-cycle lights + hemisphere bounce** | Living air like PH lot | M | **0.11.0 LANDED** |
 | 3 | **Window emissive pulse + corner rim strips** | Facade finishing | S | **0.11.0 LANDED** |
-| 4 | **Droop cables + 1 hero prop set per room** | Set dressing | M | 0.11.1 |
-| 5 | **Points/sphere dust** (replace cube motes) | Air | S | 0.11.1 |
-| 6 | Ceiling + picture frames + corner AO | Interior finish | M | 0.11.2 |
+| 4 | **Droop cables + 1 hero prop set per room** | Set dressing | M | **0.11.2 LANDED** |
+| 5 | **Points/sphere dust** (replace cube motes) | Air | S | **0.11.2 LANDED** |
+| 6 | Ceiling + picture frames + corner AO | Interior finish | M | **0.11.2 LANDED** |
 | 7 | Room patrols / sit loops | Life | M | 0.12 |
 | 8 | Custom Filament fresnel / HDR IBL | Photoreal ceiling | L / defer | 0.12+ |
 

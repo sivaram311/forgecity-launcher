@@ -57,7 +57,7 @@ import kotlin.math.roundToInt
 private const val HOUSE_ASSET = "filament/house_shell.glb"
 
 /**
- * Filament house HOME — 0.11 jointed humanoids + day-cycle lights + window/rim finishing.
+ * Filament house HOME — 0.11.2 set dressing (cables/props/ceiling) + soft sphere dust.
  */
 @Composable
 fun HouseFilamentSurface(
@@ -241,15 +241,16 @@ fun HouseFilamentSurface(
 
             val dustMat = remember {
                 materialLoader.createColorInstance(
-                    color = Color(0x66FFF6E8),
+                    color = Color(0x55FFF6E8),
                     metallic = 0f,
                     roughness = 1f,
                 )
             }
+            val dustRadius = DustMoteCloud.radiusFor(allowsSoftShadows)
             dustSeeds.forEachIndexed { index, mote ->
                 val (x, y, z) = DustMoteCloud.positionAt(mote, timeSec)
-                CubeNode(
-                    size = Size(0.035f),
+                SphereNode(
+                    radius = dustRadius,
                     materialInstance = dustMat,
                     position = Position(x = x, y = y, z = z),
                     apply = { name = "dust_$index" },
