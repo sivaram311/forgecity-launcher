@@ -57,7 +57,13 @@ import buzz.delena.forgecity.assistant.AssistantUiEvent
 import buzz.delena.forgecity.city.CityBuilding
 import buzz.delena.forgecity.city.CityState
 import buzz.delena.forgecity.city.DayNightCycle
+import buzz.delena.forgecity.house.AppPlacementEngine
+import buzz.delena.forgecity.house.HouseFeatureFlags
+import buzz.delena.forgecity.house.HouseRoom as DomainHouseRoom
+import buzz.delena.forgecity.house.PlaceableApp
 import buzz.delena.forgecity.ui.background.CityBackgroundVideo
+import buzz.delena.forgecity.ui.house.HouseHomeSurface
+import buzz.delena.forgecity.ui.house.HouseLabelMarker
 import kotlinx.coroutines.delay
 
 @Composable
@@ -137,10 +143,13 @@ fun ForgeCityHomeScreen(
         query.isBlank() || it.label.contains(query, ignoreCase = true)
     }
     val favorites = buildings.filter { it.isFavorite }.take(6)
+    val houseMode = HouseFeatureFlags.use3dHouse
     val (top, mid, bottom) = DayNightCycle.skyColors(hourOfDay)
+    val houseBackdrop = listOf(Color(0xFF1A1410), Color(0xFF2C2118), Color(0xFF1E1612))
 
     // Slice D2: when the query resolves to a single building, fly the camera to it.
     val focusBuildingId = if (query.isNotBlank() && filtered.size == 1) filtered.first().id else null
+    val houseMarkers = remember(filtered) { demoHouseMarkers(filtered) }
 
     LaunchedEffect(dockMessage) {
         if (dockMessage == null) return@LaunchedEffect
@@ -153,11 +162,15 @@ fun ForgeCityHomeScreen(
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    listOf(Color(top), Color(mid), Color(bottom)),
+                    if (houseMode) houseBackdrop else listOf(Color(top), Color(mid), Color(bottom)),
                 ),
             ),
     ) {
-        val videoOn = ambientEnabled && backgroundVideoEnabled
+        // House mode must not force city video; compile flag gates the Media3 path.
+        val videoOn = !houseMode &&
+            ambientEnabled &&
+            backgroundVideoEnabled &&
+            HouseFeatureFlags.useCityVideo
         CityBackgroundVideo(
             enabled = videoOn,
             opacity = backgroundVideoOpacity,
@@ -183,17 +196,29 @@ fun ForgeCityHomeScreen(
             )
         }
 
-        CityCanvas(
-            buildings = filtered,
-            hourOfDay = hourOfDay,
-            ambientEnabled = ambientEnabled,
-            levelUpBuildingId = levelUpBuildingId,
-            focusBuildingId = focusBuildingId,
-            onBuildingTap = onBuildingTap,
-            onBuildingLongPress = onBuildingLongPress,
-            onLevelUpConsumed = onLevelUpConsumed,
-            modifier = Modifier.fillMaxSize(),
-        )
+        if (houseMode) {
+            HouseHomeSurface(
+                markers = houseMarkers,
+                ambientEnabled = ambientEnabled,
+                night = DayNightCycle.isNight(hourOfDay),
+                onMarkerTap = { marker ->
+                    filtered.firstOrNull { it.id == marker.id }?.let(onBuildingTap)
+                },
+                modifier = Modifier.fillMaxSize(),
+            )
+        } else {
+            CityCanvas(
+                buildings = filtered,
+                hourOfDay = hourOfDay,
+                ambientEnabled = ambientEnabled,
+                levelUpBuildingId = levelUpBuildingId,
+                focusBuildingId = focusBuildingId,
+                onBuildingTap = onBuildingTap,
+                onBuildingLongPress = onBuildingLongPress,
+                onLevelUpConsumed = onLevelUpConsumed,
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
 
         // Slice C4: subtle vignette so the poster/gradient state reads with depth.
         Box(
@@ -676,4 +701,40 @@ private fun SearchBar(
             }
         },
     )
+}
+
+/** Place apps via AppPlacementEngine; map domain rooms onto Wave-1 floor-plan ids. */
+private fun demoHouseMarkers(buildings: List<CityBuilding>): List<HouseLabelMarker> {
+    val byId = buildings.associateBy { it.id }
+    val apps = buildings.map { b ->
+        PlaceableApp(
+            id = b.id,
+            district = b.district,
+            isFavorite = b.isFavorite,
+            launchCount = b.level.coerceAtLeast(0),
+        )
+    }
+    return AppPlacementEngine.place(apps).mapNotNull { placement ->
+        val building = byId[placement.appId] ?: return@mapNotNull null
+        val bounds = placement.hotspot.room.bounds
+        val nx = ((placement.hotspot.localOffset.x / bounds.width).coerceIn(0.15f, 0.85f))
+        val ny = ((placement.hotspot.localOffset.z / bounds.depth).coerceIn(0.2f, 0.8f))
+        HouseLabelMarker(
+            id = building.id,
+            label = building.label,
+            roomId = uiRoomId(placement.hotspot.room),
+            nx = nx,
+            ny = ny,
+        )
+    }
+}
+
+/** Wave-1 floor plan has 6 cells; Vault domain room shares Office visually for now. */
+private fun uiRoomId(room: DomainHouseRoom): String = when (room) {
+    DomainHouseRoom.KITCHEN -> "kitchen"
+    DomainHouseRoom.LIVING -> "living"
+    DomainHouseRoom.HALLWAY -> "hallway"
+    DomainHouseRoom.OFFICE, DomainHouseRoom.VAULT -> "office"
+    DomainHouseRoom.BEDROOM -> "bedroom"
+    DomainHouseRoom.WORKSHOP -> "workshop"
 }

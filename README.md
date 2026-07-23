@@ -1,41 +1,39 @@
 # ForgeCity Launcher
 
-A story-driven isometric city home screen for Realme P2 / P2 Pro (ColorOS).
-Apps become buildings. Habits rebuild districts. A neon city assistant can read
-notifications aloud when you opt in.
+A story-driven home screen for Realme P2 / P2 Pro (ColorOS). Apps live in a
+warm interior house (Wave 1) or classic isometric city (fallback). Habits rebuild
+districts. A neon city assistant can read notifications aloud when you opt in.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher (public)
-**Branch:** `main` · version `0.7.0-assistant-clarity-dev`
-**Latest prerelease:** [`v0.7.0-assistant-clarity-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.7.0-assistant-clarity-dev) · prior [`v0.6.1-tts-error-log-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.6.1-tts-error-log-dev)
+**Branch:** `main` · version `0.8.0-3d-house-dev`
+**Latest prerelease:** [`v0.8.0-3d-house-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.8.0-3d-house-dev)
 
 ## Download
 
 ```powershell
-curl.exe -L -o forgecity-0.7.0-assistant-clarity-dev-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.7.0-assistant-clarity-dev/forgecity-0.7.0-assistant-clarity-dev-debug.apk
-Get-FileHash .\forgecity-0.7.0-assistant-clarity-dev-debug.apk -Algorithm SHA256
-# expect CA5EE2B60FF8DBF75F63A40BDA55672D799874689CA8B346FDD201F579A408FC
-adb install -r .\forgecity-0.7.0-assistant-clarity-dev-debug.apk
+curl.exe -L -o forgecity-0.8.0-3d-house-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.8.0-3d-house-dev/forgecity-0.8.0-3d-house-dev-debug.apk
+Get-FileHash .\forgecity-0.8.0-3d-house-dev-debug.apk -Algorithm SHA256
+# expect C14D5E2CCE7F5C29387CB1BC88BD15E5228BADC0219F88D4936B8D6F7F0AAF3E
+adb install -r .\forgecity-0.8.0-3d-house-dev-debug.apk
 ```
 
-## What works in 0.7.0-assistant-clarity-dev
+## What works in 0.8.0-3d-house-dev
 
-- **Assistant Clarity:** mode-gated Gemini vs Portal settings; speak-aloud prompt
-  validation (`PromptModeValidator`); presets Tamil clear / Kongu friend / English brief
-- Masked API keys with reveal; **TEST TTS** gated off when audio prompt invalid
-- Speech diagnostics: **COPY LOG** / **CLEAR** (same privacy rules as 0.6.1)
-- Plus **0.6.x** city 3D + diagnostics, **0.5.x** Gemini audio + UI polish
-- Speech modes: OFF → DIRECT → PORTAL → GEMINI AUDIO → CASCADE
+- **House HOME (Wave 1):** procedural multi-room floor plan; apps as tappable markers
+- **Placement engine:** districts → rooms; favorites prefer desk/TV hotspots
+- **City video off** by default (`HouseFeatureFlags.useCityVideo=false`)
+- **CityCanvas fallback:** set `HouseFeatureFlags.use3dHouse=false`
+- Plus **0.7** Assistant Clarity (mode-gated Gemini/Portal, prompt validation, COPY LOG)
 
 ## Docs
 
 | Doc | Purpose |
 |-----|---------|
-| [docs/design/GROK-LAUNCHER-CONFIG-ROADMAP.md](docs/design/GROK-LAUNCHER-CONFIG-ROADMAP.md) | Grok 4.1 config panel + roadmap consult |
+| [docs/design/GROK-3D-HOUSE-LAUNCHER-PLAN.md](docs/design/GROK-3D-HOUSE-LAUNCHER-PLAN.md) | Grok realistic 3D house plan |
 | [docs/HANDOFF.md](docs/HANDOFF.md) | Current tip + next actions |
 | [docs/OPS.md](docs/OPS.md) | Install, grants, diagnostics |
-| [docs/GEMINI-SPEECH-CASCADE-SPEC.md](docs/GEMINI-SPEECH-CASCADE-SPEC.md) | Speech cascade |
-| [docs/VERIFICATION.md](docs/VERIFICATION.md) | Build evidence |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | Phased roadmap |
 
 ## Build
 

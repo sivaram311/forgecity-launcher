@@ -14,7 +14,7 @@ import javax.crypto.spec.GCMParameterSpec
 
 /**
  * Privacy-first assistant prefs. Never stores notification title/body.
- * Defaults: speech off, launcher chrome hidden, allowlist empty.
+ * Defaults: speech off, background video off, launcher chrome hidden, allowlist empty.
  */
 class AssistantSettingsStore(context: Context) {
     private val prefs = context.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -184,8 +184,9 @@ class AssistantSettingsStore(context: Context) {
         get() = prefs.getInt(KEY_QUIET_END, 7 * 60)
         set(value) = prefs.edit().putInt(KEY_QUIET_END, value).apply()
 
+    /** Default off for new installs and key-absent prefs (Media3 kept; toggle in settings). */
     var backgroundVideoEnabled: Boolean
-        get() = prefs.getBoolean(KEY_BACKGROUND_VIDEO, true)
+        get() = prefs.getBoolean(KEY_BACKGROUND_VIDEO, false)
         set(value) = prefs.edit().putBoolean(KEY_BACKGROUND_VIDEO, value).apply()
 
     var backgroundVideoOpacity: Float

@@ -179,22 +179,24 @@ Gemini audio is **opt-in** (notification text sent to Google when key is set).
 - Pin TEST TTS; collapse diagnostics
 - Next train theme **0.7 Assistant Clarity**; defer Kongu rewrite→audio two-step to **0.8**
 
-### Phase 3.6 — Assistant Clarity — v0.7.0 (implementing / landed source)
+### Phase 3.6 — Assistant Clarity — v0.7.0 (landed)
 
-**Theme:** Stable speech · versionCode **19** · `0.7.0-assistant-clarity-dev`  
-**Consult:** [design/GROK-LAUNCHER-CONFIG-ROADMAP.md](design/GROK-LAUNCHER-CONFIG-ROADMAP.md)
+**Theme:** Stable speech · versionCode **19** · `0.7.0-assistant-clarity-dev` — published
 
-| Item | Status |
-|------|--------|
-| Mode-gated Gemini vs Portal fields | 🔄 implementing / landed source |
-| `PromptModeValidator` (reject rewrite prompts for GEMINI AUDIO / CASCADE) | ✅ source |
-| Audio presets: Tamil clear / Kongu friend / English brief | ✅ source |
-| Masked API keys + reveal | 🔄 implementing / landed source |
-| TEST TTS disabled when audio prompt invalid | ✅ source (`canRunTest`) |
-| Diagnostics COPY LOG / CLEAR | ✅ carried from 0.6.1 |
-| Debug APK + SHA | ⏳ `CA5EE2B60FF8DBF75F63A40BDA55672D799874689CA8B346FDD201F579A408FC` |
-| Realme E2E | ⏳ #16 |
-| Kongu rewrite→audio two-step UI | ❌ deferred to **0.8** |
+### Phase 3.7 — Realistic 3D House HOME — v0.8.0 (Wave 0/1 landed)
+
+**Consult:** [design/GROK-3D-HOUSE-LAUNCHER-PLAN.md](design/GROK-3D-HOUSE-LAUNCHER-PLAN.md)  
+**Parallel exec:** [design/3D-HOUSE-PARALLEL-EXEC.md](design/3D-HOUSE-PARALLEL-EXEC.md)  
+**versionCode 20** · `0.8.0-3d-house-dev`
+
+| Wave | Focus | Status |
+|------|--------|--------|
+| Wave 0 | FeatureFlag + video default off + versionCode 20 | ✅ |
+| Wave 1 | Rooms/placement + HouseHomeSurface + AnimationBudget tiers | ✅ procedural Compose |
+| Wave 2 | Filament/glTF + characters | pending |
+| Wave 3 | Device perf / #16 | pending |
+
+**Stack:** Wave 1 = procedural Compose house; Filament/SceneView remains long-term per Grok.
 
 ### Phase 4 — AI Agents & Polish — v0.4.0 “Symphony” (~6–8 weeks)
 

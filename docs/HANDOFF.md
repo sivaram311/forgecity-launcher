@@ -9,26 +9,28 @@
 
 | Field | Value |
 |-------|-------|
-| versionName | `0.7.0-assistant-clarity-dev` · versionCode 19 |
-| Latest release | [`v0.7.0-assistant-clarity-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.7.0-assistant-clarity-dev) |
-| APK SHA-256 | `CA5EE2B60FF8DBF75F63A40BDA55672D799874689CA8B346FDD201F579A408FC` |
-| Prior tip | [`v0.6.1-tts-error-log-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.6.1-tts-error-log-dev) |
+| versionName | `0.8.0-3d-house-dev` · versionCode 20 |
+| Latest release | [`v0.8.0-3d-house-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.8.0-3d-house-dev) |
+| APK SHA-256 | `C14D5E2CCE7F5C29387CB1BC88BD15E5228BADC0219F88D4936B8D6F7F0AAF3E` |
+| Prior tip | [`v0.7.0-assistant-clarity-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.7.0-assistant-clarity-dev) |
 
-## Assistant Clarity (0.7.0)
+## 3D House Wave 0/1 (0.8.0)
 
-- Mode-gated sheet: Gemini fields vs Portal fields by speech mode
-- `PromptModeValidator` rejects rewrite-style prompts for **GEMINI AUDIO** / **CASCADE**
-- Audio prompt presets: **Tamil clear** / **Kongu friend** / **English brief**
-- API keys masked by default; reveal on tap (Keystore untouched on view)
-- **TEST TTS** disabled while audio prompt invalid for current mode
-- Diagnostics still **COPY LOG** / **CLEAR** (privacy invariants unchanged)
+- **House HOME on:** procedural Compose floor-plan (`HouseHomeSurface`); `HouseFeatureFlags.use3dHouse=true`
+- **City video off:** `useCityVideo=false`; new installs default background video off
+- **Placement:** `AppPlacementEngine` + district→room map; apps as tappable room markers
+- **Budget:** `AnimationBudget` quality tiers (HIGH/MEDIUM/LOW) for later Filament/characters
+- **Fallback:** set `use3dHouse=false` to restore CityCanvas
+- **Plan:** [design/GROK-3D-HOUSE-LAUNCHER-PLAN.md](design/GROK-3D-HOUSE-LAUNCHER-PLAN.md)
+
+Still pending vs Grok full vision: Filament/glTF, characters, Vault room cell, #16 device E2E.
 
 ## Now → next
 
 | Now | Next |
 |-----|------|
-| 0.7.0 Assistant Clarity published | Device: pick **Kongu friend** preset → TEST TTS → COPY LOG if fail |
-| Grok consult filed | Kongu rewrite→audio two-step deferred to **0.8** |
+| 0.8.0 Wave 1 house published | Device: tap app markers in rooms; flip flag if need city |
+| Filament + characters | Wave 2/3 per Grok plan |
 | Realme E2E (#16) PENDING | Blocks production tags |
 
 Session: 2026-07-23.

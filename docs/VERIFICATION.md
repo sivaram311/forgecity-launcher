@@ -407,3 +407,19 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | APK SHA-256 | `CA5EE2B60FF8DBF75F63A40BDA55672D799874689CA8B346FDD201F579A408FC` | local dist (~16.9 MB) |
 | Realme E2E (#16) | PENDING | debug prerelease; not production |
 | Reviewer #17 | PENDING | `agents/hires/SIGN-OFF-v0.7.0-assistant-clarity.md` |
+
+## 2026-07-23 — 0.8.0 3D House Wave 0/1
+
+| Check | Result | Notes |
+|------|--------|-------|
+| versionName / versionCode | PASS | `0.8.0-3d-house-dev` · **20** |
+| HouseFeatureFlags | PASS | `use3dHouse=true`, `useCityVideo=false` |
+| HouseHomeSurface | PASS | procedural Compose floor plan + markers |
+| AppPlacementEngine | PASS | district→room + hotspot assignment + unit tests |
+| AnimationBudget tiers | PASS | HIGH/MEDIUM/LOW + policy unit tests |
+| CityCanvas fallback | PASS | flag off restores iso city |
+| Assistant / chrome | PASS | overlays unchanged |
+| `testDebugUnitTest` / lint / assemble | PASS | |
+| APK SHA-256 | `C14D5E2CCE7F5C29387CB1BC88BD15E5228BADC0219F88D4936B8D6F7F0AAF3E` | local dist |
+| Filament / characters | PENDING | Wave 2+ |
+| Realme E2E (#16) | PENDING | debug prerelease |
