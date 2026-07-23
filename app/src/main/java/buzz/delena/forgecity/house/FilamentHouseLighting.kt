@@ -41,7 +41,7 @@ object FilamentHouseLighting {
     val day = Mode(
         sunIntensity = 5_000f,
         fillIntensity = 2_000f,
-        iblIntensity = 3_000f,
+        iblIntensity = 1_800f,
         skyTopR = 0.35f,
         skyTopG = 0.48f,
         skyTopB = 0.62f,
@@ -67,7 +67,7 @@ object FilamentHouseLighting {
     val night = Mode(
         sunIntensity = 600f,
         fillIntensity = 2_800f,
-        iblIntensity = 1_200f,
+        iblIntensity = 900f,
         skyTopR = 0.05f,
         skyTopG = 0.07f,
         skyTopB = 0.12f,

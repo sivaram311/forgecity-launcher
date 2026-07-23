@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.Color
 import io.github.sceneview.math.Position
 import io.github.sceneview.math.Rotation
 import io.github.sceneview.math.Scale
+import buzz.delena.forgecity.house.FilamentHouseIbl
 import buzz.delena.forgecity.house.character.HouseHumanoidPose
 import buzz.delena.forgecity.house.character.HumanoidLook
 import buzz.delena.forgecity.house.character.HumanoidPose
@@ -23,16 +24,36 @@ fun io.github.sceneview.SceneScope.HouseHumanoidNode(
     yawDeg: Float = 0f,
 ) {
     val skinMat = remember(nodeName, look.skin) {
-        materialLoader.createColorInstance(Color(look.skin), metallic = 0.02f, roughness = 0.75f)
+        materialLoader.createColorInstance(
+            Color(look.skin),
+            metallic = 0.02f,
+            roughness = 0.55f,
+            reflectance = FilamentHouseIbl.SKIN_REFLECTANCE,
+        )
     }
     val hairMat = remember(nodeName, look.hair) {
-        materialLoader.createColorInstance(Color(look.hair), metallic = 0f, roughness = 0.9f)
+        materialLoader.createColorInstance(
+            Color(look.hair),
+            metallic = 0f,
+            roughness = 0.88f,
+            reflectance = FilamentHouseIbl.HAIR_REFLECTANCE,
+        )
     }
     val topMat = remember(nodeName, look.top) {
-        materialLoader.createColorInstance(Color(look.top), metallic = 0.05f, roughness = 0.7f)
+        materialLoader.createColorInstance(
+            Color(look.top),
+            metallic = 0.05f,
+            roughness = 0.68f,
+            reflectance = FilamentHouseIbl.CLOTH_REFLECTANCE,
+        )
     }
     val bottomMat = remember(nodeName, look.bottom) {
-        materialLoader.createColorInstance(Color(look.bottom), metallic = 0.02f, roughness = 0.8f)
+        materialLoader.createColorInstance(
+            Color(look.bottom),
+            metallic = 0.02f,
+            roughness = 0.78f,
+            reflectance = FilamentHouseIbl.CLOTH_REFLECTANCE,
+        )
     }
 
     val hipY = HouseHumanoidPose.HIP_Y

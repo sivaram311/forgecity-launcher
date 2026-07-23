@@ -39,6 +39,7 @@ import io.github.sceneview.math.colorOf
 import io.github.sceneview.rememberCameraManipulator
 import io.github.sceneview.rememberCameraNode
 import io.github.sceneview.rememberEngine
+import io.github.sceneview.createEnvironment
 import io.github.sceneview.rememberEnvironment
 import io.github.sceneview.rememberEnvironmentLoader
 import io.github.sceneview.rememberMainLightNode
@@ -47,6 +48,7 @@ import io.github.sceneview.rememberModelLoader
 import io.github.sceneview.rememberView
 import buzz.delena.forgecity.house.DustMoteCloud
 import buzz.delena.forgecity.house.FilamentDayCycle
+import buzz.delena.forgecity.house.FilamentHouseIbl
 import buzz.delena.forgecity.house.FilamentHouseLighting
 import buzz.delena.forgecity.house.HouseFacadeFinishing
 import buzz.delena.forgecity.house.HouseWorld
@@ -58,7 +60,7 @@ import kotlin.math.roundToInt
 private const val HOUSE_ASSET = "filament/house_shell.glb"
 
 /**
- * Filament house HOME — 0.12 open-roof dollhouse + room patrols/sit loops.
+ * Filament house HOME — 0.14 HDR IBL + reflectance fresnel stand-ins; open-roof + patrols.
  */
 @Composable
 fun HouseFilamentSurface(
@@ -102,11 +104,20 @@ fun HouseFilamentSurface(
     val view = rememberView(engine)
     val environmentLoader = rememberEnvironmentLoader(engine)
 
-    val environment = rememberEnvironment(environmentLoader)
+    val environment = rememberEnvironment(
+        environmentLoader = environmentLoader,
+        environment = remember(environmentLoader) {
+            {
+                val hdr = runCatching {
+                    environmentLoader.createHDREnvironment(FilamentHouseIbl.HDR_ASSET)
+                }.getOrNull()
+                hdr ?: createEnvironment(environmentLoader, isOpaque = true)
+            }
+        },
+    )
     SideEffect {
         environment.indirectLight?.intensity =
-            if (daySample != null) daySample.hemiIntensity.coerceIn(800f, 3_500f)
-            else baseLighting.iblIntensity
+            FilamentHouseIbl.iblIntensity(night, daySample?.hemiIntensity)
     }
 
     val cameraNode = rememberCameraNode(engine) {
@@ -232,6 +243,13 @@ fun HouseFilamentSurface(
                     color = colorOf(daySample.hemiSky),
                 )
             }
+            // Grazing rim (PH fresnel stand-in) — Adreno-safe directional, not custom filamat.
+            LightNode(
+                type = LightManager.Type.DIRECTIONAL,
+                intensity = FilamentHouseIbl.rimIntensity(ambientEnabled, night, emissivePulse),
+                direction = Direction(-0.82f, -0.12f, 0.42f),
+                color = colorOf(if (night) Color(0xFF7EC8E3) else Color(0xFFE8D4B8)),
+            )
 
             houseInstance?.let { instance ->
                 ModelNode(
@@ -265,7 +283,13 @@ fun HouseFilamentSurface(
                 HouseFacadeFinishing.windowPanes.forEachIndexed { index, pane ->
                     val warm = if (pane.warm) Color(0xAAE8B86D) else Color(0xAA7EC8E3)
                     val mat = remember(index, pane.warm) {
-                        materialLoader.createUnlitColorInstance(warm)
+                        // Lit glass: IBL + reflectance for fresnel edges (gap #8).
+                        materialLoader.createColorInstance(
+                            color = warm,
+                            metallic = 0.12f,
+                            roughness = 0.22f,
+                            reflectance = FilamentHouseIbl.GLASS_REFLECTANCE,
+                        )
                     }
                     CubeNode(
                         size = Size(pane.sx, pane.sy * windowScale, pane.sz),
@@ -277,7 +301,12 @@ fun HouseFilamentSurface(
                 HouseFacadeFinishing.cornerRims.forEachIndexed { index, strip ->
                     val base = if (strip.cool) Color(0x887EC8E3) else Color(0x88E8B86D)
                     val mat = remember(index, strip.cool) {
-                        materialLoader.createUnlitColorInstance(base)
+                        materialLoader.createColorInstance(
+                            color = base,
+                            metallic = 0.08f,
+                            roughness = 0.30f,
+                            reflectance = FilamentHouseIbl.RIM_STRIP_REFLECTANCE,
+                        )
                     }
                     CubeNode(
                         size = Size(strip.sx, strip.sy, strip.sz),

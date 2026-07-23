@@ -23,7 +23,8 @@ class FilamentHouseLightingTest {
         assertTrue(FilamentHouseLighting.day.aperture <= 22f)
         assertTrue(FilamentHouseLighting.day.iso in 50f..1600f)
         assertTrue(FilamentHouseLighting.day.sunIntensity <= 8_000f)
-        assertTrue(FilamentHouseLighting.day.iblIntensity <= 5_000f)
+        assertTrue(FilamentHouseLighting.day.iblIntensity <= 2_200f)
+        assertEquals(1_800f, FilamentHouseLighting.day.iblIntensity, 0.01f)
         assertTrue(!FilamentHouseLighting.day.bloomEnabled)
     }
 
