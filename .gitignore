@@ -15,3 +15,6 @@ dist/
 __pycache__/
 tools_gen_city_bg.log
 
+# Grok / design API raw responses (keep markdown briefs only)
+docs/design/*-raw.json
+

@@ -25,7 +25,8 @@
 
 | Now | Next |
 |-----|------|
-| 0.6.1 diagnostics log published | Device: TEST TTS → COPY LOG → paste if Gemini fails |
+| 0.6.1 diagnostics log published | **0.7 Assistant Clarity** (Grok consult) — mode-gated settings + prompt validation |
+| Grok roadmap consult filed | See `docs/design/GROK-LAUNCHER-CONFIG-ROADMAP.md` |
 | Realme E2E (#16) PENDING | Blocks production tags |
 
-Session: 2026-07-22.
+Session: 2026-07-23 (Grok 4.1 consult).

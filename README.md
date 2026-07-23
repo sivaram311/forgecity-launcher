@@ -30,6 +30,7 @@ adb install -r .\forgecity-0.6.1-tts-error-log-dev-debug.apk
 
 | Doc | Purpose |
 |-----|---------|
+| [docs/design/GROK-LAUNCHER-CONFIG-ROADMAP.md](docs/design/GROK-LAUNCHER-CONFIG-ROADMAP.md) | Grok 4.1 config panel + roadmap consult |
 | [docs/HANDOFF.md](docs/HANDOFF.md) | Current tip + next actions |
 | [docs/OPS.md](docs/OPS.md) | Install, grants, diagnostics |
 | [docs/GEMINI-SPEECH-CASCADE-SPEC.md](docs/GEMINI-SPEECH-CASCADE-SPEC.md) | Speech cascade |

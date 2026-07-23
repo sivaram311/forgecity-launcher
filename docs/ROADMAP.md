@@ -6,7 +6,7 @@ story — while staying performant on Snapdragon 7s Gen 2 + Adreno 710 + 120 Hz.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher  
 **Device SoT:** `E:\MyAgent\workflow\devices\REALME-P2-PRO.md`  
-**Last updated:** 2026-07-20 (`0.4.6-gemini-native-audio-dev` · **P1 = Gemini native audio → Portal → DIRECT**)
+**Last updated:** 2026-07-23 (`0.6.1-tts-error-log-dev` · Grok 4.1 config/roadmap consult)
 
 ---
 
@@ -163,9 +163,21 @@ gate.
 | Gemini API key + TTS model / voice / `ta-IN` in City Assistant | ✅ |
 | `GEMINI_TAMIL` = fail-closed native audio | ✅ |
 | TEST TTS runs full cascade | ✅ |
+| In-app COPY LOG diagnostics (`0.6.1`) | ✅ |
 | Realme E2E for cascade | ⏳ #16 |
 
 Gemini audio is **opt-in** (notification text sent to Google when key is set).
+
+### Grok consult — config panel + roadmap (2026-07-23)
+
+**Source:** [design/GROK-LAUNCHER-CONFIG-ROADMAP.md](design/GROK-LAUNCHER-CONFIG-ROADMAP.md)  
+**Model:** requested `grok-4-1-fast-reasoning` (API reported `grok-4.3`)
+
+**Headline recommendations**
+- Mode-gated settings cards (hide Gemini vs Portal fields by speech mode)
+- Prompt validation / presets so rewrite prompts cannot be saved for GEMINI AUDIO
+- Pin TEST TTS; collapse diagnostics
+- Next train theme **0.7 Assistant Clarity**; defer Kongu rewrite→audio two-step to **0.8**
 
 ### Phase 4 — AI Agents & Polish — v0.4.0 “Symphony” (~6–8 weeks)
 
