@@ -2,6 +2,7 @@ package buzz.delena.forgecity.assistant
 
 import buzz.delena.forgecity.assistant.gemini.GeminiAudioResult
 import buzz.delena.forgecity.assistant.gemini.GeminiAudioTtsClient
+import buzz.delena.forgecity.assistant.gemini.GeminiVoiceResolver
 import buzz.delena.forgecity.assistant.gemini.PromptModeValidator
 import buzz.delena.forgecity.assistant.gemini.PromptTemplateFormatter
 import buzz.delena.forgecity.assistant.rewrite.AgentPortalRewriteClient
@@ -78,12 +79,14 @@ class CascadeSpeechOrchestrator(
             return false
         }
         ForgeCityTtsDiagnostics.info("cascade_try", "tier=gemini_audio")
+        val resolvedVoice = GeminiVoiceResolver.resolve(config.geminiVoice)
+        ForgeCityTtsDiagnostics.info("gemini_voice_resolved", "voice=$resolvedVoice")
         return when (
             val result = geminiAudioClient.synthesize(
                 apiKey = geminiKey,
                 model = config.geminiModel,
                 prompt = prompt,
-                voice = config.geminiVoice,
+                voice = resolvedVoice,
                 languageCode = config.geminiLanguageCode,
             )
         ) {

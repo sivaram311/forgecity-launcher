@@ -65,6 +65,8 @@ class MainActivity : ComponentActivity() {
             val geminiVoice by viewModel.geminiVoice.collectAsState()
             val geminiLanguageCode by viewModel.geminiLanguageCode.collectAsState()
             val promptTemplate by viewModel.promptTemplate.collectAsState()
+            val promptTemplates by viewModel.promptTemplates.collectAsState()
+            val activePromptTemplateId by viewModel.activePromptTemplateId.collectAsState()
             val speechTestStatus by viewModel.speechTestStatus.collectAsState()
             val diagnosticsLog by viewModel.diagnosticsLog.collectAsState()
             val allowCount by viewModel.allowCount.collectAsState()
@@ -102,6 +104,8 @@ class MainActivity : ComponentActivity() {
                 geminiVoice = geminiVoice,
                 geminiLanguageCode = geminiLanguageCode,
                 promptTemplate = promptTemplate,
+                promptTemplates = promptTemplates,
+                activePromptTemplateId = activePromptTemplateId,
                 speechTestStatus = speechTestStatus,
                 diagnosticsLog = diagnosticsLog,
                 allowCount = allowCount,
@@ -132,6 +136,9 @@ class MainActivity : ComponentActivity() {
                 onGeminiVoiceChange = viewModel::setGeminiVoice,
                 onGeminiLanguageCodeChange = viewModel::setGeminiLanguageCode,
                 onPromptTemplateChange = viewModel::setPromptTemplate,
+                onSelectPromptTemplate = viewModel::selectPromptTemplate,
+                onSavePromptTemplateAs = { name -> viewModel.savePromptTemplateAs(name) },
+                onDeletePromptTemplate = { id -> viewModel.deletePromptTemplate(id) },
                 onSaveGeminiApiKey = viewModel::saveGeminiApiKey,
                 onTestSpeechMode = viewModel::testSpeechMode,
                 onClearSpeechTestStatus = viewModel::clearSpeechTestStatus,

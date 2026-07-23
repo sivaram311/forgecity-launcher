@@ -11,6 +11,7 @@ import buzz.delena.forgecity.assistant.AssistantUiEvent
 import buzz.delena.forgecity.assistant.ForgeCityTtsDiagnostics
 import buzz.delena.forgecity.assistant.NotificationAccess
 import buzz.delena.forgecity.assistant.SpeechModeTestRunner
+import buzz.delena.forgecity.assistant.gemini.PromptTemplateEntry
 import buzz.delena.forgecity.city.CityBuilding
 import buzz.delena.forgecity.city.CityState
 import buzz.delena.forgecity.data.CityRepository
@@ -94,6 +95,12 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
 
     private val _promptTemplate = MutableStateFlow(assistantSettings.promptTemplate)
     val promptTemplate: StateFlow<String> = _promptTemplate.asStateFlow()
+
+    private val _promptTemplates = MutableStateFlow(assistantSettings.listTemplates())
+    val promptTemplates: StateFlow<List<PromptTemplateEntry>> = _promptTemplates.asStateFlow()
+
+    private val _activePromptTemplateId = MutableStateFlow(assistantSettings.activePromptTemplateId)
+    val activePromptTemplateId: StateFlow<String> = _activePromptTemplateId.asStateFlow()
 
     private val _speechTestStatus = MutableStateFlow<String?>(null)
     val speechTestStatus: StateFlow<String?> = _speechTestStatus.asStateFlow()
@@ -202,6 +209,8 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
         _geminiVoice.value = assistantSettings.geminiVoice
         _geminiLanguageCode.value = assistantSettings.geminiLanguageCode
         _promptTemplate.value = assistantSettings.promptTemplate
+        _promptTemplates.value = assistantSettings.listTemplates()
+        _activePromptTemplateId.value = assistantSettings.activePromptTemplateId
         _allowCount.value = assistantSettings.allowedPackages().size
         _quietLabel.value = formatQuietLabel()
         _backgroundVideoEnabled.value = assistantSettings.backgroundVideoEnabled
@@ -284,8 +293,38 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun setPromptTemplate(value: String) {
-        assistantSettings.promptTemplate = value
+        assistantSettings.updateActiveTemplateBody(value)
         _promptTemplate.value = assistantSettings.promptTemplate
+        _promptTemplates.value = assistantSettings.listTemplates()
+    }
+
+    fun selectPromptTemplate(id: String) {
+        if (!assistantSettings.selectTemplate(id)) return
+        _activePromptTemplateId.value = assistantSettings.activePromptTemplateId
+        _promptTemplate.value = assistantSettings.promptTemplate
+        _promptTemplates.value = assistantSettings.listTemplates()
+    }
+
+    fun savePromptTemplateAs(name: String): Boolean {
+        val entry = assistantSettings.saveAsTemplate(name, _promptTemplate.value) ?: return false
+        _activePromptTemplateId.value = entry.id
+        _promptTemplate.value = entry.body
+        _promptTemplates.value = assistantSettings.listTemplates()
+        return true
+    }
+
+    fun renameActivePromptTemplate(name: String): Boolean {
+        if (!assistantSettings.saveActiveTemplateName(name)) return false
+        _promptTemplates.value = assistantSettings.listTemplates()
+        return true
+    }
+
+    fun deletePromptTemplate(id: String): Boolean {
+        if (!assistantSettings.deleteTemplate(id)) return false
+        _activePromptTemplateId.value = assistantSettings.activePromptTemplateId
+        _promptTemplate.value = assistantSettings.promptTemplate
+        _promptTemplates.value = assistantSettings.listTemplates()
+        return true
     }
 
     fun saveGeminiApiKey(value: String) {

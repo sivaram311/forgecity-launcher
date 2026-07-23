@@ -2,11 +2,15 @@ package buzz.delena.forgecity.assistant
 
 import android.content.Context
 import buzz.delena.forgecity.assistant.gemini.GeminiAudioTtsClient
+import buzz.delena.forgecity.assistant.gemini.AudioPromptPresets
 import buzz.delena.forgecity.assistant.gemini.PromptTemplateDefaults
+import buzz.delena.forgecity.assistant.gemini.PromptTemplateEntry
+import buzz.delena.forgecity.assistant.gemini.PromptTemplateLibraryCodec
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
 import java.security.KeyStore
+import java.util.UUID
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
@@ -120,15 +124,18 @@ class AssistantSettingsStore(context: Context) {
             .apply()
 
     var geminiVoice: String
-        get() = prefs.getString(KEY_GEMINI_VOICE, GeminiAudioTtsClient.DEFAULT_VOICE)
-            .orEmpty()
-            .ifBlank { GeminiAudioTtsClient.DEFAULT_VOICE }
-        set(value) = prefs.edit()
-            .putString(
-                KEY_GEMINI_VOICE,
-                value.trim().ifBlank { GeminiAudioTtsClient.DEFAULT_VOICE },
-            )
-            .apply()
+        get() {
+            val raw = prefs.getString(KEY_GEMINI_VOICE, GeminiAudioTtsClient.DEFAULT_VOICE)
+                .orEmpty()
+                .trim()
+            if (raw.isEmpty()) return GeminiAudioTtsClient.DEFAULT_VOICE
+            // Preserve random sentinels; fixed names stay as stored.
+            return raw
+        }
+        set(value) {
+            val trimmed = value.trim().ifBlank { GeminiAudioTtsClient.DEFAULT_VOICE }
+            prefs.edit().putString(KEY_GEMINI_VOICE, trimmed).apply()
+        }
 
     var geminiLanguageCode: String
         get() = prefs.getString(KEY_GEMINI_LANGUAGE, GeminiAudioTtsClient.DEFAULT_LANGUAGE)
@@ -146,6 +153,105 @@ class AssistantSettingsStore(context: Context) {
             .orEmpty()
             .ifBlank { PromptTemplateDefaults.TEMPLATE }
         set(value) = prefs.edit().putString(KEY_PROMPT_TEMPLATE, value).apply()
+
+    var activePromptTemplateId: String
+        get() {
+            ensureTemplateLibrarySeeded()
+            return prefs.getString(KEY_ACTIVE_PROMPT_TEMPLATE_ID, AudioPromptPresets.ALL.first().id)
+                .orEmpty()
+                .ifBlank { AudioPromptPresets.ALL.first().id }
+        }
+        set(value) = prefs.edit().putString(KEY_ACTIVE_PROMPT_TEMPLATE_ID, value).apply()
+
+    fun listTemplates(): List<PromptTemplateEntry> {
+        ensureTemplateLibrarySeeded()
+        return PromptTemplateLibraryCodec.decode(prefs.getString(KEY_PROMPT_TEMPLATES_JSON, null))
+    }
+
+    fun selectTemplate(id: String): Boolean {
+        val entry = listTemplates().firstOrNull { it.id == id } ?: return false
+        activePromptTemplateId = entry.id
+        promptTemplate = entry.body
+        return true
+    }
+
+    /** Updates active body in prefs + library entry (keeps name). */
+    fun updateActiveTemplateBody(body: String) {
+        promptTemplate = body
+        val id = activePromptTemplateId
+        val list = listTemplates().toMutableList()
+        val idx = list.indexOfFirst { it.id == id }
+        if (idx >= 0) {
+            list[idx] = list[idx].copy(body = body, updatedAtMs = System.currentTimeMillis())
+            writeTemplates(list)
+        }
+    }
+
+    fun saveAsTemplate(name: String, body: String): PromptTemplateEntry? {
+        val label = name.trim().ifBlank { return null }
+        val text = body.trim().ifBlank { return null }
+        val list = listTemplates().toMutableList()
+        if (list.size >= PromptTemplateLibraryCodec.MAX_TEMPLATES) return null
+        val entry = PromptTemplateEntry(
+            id = "user_${UUID.randomUUID().toString().take(8)}",
+            name = label.take(48),
+            body = text,
+            updatedAtMs = System.currentTimeMillis(),
+            builtin = false,
+        )
+        list += entry
+        writeTemplates(list)
+        activePromptTemplateId = entry.id
+        promptTemplate = entry.body
+        return entry
+    }
+
+    fun saveActiveTemplateName(name: String): Boolean {
+        val label = name.trim().ifBlank { return false }
+        val list = listTemplates().toMutableList()
+        val idx = list.indexOfFirst { it.id == activePromptTemplateId }
+        if (idx < 0) return false
+        list[idx] = list[idx].copy(
+            name = label.take(48),
+            body = promptTemplate,
+            updatedAtMs = System.currentTimeMillis(),
+        )
+        writeTemplates(list)
+        return true
+    }
+
+    fun deleteTemplate(id: String): Boolean {
+        val list = listTemplates().toMutableList()
+        if (list.size <= 1) return false
+        val removed = list.removeAll { it.id == id }
+        if (!removed) return false
+        writeTemplates(list)
+        if (activePromptTemplateId == id) {
+            val next = list.first()
+            activePromptTemplateId = next.id
+            promptTemplate = next.body
+        }
+        return true
+    }
+
+    private fun ensureTemplateLibrarySeeded() {
+        val raw = prefs.getString(KEY_PROMPT_TEMPLATES_JSON, null)
+        if (!raw.isNullOrBlank() && raw != "[]") return
+        val seed = PromptTemplateLibraryCodec.seedFromPresets()
+        writeTemplates(seed)
+        val currentBody = prefs.getString(KEY_PROMPT_TEMPLATE, null)
+        val match = seed.firstOrNull { it.body == currentBody } ?: seed.first()
+        prefs.edit()
+            .putString(KEY_ACTIVE_PROMPT_TEMPLATE_ID, match.id)
+            .putString(KEY_PROMPT_TEMPLATE, match.body)
+            .apply()
+    }
+
+    private fun writeTemplates(entries: List<PromptTemplateEntry>) {
+        prefs.edit()
+            .putString(KEY_PROMPT_TEMPLATES_JSON, PromptTemplateLibraryCodec.encode(entries))
+            .apply()
+    }
 
     fun saveGeminiApiKey(value: String): Boolean = saveEncryptedKey(
         value = value,
@@ -290,6 +396,8 @@ class AssistantSettingsStore(context: Context) {
         private const val KEY_GEMINI_VOICE = "gemini_voice"
         private const val KEY_GEMINI_LANGUAGE = "gemini_language"
         private const val KEY_PROMPT_TEMPLATE = "prompt_template"
+        private const val KEY_PROMPT_TEMPLATES_JSON = "prompt_templates_json"
+        private const val KEY_ACTIVE_PROMPT_TEMPLATE_ID = "active_prompt_template_id"
         private const val KEY_ALLOW = "allowed_packages"
         private const val KEY_QUIET_START = "quiet_start"
         private const val KEY_QUIET_END = "quiet_end"

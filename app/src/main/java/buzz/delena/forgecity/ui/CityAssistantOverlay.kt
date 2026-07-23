@@ -28,6 +28,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -55,7 +57,10 @@ import androidx.compose.ui.unit.sp
 import buzz.delena.forgecity.assistant.AssistantSpeechMode
 import buzz.delena.forgecity.assistant.AssistantUiEvent
 import buzz.delena.forgecity.assistant.gemini.AudioPromptPresets
+import buzz.delena.forgecity.assistant.gemini.GeminiTtsCatalog
+import buzz.delena.forgecity.assistant.gemini.GeminiVoiceSelection
 import buzz.delena.forgecity.assistant.gemini.PromptModeValidator
+import buzz.delena.forgecity.assistant.gemini.PromptTemplateEntry
 import kotlinx.coroutines.delay
 
 @Composable
@@ -159,6 +164,8 @@ fun AssistantSettingsSheet(
     geminiVoice: String,
     geminiLanguageCode: String,
     promptTemplate: String,
+    promptTemplates: List<PromptTemplateEntry> = emptyList(),
+    activePromptTemplateId: String = "",
     speechTestText: String,
     speechTestStatus: String?,
     diagnosticsLog: String,
@@ -177,6 +184,9 @@ fun AssistantSettingsSheet(
     onGeminiVoiceChange: (String) -> Unit,
     onGeminiLanguageCodeChange: (String) -> Unit,
     onPromptTemplateChange: (String) -> Unit,
+    onSelectPromptTemplate: (String) -> Unit = {},
+    onSavePromptTemplateAs: (String) -> Unit = {},
+    onDeletePromptTemplate: (String) -> Unit = {},
     onSaveGeminiApiKey: (String) -> Unit,
     onSpeechTestTextChange: (String) -> Unit,
     onTestSpeechMode: () -> Unit,
@@ -247,6 +257,8 @@ fun AssistantSettingsSheet(
                     geminiVoice = geminiVoice,
                     geminiLanguageCode = geminiLanguageCode,
                     promptTemplate = promptTemplate,
+                    promptTemplates = promptTemplates,
+                    activePromptTemplateId = activePromptTemplateId,
                     speechTestText = speechTestText,
                     speechTestStatus = speechTestStatus,
                     diagnosticsLog = diagnosticsLog,
@@ -265,6 +277,9 @@ fun AssistantSettingsSheet(
                     onGeminiVoiceChange = onGeminiVoiceChange,
                     onGeminiLanguageCodeChange = onGeminiLanguageCodeChange,
                     onPromptTemplateChange = onPromptTemplateChange,
+                    onSelectPromptTemplate = onSelectPromptTemplate,
+                    onSavePromptTemplateAs = onSavePromptTemplateAs,
+                    onDeletePromptTemplate = onDeletePromptTemplate,
                     onSaveGeminiApiKey = onSaveGeminiApiKey,
                     onSpeechTestTextChange = onSpeechTestTextChange,
                     onTestSpeechMode = onTestSpeechMode,
@@ -298,6 +313,8 @@ fun AssistantSettingsCard(
     geminiVoice: String,
     geminiLanguageCode: String,
     promptTemplate: String,
+    promptTemplates: List<PromptTemplateEntry> = emptyList(),
+    activePromptTemplateId: String = "",
     speechTestText: String,
     speechTestStatus: String?,
     diagnosticsLog: String,
@@ -316,6 +333,9 @@ fun AssistantSettingsCard(
     onGeminiVoiceChange: (String) -> Unit,
     onGeminiLanguageCodeChange: (String) -> Unit,
     onPromptTemplateChange: (String) -> Unit,
+    onSelectPromptTemplate: (String) -> Unit = {},
+    onSavePromptTemplateAs: (String) -> Unit = {},
+    onDeletePromptTemplate: (String) -> Unit = {},
     onSaveGeminiApiKey: (String) -> Unit,
     onSpeechTestTextChange: (String) -> Unit,
     onTestSpeechMode: () -> Unit,
@@ -334,11 +354,14 @@ fun AssistantSettingsCard(
     var apiKeyDraft by remember(apiKey) { mutableStateOf(apiKey) }
     var geminiKeyDraft by remember(geminiApiKey) { mutableStateOf(geminiApiKey) }
     var templateDraft by remember(promptTemplate) { mutableStateOf(promptTemplate) }
+    var saveAsName by remember { mutableStateOf("") }
+    var showSaveAs by remember { mutableStateOf(false) }
     var copyHint by remember { mutableStateOf<String?>(null) }
     var revealPortalKey by remember { mutableStateOf(false) }
     var revealGeminiKey by remember { mutableStateOf(false) }
     var diagnosticsExpanded by remember { mutableStateOf(true) }
     val clipboard = LocalClipboardManager.current
+    LaunchedEffect(promptTemplate) { templateDraft = promptTemplate }
     val promptValidation = remember(speechMode, templateDraft) {
         PromptModeValidator.validate(speechMode, templateDraft)
     }
@@ -421,6 +444,17 @@ fun AssistantSettingsCard(
                 color = Color(0x88FFF6F0),
                 fontSize = 9.sp,
             )
+            CatalogDropdown(
+                label = promptTemplates.firstOrNull { it.id == activePromptTemplateId }?.name
+                    ?: "Template",
+                options = promptTemplates.map { it.id to it.name },
+                onSelect = { id ->
+                    onSelectPromptTemplate(id)
+                    promptTemplates.firstOrNull { it.id == id }?.let {
+                        templateDraft = it.body
+                    }
+                },
+            )
             Row(
                 horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(6.dp),
                 modifier = Modifier
@@ -436,8 +470,14 @@ fun AssistantSettingsCard(
                         modifier = Modifier
                             .background(Color(0x55302A38), RoundedCornerShape(8.dp))
                             .clickable {
-                                templateDraft = preset.template
-                                onPromptTemplateChange(preset.template)
+                                val match = promptTemplates.firstOrNull { it.id == preset.id }
+                                if (match != null) {
+                                    onSelectPromptTemplate(match.id)
+                                    templateDraft = match.body
+                                } else {
+                                    templateDraft = preset.template
+                                    onPromptTemplateChange(preset.template)
+                                }
                             }
                             .padding(horizontal = 8.dp, vertical = 6.dp),
                     )
@@ -452,6 +492,53 @@ fun AssistantSettingsCard(
                 placeholder = "Synthesize speech… #### TRANSCRIPT … {appLabel} {title} {text}",
                 minLines = 4,
             )
+            Row(
+                horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(top = 4.dp),
+            ) {
+                Text(
+                    text = if (showSaveAs) "Cancel" else "Save as…",
+                    color = Color(0xFF4FD1C5),
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier
+                        .clickable { showSaveAs = !showSaveAs }
+                        .padding(4.dp),
+                )
+                if (promptTemplates.size > 1) {
+                    Text(
+                        text = "Delete",
+                        color = Color(0xFFFF8A80),
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier
+                            .clickable { onDeletePromptTemplate(activePromptTemplateId) }
+                            .padding(4.dp),
+                    )
+                }
+            }
+            if (showSaveAs) {
+                RemoteTextField(
+                    value = saveAsName,
+                    onValueChange = { saveAsName = it },
+                    placeholder = "Template name",
+                )
+                Text(
+                    text = "Save",
+                    color = Color(0xFFE8A15A),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier
+                        .clickable {
+                            if (saveAsName.isNotBlank()) {
+                                onSavePromptTemplateAs(saveAsName.trim())
+                                saveAsName = ""
+                                showSaveAs = false
+                            }
+                        }
+                        .padding(4.dp),
+                )
+            }
             if (!promptValidation.ok && promptValidation.message != null) {
                 Text(
                     text = promptValidation.message!!,
@@ -476,15 +563,22 @@ fun AssistantSettingsCard(
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(top = 8.dp),
             )
-            RemoteTextField(
-                value = geminiModel,
-                onValueChange = onGeminiModelChange,
-                placeholder = "gemini-3.1-flash-tts-preview",
+            CatalogDropdown(
+                label = GeminiTtsCatalog.models.firstOrNull { it.id == geminiModel }?.label
+                    ?: geminiModel,
+                options = GeminiTtsCatalog.models.map { it.id to it.label },
+                onSelect = onGeminiModelChange,
             )
-            RemoteTextField(
-                value = geminiVoice,
-                onValueChange = onGeminiVoiceChange,
-                placeholder = "Kore",
+            val voiceOptions = buildList {
+                add(GeminiVoiceSelection.SENTINEL_RANDOM to "Random")
+                add(GeminiVoiceSelection.SENTINEL_RANDOM_FEMALE to "Random female")
+                add(GeminiVoiceSelection.SENTINEL_RANDOM_MALE to "Random male")
+                GeminiTtsCatalog.voices.forEach { add(it.name to it.label) }
+            }
+            CatalogDropdown(
+                label = GeminiVoiceSelection.displayLabel(geminiVoice),
+                options = voiceOptions,
+                onSelect = onGeminiVoiceChange,
             )
             RemoteTextField(
                 value = geminiLanguageCode,
@@ -766,6 +860,51 @@ fun AssistantSettingsCard(
             color = Color(0x77FFF6F0),
             fontSize = 10.sp,
         )
+    }
+}
+
+@Composable
+private fun CatalogDropdown(
+    label: String,
+    options: List<Pair<String, String>>,
+    onSelect: (String) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 4.dp),
+    ) {
+        Text(
+            text = label,
+            color = Color(0xFFFFF6F0),
+            fontSize = 11.sp,
+            maxLines = 1,
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color(0x66302A38), RoundedCornerShape(8.dp))
+                .clickable { expanded = true }
+                .padding(horizontal = 10.dp, vertical = 10.dp),
+        )
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier
+                .fillMaxWidth(0.92f)
+                .background(Color(0xFF241830)),
+        ) {
+            options.forEach { (id, optionLabel) ->
+                DropdownMenuItem(
+                    text = {
+                        Text(optionLabel, color = Color(0xFFFFF6F0), fontSize = 11.sp)
+                    },
+                    onClick = {
+                        onSelect(id)
+                        expanded = false
+                    },
+                )
+            }
+        }
     }
 }
 
