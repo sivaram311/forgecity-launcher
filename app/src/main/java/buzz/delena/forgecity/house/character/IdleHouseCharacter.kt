@@ -1,7 +1,8 @@
 package buzz.delena.forgecity.house.character
 
 /**
- * Stylized idle occupant for the procedural Compose house (Wave 2 — no glTF).
+ * House occupant roster. Filament HOME uses jointed capsule humanoids (0.11+);
+ * Compose [buzz.delena.forgecity.ui.house.HouseHomeSurface] still draws stylized 2D.
  * Positions are normalized inside the target [roomId] floor cell (0–1).
  */
 enum class CharacterRole {
