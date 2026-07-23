@@ -10,6 +10,13 @@ enum class CharacterRole {
     NPC,
 }
 
+/** Filament asset under `assets/filament/` (Grok 0.10.6 character fidelity). */
+fun CharacterRole.filamentAsset(): String = when (this) {
+    CharacterRole.MAYOR -> "filament/char_mayor.glb"
+    CharacterRole.ASSISTANT -> "filament/char_assist.glb"
+    CharacterRole.NPC -> "filament/char_npc.glb"
+}
+
 data class IdleHouseCharacter(
     val id: String,
     val role: CharacterRole,
@@ -18,7 +25,9 @@ data class IdleHouseCharacter(
     val ny: Float,
     /** Phase offset so bob/breath desyncs across characters. */
     val phaseOffset: Float = 0f,
-)
+) {
+    val filamentAsset: String get() = role.filamentAsset()
+}
 
 /** Default mayor / assistant / NPC roster; callers take only the first [maxCharacters]. */
 val DefaultIdleHouseCharacters: List<IdleHouseCharacter> = listOf(

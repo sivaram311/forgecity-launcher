@@ -55,12 +55,11 @@ import buzz.delena.forgecity.house.character.IdleHouseCharacter
 import kotlin.math.roundToInt
 
 private const val HOUSE_ASSET = "filament/house_shell.glb"
-private const val CHAR_ASSET = "filament/char_idle.glb"
 
 /**
- * Filament house HOME — 0.10.4 white-screen exposure fix (Grok).
+ * Filament house HOME — 0.10.5 wall architecture + 0.10.6 character fidelity (Grok).
  *
- * Bare setExposure(1.x) EV blew the frame white while orbit still worked.
+ * Wall bands/moldings/frames in house_shell.glb; per-role character GLBs + torso bob.
  */
 @Composable
 fun HouseFilamentSurface(
@@ -238,16 +237,15 @@ fun HouseFilamentSurface(
             activeCharacters.forEach { character ->
                 val room = HouseWorld.roomById(character.roomId) ?: return@forEach
                 val (x, y, z) = HouseWorld.positionInRoom(room, character.nx, character.ny, y = 0f)
-                val pulse =
-                    if (character.role == CharacterRole.ASSISTANT && assistantSpeaking) {
-                        lighting.speechPulseScale
-                    } else {
-                        1f
-                    }
+                // Idle bob 1.2 Hz · 0.02 m; assistant speech adds slight extra lift (not whole-body scale).
+                val bob =
+                    kotlin.math.sin((timeSec * 1.2f + character.phaseOffset) * Math.PI.toFloat() * 2f) * 0.02f
+                val speakBoost =
+                    if (character.role == CharacterRole.ASSISTANT && assistantSpeaking) 0.04f else 0f
                 CharacterModel(
-                    assetPath = CHAR_ASSET,
-                    position = Position(x = x, y = y, z = z),
-                    scale = Scale(pulse),
+                    assetPath = character.filamentAsset,
+                    position = Position(x = x, y = y + bob + speakBoost, z = z),
+                    scale = Scale(1f),
                     nodeName = character.id,
                     fallbackTint = characterTint(character),
                 )

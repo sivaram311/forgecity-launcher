@@ -492,3 +492,10 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | exposure API | PASS | f-stop/shutter/ISO |
 | SHA | PASS | `AF48EEA7D44FD3838724D45C68D65FC8ECBC719D7411577C36B73F87F55E7224` |
 
+
+## 2026-07-23 — 0.10.5 wall + character
+| Check | Result | Notes |
+| wall bands/moldings | PASS | house_shell 114504 B |
+| character GLBs | PASS | mayor/assist/npc |
+| SHA | PASS | `66BE9AAAF0881AB9D8C72AA894F4D7366353F36CB22F9F64757DB24C70F5CBFB` |
+

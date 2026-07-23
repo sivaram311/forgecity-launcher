@@ -31,11 +31,19 @@ WALL_H = 2.5
 FLOOR_T = 0.05
 WALL_T = 0.1
 DOOR_W = 0.9
+DOOR_H = 2.1
 STRIPE_W = 0.2
-BASEBOARD_H = 0.08
-BASEBOARD_D = 0.04
-TRIM_CREAM = 0xFFF5E6D3
-TRIM_WOOD = 0xFFC4A070
+BAND_BASE_TOP = FLOOR_T + 0.9
+BAND_SHADOW_TOP = FLOOR_T + 2.1
+BASEBOARD_H = 0.12
+BASEBOARD_D = 0.02
+CHAIR_RAIL_H = 0.08
+CHAIR_RAIL_Y = FLOOR_T + 0.9
+PICTURE_RAIL_H = 0.06
+PICTURE_RAIL_Y = FLOOR_T + 2.1
+WINDOW_FRAME_W = 0.08
+DOOR_CASING_W = 0.10
+EXTERIOR_TRIM = 0xFF3A3630
 
 
 @dataclass(frozen=True)
@@ -46,18 +54,22 @@ class RoomSpec:
     max_x: float
     max_z: float
     floor: int
-    wall: int
+    base: int
+    shadow: int
+    trim: int
+    accent: int
 
 
 # Matches buzz.delena.forgecity.house.HouseRoom bounds (meters, SW origin).
+# Grok wall palettes: base / shadow / trim / accent.
 ROOMS: tuple[RoomSpec, ...] = (
-    RoomSpec("kitchen", 0, 0, 3, 3, 0xFFC9A66B, 0xFF8F6A3E),
-    RoomSpec("living", 3, 0, 7, 3, 0xFFB8956A, 0xFF7A5138),
-    RoomSpec("hallway", 0, 3, 3, 6, 0xFFD4C4A8, 0xFF9A8060),
-    RoomSpec("office", 3, 3, 7, 6, 0xFFA8885C, 0xFF6E4C32),
-    RoomSpec("bedroom", 0, 6, 3, 9, 0xFFC4A882, 0xFF8B6848),
-    RoomSpec("workshop", 3, 6, 7, 9, 0xFFB07A4A, 0xFF6B4226),
-    RoomSpec("vault", 7, 3, 9, 6, 0xFF8A7340, 0xFFC9A227),
+    RoomSpec("kitchen", 0, 0, 3, 3, 0xFFC9A66B, 0xFFE8DFD0, 0xFFC9B89A, 0xFF3D2B1F, 0xFF8B5E3C),
+    RoomSpec("living", 3, 0, 7, 3, 0xFFB8956A, 0xFFD4C9B9, 0xFFA89B85, 0xFF2F2A24, 0xFF5C4033),
+    RoomSpec("hallway", 0, 3, 3, 6, 0xFFD4C4A8, 0xFFCFC8BC, 0xFFA99D8C, 0xFF3A3630, 0xFF6B5B4F),
+    RoomSpec("office", 3, 3, 7, 6, 0xFFA8885C, 0xFFD8D0C4, 0xFFB3A68F, 0xFF2C2823, 0xFF4A3F35),
+    RoomSpec("bedroom", 0, 6, 3, 9, 0xFFC4A882, 0xFFE2D9CC, 0xFFBFAE94, 0xFF3F2E26, 0xFF7A5C4A),
+    RoomSpec("workshop", 3, 6, 7, 9, 0xFFB07A4A, 0xFFC8BFAF, 0xFF958A75, 0xFF2A2722, 0xFF5C5245),
+    RoomSpec("vault", 7, 3, 9, 6, 0xFF8A7340, 0xFFB8B0A3, 0xFF7D7668, 0xFF1F1C18, 0xFF3D3630),
 )
 
 
@@ -79,6 +91,14 @@ def shade(argb: int, delta: int) -> tuple[float, float, float, float]:
 
 def floor_stripe_colors(base: int) -> tuple[tuple[float, float, float, float], tuple[float, float, float, float]]:
     return shade(base, -18), shade(base, 14)
+
+
+def room_wall_colors(room: RoomSpec) -> tuple[
+    tuple[float, float, float, float],
+    tuple[float, float, float, float],
+    tuple[float, float, float, float],
+]:
+    return rgba(room.base), rgba(room.shadow), rgba(room.trim)
 
 
 class MeshBuilder:
@@ -156,6 +176,30 @@ class MeshBuilder:
         for a, b, c in faces:
             self._indices.extend((base + a, base + b, base + c))
 
+    def add_banded_box(
+        self,
+        x0: float,
+        y0: float,
+        z0: float,
+        x1: float,
+        y1: float,
+        z1: float,
+        base_c: tuple[float, float, float, float],
+        shadow_c: tuple[float, float, float, float],
+        trim_c: tuple[float, float, float, float],
+        material: int = MAT_VERTEX,
+    ) -> None:
+        if y1 <= y0:
+            return
+        bands = (
+            (y0, min(y1, BAND_BASE_TOP), base_c),
+            (max(y0, BAND_BASE_TOP), min(y1, BAND_SHADOW_TOP), shadow_c),
+            (max(y0, BAND_SHADOW_TOP), y1, trim_c),
+        )
+        for by0, by1, color in bands:
+            if by1 - by0 > 1e-6:
+                self.add_box(x0, by0, z0, x1, by1, z1, color, material=material)
+
     def add_striped_floor(self, room: RoomSpec) -> None:
         c0, c1 = floor_stripe_colors(room.floor)
         x0, z0, x1, z1 = room.min_x, room.min_z, room.max_x, room.max_z
@@ -172,52 +216,154 @@ class MeshBuilder:
         x: float,
         z0: float,
         z1: float,
-        wall_argb: int,
+        room: RoomSpec,
         door_center: float | None = None,
-        tint: int = 0,
     ) -> None:
-        wc = shade(wall_argb, tint)
+        base_c, shadow_c, trim_c = room_wall_colors(room)
+        y0, y1 = FLOOR_T, WALL_H
         if door_center is None:
-            self.add_box(x - WALL_T / 2, FLOOR_T, z0, x + WALL_T / 2, WALL_H, z1, wc)
+            self.add_banded_box(x - WALL_T / 2, y0, z0, x + WALL_T / 2, y1, z1, base_c, shadow_c, trim_c)
             return
         half = DOOR_W / 2
         if door_center - half > z0:
-            self.add_box(x - WALL_T / 2, FLOOR_T, z0, x + WALL_T / 2, WALL_H, door_center - half, wc)
+            self.add_banded_box(
+                x - WALL_T / 2, y0, z0, x + WALL_T / 2, y1, door_center - half,
+                base_c, shadow_c, trim_c,
+            )
         if door_center + half < z1:
-            self.add_box(x - WALL_T / 2, FLOOR_T, door_center + half, x + WALL_T / 2, WALL_H, z1, wc)
+            self.add_banded_box(
+                x - WALL_T / 2, y0, door_center + half, x + WALL_T / 2, y1, z1,
+                base_c, shadow_c, trim_c,
+            )
 
     def add_wall_z(
         self,
         z: float,
         x0: float,
         x1: float,
-        wall_argb: int,
+        room: RoomSpec,
         door_center: float | None = None,
-        tint: int = 0,
     ) -> None:
-        wc = shade(wall_argb, tint)
+        base_c, shadow_c, trim_c = room_wall_colors(room)
+        y0, y1 = FLOOR_T, WALL_H
         if door_center is None:
-            self.add_box(x0, FLOOR_T, z - WALL_T / 2, x1, WALL_H, z + WALL_T / 2, wc)
+            self.add_banded_box(x0, y0, z - WALL_T / 2, x1, y1, z + WALL_T / 2, base_c, shadow_c, trim_c)
             return
         half = DOOR_W / 2
         if door_center - half > x0:
-            self.add_box(x0, FLOOR_T, z - WALL_T / 2, door_center - half, WALL_H, z + WALL_T / 2, wc)
+            self.add_banded_box(
+                x0, y0, z - WALL_T / 2, door_center - half, y1, z + WALL_T / 2,
+                base_c, shadow_c, trim_c,
+            )
         if door_center + half < x1:
-            self.add_box(door_center + half, FLOOR_T, z - WALL_T / 2, x1, WALL_H, z + WALL_T / 2, wc)
+            self.add_banded_box(
+                door_center + half, y0, z - WALL_T / 2, x1, y1, z + WALL_T / 2,
+                base_c, shadow_c, trim_c,
+            )
 
-    def add_baseboard_z(self, z: float, x0: float, x1: float, inward: float) -> None:
-        cream = rgba(TRIM_CREAM)
-        if inward > 0:
-            self.add_box(x0, FLOOR_T, z, x1, FLOOR_T + BASEBOARD_H, z + BASEBOARD_D, cream)
-        else:
-            self.add_box(x0, FLOOR_T, z - BASEBOARD_D, x1, FLOOR_T + BASEBOARD_H, z, cream)
+    def add_exterior_wall_x(self, x: float, z0: float, z1: float) -> None:
+        base_c, shadow_c, trim_c = rgba(0xFFCFC8BC), rgba(0xFFA99D8C), rgba(EXTERIOR_TRIM)
+        self.add_banded_box(x - WALL_T / 2, FLOOR_T, z0, x + WALL_T / 2, WALL_H, z1, base_c, shadow_c, trim_c)
 
-    def add_baseboard_x(self, x: float, z0: float, z1: float, inward: float) -> None:
-        wood = rgba(TRIM_WOOD)
-        if inward > 0:
-            self.add_box(x, FLOOR_T, z0, x + BASEBOARD_D, FLOOR_T + BASEBOARD_H, z1, wood)
-        else:
-            self.add_box(x - BASEBOARD_D, FLOOR_T, z0, x, FLOOR_T + BASEBOARD_H, z1, wood)
+    def add_exterior_wall_z(self, z: float, x0: float, x1: float) -> None:
+        base_c, shadow_c, trim_c = rgba(0xFFCFC8BC), rgba(0xFFA99D8C), rgba(EXTERIOR_TRIM)
+        self.add_banded_box(x0, FLOOR_T, z - WALL_T / 2, x1, WALL_H, z + WALL_T / 2, base_c, shadow_c, trim_c)
+
+    def add_molding_z(
+        self,
+        z: float,
+        x0: float,
+        x1: float,
+        inward: float,
+        trim_c: tuple[float, float, float, float],
+        accent_c: tuple[float, float, float, float],
+    ) -> None:
+        z0, z1 = (z, z + BASEBOARD_D) if inward > 0 else (z - BASEBOARD_D, z)
+        self.add_box(x0, FLOOR_T, z0, x1, FLOOR_T + BASEBOARD_H, z1, trim_c)
+        self.add_box(x0, CHAIR_RAIL_Y, z0, x1, CHAIR_RAIL_Y + CHAIR_RAIL_H, z1, accent_c)
+        self.add_box(x0, PICTURE_RAIL_Y, z0, x1, PICTURE_RAIL_Y + PICTURE_RAIL_H, z1, trim_c)
+
+    def add_molding_x(
+        self,
+        x: float,
+        z0: float,
+        z1: float,
+        inward: float,
+        trim_c: tuple[float, float, float, float],
+        accent_c: tuple[float, float, float, float],
+    ) -> None:
+        x0, x1 = (x, x + BASEBOARD_D) if inward > 0 else (x - BASEBOARD_D, x)
+        self.add_box(x0, FLOOR_T, z0, x1, FLOOR_T + BASEBOARD_H, z1, trim_c)
+        self.add_box(x0, CHAIR_RAIL_Y, z0, x1, CHAIR_RAIL_Y + CHAIR_RAIL_H, z1, accent_c)
+        self.add_box(x0, PICTURE_RAIL_Y, z0, x1, PICTURE_RAIL_Y + PICTURE_RAIL_H, z1, trim_c)
+
+    def add_door_casing_z(
+        self,
+        z: float,
+        door_center: float,
+        trim_c: tuple[float, float, float, float],
+        inward: float = 1.0,
+    ) -> None:
+        half = DOOR_W / 2
+        cw = DOOR_CASING_W
+        y0, y1 = FLOOR_T, FLOOR_T + DOOR_H
+        z0, z1 = (z, z + cw) if inward > 0 else (z - cw, z)
+        self.add_box(door_center - half - cw, y0, z0, door_center - half, y1, z1, trim_c)
+        self.add_box(door_center + half, y0, z0, door_center + half + cw, y1, z1, trim_c)
+        self.add_box(door_center - half - cw, y1, z0, door_center + half + cw, y1 + cw, z1, trim_c)
+
+    def add_door_casing_x(
+        self,
+        x: float,
+        door_center: float,
+        trim_c: tuple[float, float, float, float],
+        inward: float = 1.0,
+    ) -> None:
+        half = DOOR_W / 2
+        cw = DOOR_CASING_W
+        y0, y1 = FLOOR_T, FLOOR_T + DOOR_H
+        x0, x1 = (x, x + cw) if inward > 0 else (x - cw, x)
+        self.add_box(x0, y0, door_center - half - cw, x1, y1, door_center - half, trim_c)
+        self.add_box(x0, y0, door_center + half, x1, y1, door_center + half + cw, trim_c)
+        self.add_box(x0, y1, door_center - half - cw, x1, y1 + cw, door_center + half + cw, trim_c)
+
+    def add_window_frame_x(
+        self,
+        x: float,
+        z_center: float,
+        z_half: float,
+        y0: float,
+        y1: float,
+        outward: float,
+        frame_c: tuple[float, float, float, float],
+    ) -> None:
+        fw = WINDOW_FRAME_W
+        wx = x + outward * 0.04
+        depth = fw if outward >= 0 else -fw
+        z_lo, z_hi = z_center - z_half, z_center + z_half
+        self.add_box(wx, y0 - fw, z_lo - fw, wx + depth, y0, z_hi + fw, frame_c)
+        self.add_box(wx, y1, z_lo - fw, wx + depth, y1 + fw, z_hi + fw, frame_c)
+        self.add_box(wx, y0, z_lo - fw, wx + depth, y1, z_lo, frame_c)
+        self.add_box(wx, y0, z_hi, wx + depth, y1, z_hi + fw, frame_c)
+
+    def add_window_frame_z(
+        self,
+        z: float,
+        x_center: float,
+        x_half: float,
+        y0: float,
+        y1: float,
+        outward: float,
+        frame_c: tuple[float, float, float, float],
+    ) -> None:
+        fw = WINDOW_FRAME_W
+        wz = z + outward * 0.04
+        depth = fw if outward >= 0 else -fw
+        x_lo, x_hi = x_center - x_half, x_center + x_half
+        self.add_box(x_lo - fw, y0 - fw, wz, x_hi + fw, y0, wz + depth, frame_c)
+        self.add_box(x_lo - fw, y1, wz, x_hi + fw, y1 + fw, wz + depth, frame_c)
+        self.add_box(x_lo - fw, y0, wz, x_lo, y1, wz + depth, frame_c)
+        self.add_box(x_hi, y0, wz, x_hi + fw, y1, wz + depth, frame_c)
 
     def add_window_x(
         self,
@@ -404,23 +550,82 @@ def _room_by_name(name: str) -> RoomSpec:
     return next(r for r in ROOMS if r.name == name)
 
 
-def _add_room_baseboards(mb: MeshBuilder, room: RoomSpec) -> None:
-    mb.add_baseboard_z(room.min_z, room.min_x + 0.02, room.max_x - 0.02, inward=1)
-    mb.add_baseboard_z(room.max_z, room.min_x + 0.02, room.max_x - 0.02, inward=-1)
-    mb.add_baseboard_x(room.min_x, room.min_z + 0.02, room.max_z - 0.02, inward=1)
-    mb.add_baseboard_x(room.max_x, room.min_z + 0.02, room.max_z - 0.02, inward=-1)
+PARTITION_Z = (3.0, 6.0)
+PARTITION_X = (3.0, 7.0)
+
+
+def _spans_office_vault_wall(room: RoomSpec) -> bool:
+    return room.min_z < 6.0 and room.max_z > 3.0
+
+
+def _skip_wall_z(room: RoomSpec, z: float) -> bool:
+    if z not in PARTITION_Z:
+        return False
+    return abs(z - room.min_z) < 1e-6 or abs(z - room.max_z) < 1e-6
+
+
+def _skip_wall_x(room: RoomSpec, x: float) -> bool:
+    if x not in PARTITION_X or not _spans_office_vault_wall(room):
+        return False
+    return abs(x - room.min_x) < 1e-6 or abs(x - room.max_x) < 1e-6
+
+
+def _add_room_moldings(mb: MeshBuilder, room: RoomSpec) -> None:
+    trim_c, accent_c = rgba(room.trim), rgba(room.accent)
+    inset = 0.02
+    if room.min_z > 0:
+        mb.add_molding_z(room.min_z, room.min_x + inset, room.max_x - inset, inward=1, trim_c=trim_c, accent_c=accent_c)
+    if room.max_z < 9:
+        mb.add_molding_z(room.max_z, room.min_x + inset, room.max_x - inset, inward=-1, trim_c=trim_c, accent_c=accent_c)
+    if room.min_x > 0:
+        mb.add_molding_x(room.min_x, room.min_z + inset, room.max_z - inset, inward=1, trim_c=trim_c, accent_c=accent_c)
+    if room.max_x < 9:
+        mb.add_molding_x(room.max_x, room.min_z + inset, room.max_z - inset, inward=-1, trim_c=trim_c, accent_c=accent_c)
+
+
+def _add_door_casings(mb: MeshBuilder) -> None:
+    hallway = _room_by_name("hallway")
+    kitchen = _room_by_name("kitchen")
+    living = _room_by_name("living")
+    office = _room_by_name("office")
+    bedroom = _room_by_name("bedroom")
+    workshop = _room_by_name("workshop")
+    vault = _room_by_name("vault")
+
+    mb.add_door_casing_z(3.0, 1.5, rgba(hallway.trim), inward=1)
+    mb.add_door_casing_z(3.0, 1.5, rgba(kitchen.trim), inward=-1)
+    mb.add_door_casing_z(3.0, 5.0, rgba(office.trim), inward=1)
+    mb.add_door_casing_z(3.0, 5.0, rgba(living.trim), inward=-1)
+    mb.add_door_casing_x(3.0, 4.5, rgba(office.trim), inward=1)
+    mb.add_door_casing_x(3.0, 4.5, rgba(hallway.trim), inward=-1)
+    mb.add_door_casing_z(6.0, 1.5, rgba(bedroom.trim), inward=1)
+    mb.add_door_casing_z(6.0, 1.5, rgba(hallway.trim), inward=-1)
+    mb.add_door_casing_z(6.0, 5.0, rgba(workshop.trim), inward=1)
+    mb.add_door_casing_z(6.0, 5.0, rgba(office.trim), inward=-1)
+    mb.add_door_casing_x(7.0, 4.5, rgba(vault.trim), inward=1)
+    mb.add_door_casing_x(7.0, 4.5, rgba(office.trim), inward=-1)
 
 
 def _add_exterior_windows(mb: MeshBuilder) -> None:
     wy0, wy1 = 0.9, 2.0
-    mb.add_window_z(0.0, 1.5, 0.55, wy0, wy1, outward=-1)
-    mb.add_window_x(0.0, 1.5, 0.55, wy0, wy1, outward=-1)
-    mb.add_window_z(0.0, 5.0, 0.7, wy0, wy1, outward=-1)
-    mb.add_window_z(0.0, 3.8, 0.5, wy0, wy1, outward=-1)
-    mb.add_window_x(0.0, 7.5, 0.55, wy0, wy1, outward=-1)
-    mb.add_window_z(9.0, 1.5, 0.55, wy0, wy1, outward=1)
-    mb.add_window_z(9.0, 5.0, 0.7, wy0, wy1, outward=1)
-    mb.add_window_x(9.0, 4.5, 0.45, wy0, wy1, outward=1)
+    frame = rgba(EXTERIOR_TRIM)
+    openings = (
+        ("z", 0.0, 1.5, 0.55, wy0, wy1, -1),
+        ("x", 0.0, 1.5, 0.55, wy0, wy1, -1),
+        ("z", 0.0, 5.0, 0.7, wy0, wy1, -1),
+        ("z", 0.0, 3.8, 0.5, wy0, wy1, -1),
+        ("x", 0.0, 7.5, 0.55, wy0, wy1, -1),
+        ("z", 9.0, 1.5, 0.55, wy0, wy1, 1),
+        ("z", 9.0, 5.0, 0.7, wy0, wy1, 1),
+        ("x", 9.0, 4.5, 0.45, wy0, wy1, 1),
+    )
+    for kind, plane, center, half, y0, y1, outward in openings:
+        if kind == "z":
+            mb.add_window_frame_z(plane, center, half, y0, y1, outward, frame)
+            mb.add_window_z(plane, center, half, y0, y1, outward)
+        else:
+            mb.add_window_frame_x(plane, center, half, y0, y1, outward, frame)
+            mb.add_window_x(plane, center, half, y0, y1, outward)
 
 
 def _add_cable_runs(mb: MeshBuilder) -> None:
@@ -461,29 +666,35 @@ def _add_furniture(mb: MeshBuilder) -> None:
 
 def build_house_shell() -> MeshBuilder:
     mb = MeshBuilder()
+    hallway = _room_by_name("hallway")
+    office = _room_by_name("office")
+    vault = _room_by_name("vault")
 
     for room in ROOMS:
         mb.add_striped_floor(room)
-        tint_n = 6 if room.name in ("kitchen", "bedroom") else -4
-        tint_s = -5 if room.name in ("living", "workshop") else 3
-        mb.add_wall_z(room.min_z, room.min_x, room.max_x, room.wall, tint=tint_n)
-        mb.add_wall_z(room.max_z, room.min_x, room.max_x, room.wall, tint=tint_s)
-        mb.add_wall_x(room.min_x, room.min_z, room.max_z, room.wall, tint=-3)
-        mb.add_wall_x(room.max_x, room.min_z, room.max_z, room.wall, tint=5)
-        _add_room_baseboards(mb, room)
+        if not _skip_wall_z(room, room.min_z):
+            mb.add_wall_z(room.min_z, room.min_x, room.max_x, room)
+        if not _skip_wall_z(room, room.max_z):
+            mb.add_wall_z(room.max_z, room.min_x, room.max_x, room)
+        if not _skip_wall_x(room, room.min_x):
+            mb.add_wall_x(room.min_x, room.min_z, room.max_z, room)
+        if not _skip_wall_x(room, room.max_x):
+            mb.add_wall_x(room.max_x, room.min_z, room.max_z, room)
+        _add_room_moldings(mb, room)
 
-    mb.add_wall_z(3.0, 0, 3, ROOMS[2].wall, door_center=1.5, tint=4)
-    mb.add_wall_z(3.0, 3, 7, ROOMS[3].wall, door_center=5.0, tint=-3)
-    mb.add_wall_x(3.0, 3, 6, ROOMS[2].wall, door_center=4.5, tint=2)
-    mb.add_wall_z(6.0, 0, 3, ROOMS[2].wall, door_center=1.5, tint=-2)
-    mb.add_wall_z(6.0, 3, 7, ROOMS[3].wall, door_center=5.0, tint=3)
-    mb.add_wall_x(7.0, 3, 6, ROOMS[6].wall, door_center=4.5, tint=-4)
+    mb.add_wall_z(3.0, 0, 3, hallway, door_center=1.5)
+    mb.add_wall_z(3.0, 3, 7, office, door_center=5.0)
+    mb.add_wall_x(3.0, 3, 6, hallway, door_center=4.5)
+    mb.add_wall_z(6.0, 0, 3, hallway, door_center=1.5)
+    mb.add_wall_z(6.0, 3, 7, office, door_center=5.0)
+    mb.add_wall_x(7.0, 3, 6, vault, door_center=4.5)
 
-    mb.add_wall_x(0.0, 0, 9, TRIM_CREAM, tint=-8)
-    mb.add_wall_x(9.0, 0, 9, TRIM_CREAM, tint=6)
-    mb.add_wall_z(0.0, 0, 9, TRIM_CREAM, tint=-5)
-    mb.add_wall_z(9.0, 0, 9, TRIM_CREAM, tint=4)
+    mb.add_exterior_wall_x(0.0, 0, 9)
+    mb.add_exterior_wall_x(9.0, 0, 9)
+    mb.add_exterior_wall_z(0.0, 0, 9)
+    mb.add_exterior_wall_z(9.0, 0, 9)
 
+    _add_door_casings(mb)
     _add_exterior_windows(mb)
     _add_cable_runs(mb)
     _add_furniture(mb)
@@ -524,14 +735,14 @@ def build_char_idle() -> MeshBuilder:
 
 
 def main() -> None:
+    from generate_characters import generate_all
+
     house_path = OUT_DIR / "house_shell.glb"
-    char_path = OUT_DIR / "char_idle.glb"
-
     house_size = build_house_shell().to_glb(house_path, "house_shell")
-    char_size = build_char_idle().to_glb(char_path, "char_idle")
-
     print(f"Wrote {house_path} ({house_size:,} bytes)")
-    print(f"Wrote {char_path} ({char_size:,} bytes)")
+
+    for path, size in generate_all(OUT_DIR):
+        print(f"Wrote {path} ({size:,} bytes)")
 
 
 if __name__ == "__main__":

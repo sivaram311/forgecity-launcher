@@ -9,9 +9,9 @@
 
 | Field | Value |
 |-------|-------|
-| versionName | `0.10.4-white-screen-fix-dev` · versionCode **26** |
-| Latest release | [`v0.10.4-white-screen-fix-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.10.4-white-screen-fix-dev) |
-| APK SHA-256 | `AF48EEA7D44FD3838724D45C68D65FC8ECBC719D7411577C36B73F87F55E7224` |
+| versionName | `0.10.5-wall-character-dev` · versionCode **27** |
+| Latest release | [`v0.10.5-wall-character-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.10.5-wall-character-dev) |
+| APK SHA-256 | `66BE9AAAF0881AB9D8C72AA894F4D7366353F36CB22F9F64757DB24C70F5CBFB` |
 | Prior tip | [`v0.10.0-filament-house-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.10.0-filament-house-dev) · SHA `3D958C94…` |
 
 ## Waves complete (0.8 → 0.10)
