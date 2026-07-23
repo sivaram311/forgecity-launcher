@@ -379,3 +379,14 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | lint / assemble | PASS | versionCode 18 |
 | APK SHA-256 | `BE2F45E5EF46F7CD11F4B3CBB0A03A3CD0DA49E8889E7AA0A054699600568383` | local dist (~16.9 MB) |
 | Realme E2E (#16) | PENDING | debug prerelease; not production |
+
+## 2026-07-23 — Grok 4.1 config panel + roadmap consult (docs)
+
+| Check | Result | Notes |
+|------|--------|-------|
+| API call | PASS | requested `grok-4-1-fast-reasoning`; API reported `grok-4.3` |
+| Brief | FILED | `docs/design/GROK-LAUNCHER-CONFIG-ROADMAP.md` |
+| Raw JSON | GITIGNORED | `docs/design/*-raw.json` (not committed) |
+| Pointers | PASS | ROADMAP + HANDOFF + README |
+| Code / APK | N/A | docs-only; versionCode still 18 |
+| Realme E2E (#16) | N/A | docs-only push |
