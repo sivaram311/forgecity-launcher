@@ -5,7 +5,7 @@ Story-driven HOME for Realme P2 / P2 Pro: apps live in a warm interior **house**
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher (public)
 **Branch:** `main` · version `0.10.0-filament-house-dev`
-**Latest prerelease:** [`v0.9.0-3d-house-characters-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.9.0-3d-house-characters-dev) · tip tag `v0.10.0-filament-house-dev` pending
+**Latest prerelease:** [`v0.10.0-filament-house-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.10.0-filament-house-dev)
 
 ## Download
 

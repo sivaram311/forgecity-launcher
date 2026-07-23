@@ -10,7 +10,7 @@
 | Field | Value |
 |-------|-------|
 | versionName | `0.10.0-filament-house-dev` · versionCode **22** |
-| Latest release | [`v0.9.0-3d-house-characters-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.9.0-3d-house-characters-dev) — **`v0.10.0-filament-house-dev` tag pending** |
+| Latest release | [`v0.10.0-filament-house-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.10.0-filament-house-dev) |
 | APK SHA-256 | `3D958C94EA50A82C85A0EF4F01BA6B7AF2C1BB6D5ADCB13BD0C5C6371293D9C2` |
 | Prior tip | [`v0.9.0-3d-house-characters-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.9.0-3d-house-characters-dev) · SHA `D8E66EA9…` |
 
