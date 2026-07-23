@@ -465,3 +465,15 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | assembleDebug | PASS | SHA `1CEB353D9B6F4D0F6B21390A25436CA97568F1D36D286C909896544A7C541116` |
 | Realme E2E (#16) | PENDING | no ADB device |
 
+
+## 2026-07-23 — 0.10.2 BlueHourInterior (Grok realism)
+
+| Check | Result | Notes |
+|------|--------|-------|
+| Grok consult | FILED | `docs/design/GROK-FILAMENT-REALISM.md` |
+| versionCode | PASS | **24** · `0.10.2-blue-hour-interior-dev` |
+| Assets | PASS | house_shell ~65KB (windows/wood/props/cables) |
+| Lighting/fog | PASS | dual directional + fog + exposure + bloom |
+| assemble | PASS | SHA `7C8232254E87C0ADA998C8498665844480F502AD1B1A83915C6E2F16C8384597` |
+| #16 E2E | PENDING | no ADB device |
+

@@ -9,9 +9,9 @@
 
 | Field | Value |
 |-------|-------|
-| versionName | `0.10.1-filament-fix-dev` · versionCode **23** |
-| Latest release | [`v0.10.1-filament-fix-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.10.1-filament-fix-dev) |
-| APK SHA-256 | `1CEB353D9B6F4D0F6B21390A25436CA97568F1D36D286C909896544A7C541116` |
+| versionName | `0.10.2-blue-hour-interior-dev` · versionCode **24** |
+| Latest release | [`v0.10.2-blue-hour-interior-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.10.2-blue-hour-interior-dev) |
+| APK SHA-256 | `7C8232254E87C0ADA998C8498665844480F502AD1B1A83915C6E2F16C8384597` |
 | Prior tip | [`v0.10.0-filament-house-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.10.0-filament-house-dev) · SHA `3D958C94…` |
 
 ## Waves complete (0.8 → 0.10)
@@ -32,7 +32,7 @@
 
 | Now | Next |
 |-----|------|
-| 0.10.0 Filament train on `main` | Tag `v0.10.0-filament-house-dev` + fill APK SHA |
+| 0.10.1 fullscreen + TextureSurface fix | Device #16 using `docs/DEVICE-E2E-HOUSE-CHECKLIST.md` (no ADB device this session) |
 | Compile + unit PASS | Device #16 using `docs/DEVICE-E2E-HOUSE-CHECKLIST.md` (prerelease waiver OK) |
 
 Session: 2026-07-23.

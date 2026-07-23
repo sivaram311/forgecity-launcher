@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +24,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.android.filament.LightManager
 import com.google.android.filament.MaterialInstance
 import io.github.sceneview.RenderQuality
 import io.github.sceneview.SceneView
@@ -31,6 +33,7 @@ import io.github.sceneview.math.Direction
 import io.github.sceneview.math.Position
 import io.github.sceneview.math.Scale
 import io.github.sceneview.math.Size
+import io.github.sceneview.math.colorOf
 import io.github.sceneview.rememberCameraManipulator
 import io.github.sceneview.rememberCameraNode
 import io.github.sceneview.rememberEngine
@@ -39,6 +42,7 @@ import io.github.sceneview.rememberEnvironmentLoader
 import io.github.sceneview.rememberMainLightNode
 import io.github.sceneview.rememberModelInstance
 import io.github.sceneview.rememberModelLoader
+import io.github.sceneview.rememberView
 import buzz.delena.forgecity.house.FilamentHouseLighting
 import buzz.delena.forgecity.house.HouseWorld
 import buzz.delena.forgecity.house.character.CharacterRole
@@ -50,11 +54,9 @@ private const val HOUSE_ASSET = "filament/house_shell.glb"
 private const val CHAR_ASSET = "filament/char_idle.glb"
 
 /**
- * Filament / SceneView 3D house HOME.
+ * Filament house HOME — 0.10.2 BlueHourInterior (Grok realism vs Production House).
  *
- * Uses [SurfaceType.TextureSurface] so the scene renders **inline** in Compose
- * (default SurfaceView draws behind opaque parents and appears blank).
- * Small Compose chips keep app launch taps reliable without blocking orbit.
+ * TextureSurface + fog + dual lights + exposure + upgraded procedural GLB.
  */
 @Composable
 fun HouseFilamentSurface(
@@ -75,25 +77,74 @@ fun HouseFilamentSurface(
 
     val engine = rememberEngine()
     val modelLoader = rememberModelLoader(engine)
+    val view = rememberView(engine)
     val environmentLoader = rememberEnvironmentLoader(engine)
+
+    // Neutral IBL from SceneView assets; day/night mood driven by lights + fog + exposure.
     val environment = rememberEnvironment(environmentLoader)
+    SideEffect {
+        environment.indirectLight?.intensity = lighting.iblIntensity
+    }
 
     val cameraNode = rememberCameraNode(engine) {
-        position = Position(x = 4.5f, y = 9.5f, z = 12.5f)
-        lookAt(Position(x = 4.5f, y = 0.5f, z = 4.5f))
+        position = Position(x = 4.5f, y = 9.2f, z = 12.2f)
+        lookAt(Position(x = 4.5f, y = 0.6f, z = 4.5f))
+        setExposure(lighting.exposure)
     }
+    SideEffect {
+        cameraNode.setExposure(lighting.exposure)
+        // Tint sky each mode without rebuilding Environment (4.15 has no env key).
+        runCatching {
+            environment.skybox?.setColor(
+                floatArrayOf(lighting.skyTopR, lighting.skyTopG, lighting.skyTopB, 1f),
+            )
+        }
+    }
+
     val cameraManipulator = rememberCameraManipulator(
         orbitHomePosition = cameraNode.worldPosition,
-        targetPosition = Position(x = 4.5f, y = 0.5f, z = 4.5f),
+        targetPosition = Position(x = 4.5f, y = 0.6f, z = 4.5f),
     )
 
     val mainLight = rememberMainLightNode(engine) {
         intensity = if (ambientEnabled) lighting.sunIntensity else lighting.sunIntensity * 0.35f
         lightDirection = Direction(lighting.dirX, lighting.dirY, lighting.dirZ)
+        color = colorOf(
+            if (night) Color(0xFFB8C4E0) else Color(0xFFFFF2DC),
+        )
         isShadowCaster = allowsSoftShadows
     }
 
+    // Apply fog + mild bloom after RenderQuality preset (keyed SideEffect).
+    SideEffect {
+        try {
+            view.fogOptions = view.fogOptions.apply {
+                enabled = ambientEnabled
+                density = lighting.fogDensity
+                // Filament linear-ish depth fog; distance is near plane of fog.
+                distance = 2.5f
+                maximumOpacity = if (night) 0.55f else 0.40f
+                color[0] = lighting.fogColorR
+                color[1] = lighting.fogColorG
+                color[2] = lighting.fogColorB
+            }
+        } catch (_: Throwable) {
+            // Older bindings may lack fog — lighting still upgrades mood.
+        }
+        try {
+            view.bloomOptions = view.bloomOptions.apply {
+                enabled = ambientEnabled
+                strength = if (allowsSoftShadows) lighting.bloomStrength else lighting.bloomStrength * 0.5f
+            }
+        } catch (_: Throwable) {
+        }
+    }
+
     val houseInstance = rememberModelInstance(modelLoader, HOUSE_ASSET)
+    val quality = when {
+        allowsSoftShadows -> RenderQuality.Default
+        else -> RenderQuality.Performance
+    }
 
     Box(modifier = modifier.fillMaxSize()) {
         SceneView(
@@ -101,17 +152,13 @@ fun HouseFilamentSurface(
             surfaceType = SurfaceType.TextureSurface,
             engine = engine,
             modelLoader = modelLoader,
-            environmentLoader = environmentLoader,
+            view = view,
             environment = environment,
             mainLightNode = mainLight,
-            fillLightNode = null,
+            fillLightNode = null, // custom warm fill via LightNode in DSL
             cameraNode = cameraNode,
             cameraManipulator = cameraManipulator,
-            renderQuality = if (allowsSoftShadows) {
-                RenderQuality.Default
-            } else {
-                RenderQuality.Performance
-            },
+            renderQuality = quality,
             autoCenterContent = false,
             autoFitContent = false,
             isOpaque = true,
@@ -127,6 +174,14 @@ fun HouseFilamentSurface(
                 true
             },
         ) {
+            // Warm window fill (3000K-ish) — Grok MUST-SHIP dual light.
+            LightNode(
+                type = LightManager.Type.DIRECTIONAL,
+                intensity = if (ambientEnabled) lighting.fillIntensity else lighting.fillIntensity * 0.3f,
+                direction = Direction(lighting.fillDirX, lighting.fillDirY, lighting.fillDirZ),
+                color = colorOf(if (night) Color(0xFFFFC978) else Color(0xFFFFE0B0)),
+            )
+
             houseInstance?.let { instance ->
                 ModelNode(
                     modelInstance = instance,
@@ -141,8 +196,8 @@ fun HouseFilamentSurface(
                 val mat = remember(marker.id) {
                     materialLoader.createColorInstance(
                         color = Color(0xFFE8A15A),
-                        metallic = 0.15f,
-                        roughness = 0.75f,
+                        metallic = 0.12f,
+                        roughness = 0.72f,
                     )
                 }
                 HotspotCube(

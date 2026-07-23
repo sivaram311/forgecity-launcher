@@ -1,34 +1,27 @@
-# ForgeCity Launcher
+﻿# ForgeCity Launcher
 
-Story-driven HOME for Realme P2 / P2 Pro: apps live in a warm interior **house**
-(with idle characters) or classic isometric city. Assistant can read notifications aloud.
+Story-driven HOME for Realme P2 / P2 Pro: warm interior **Filament house** (BlueHourInterior) or classic isometric city.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher (public)
-**Branch:** `main` · version `0.10.1-filament-fix-dev`
-**Latest prerelease:** [`v0.10.1-filament-fix-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.10.1-filament-fix-dev)
+**Branch:** `main` · version `0.10.2-blue-hour-interior-dev`
+**Latest prerelease:** [`v0.10.2-blue-hour-interior-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.10.2-blue-hour-interior-dev)
 
 ## Download
 
-Tip (**0.10.1** Filament fix) — published prerelease:
-
 ```powershell
-curl.exe -L -o forgecity-0.10.1-filament-fix-dev-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.10.1-filament-fix-dev/forgecity-0.10.1-filament-fix-dev-debug.apk
-Get-FileHash .\forgecity-0.10.1-filament-fix-dev-debug.apk -Algorithm SHA256
-# expect 1CEB353D9B6F4D0F6B21390A25436CA97568F1D36D286C909896544A7C541116
+curl.exe -L -o forgecity-0.10.2-blue-hour-interior-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.10.2-blue-hour-interior-dev/forgecity-0.10.2-blue-hour-interior-dev-debug.apk
+Get-FileHash .\forgecity-0.10.2-blue-hour-interior-dev-debug.apk -Algorithm SHA256
+# expect 7C8232254E87C0ADA998C8498665844480F502AD1B1A83915C6E2F16C8384597
 ```
 
-## What works in 0.10.1
+## What works in 0.10.2
 
-- Immersive fullscreen HOME; SceneView **TextureSurface** (fixes blank 3D behind Compose)
-- Filament house + orbit + app marker chips; Compose/CityCanvas fallbacks
-- Grok ship/lighting notes: [GROK-FILAMENT-SHIP.md](docs/design/GROK-FILAMENT-SHIP.md), [GROK-FILAMENT-LIGHTING.md](docs/design/GROK-FILAMENT-LIGHTING.md)
-- Device checklist: [docs/DEVICE-E2E-HOUSE-CHECKLIST.md](docs/DEVICE-E2E-HOUSE-CHECKLIST.md) (#16 still pending)
+- Grok **BlueHourInterior**: dual lights, fog, exposure, bloom; richer procedural GLB (windows, wood stripes, furniture, cables)
+- Immersive fullscreen + TextureSurface (0.10.1 fixes)
+- Consult: [GROK-FILAMENT-REALISM.md](docs/design/GROK-FILAMENT-REALISM.md)
+- #16 Realme E2E still PENDING
 
 ## Docs
 
-| Doc | Purpose |
-|-----|---------|
-| [GROK-3D-HOUSE-LAUNCHER-PLAN.md](docs/design/GROK-3D-HOUSE-LAUNCHER-PLAN.md) | Full Grok plan |
-| [HANDOFF.md](docs/HANDOFF.md) | Tip + next |
-| [OPS.md](docs/OPS.md) | Install / grants |
+See `docs/HANDOFF.md`, `docs/OPS.md`, `docs/VERIFICATION.md`, `docs/ROADMAP.md`.

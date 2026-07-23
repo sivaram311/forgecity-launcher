@@ -21,6 +21,13 @@ class FilamentHouseLightingTest {
         assertTrue(FilamentHouseLighting.day.speechPulseScale > 1f)
         assertTrue(FilamentHouseLighting.night.speechPulseScale > 1f)
     }
+
+    @Test
+    fun blueHourHasWarmFillAndFog() {
+        assertTrue(FilamentHouseLighting.night.fillIntensity > FilamentHouseLighting.day.fillIntensity)
+        assertTrue(FilamentHouseLighting.day.fogDensity > 0f)
+        assertTrue(FilamentHouseLighting.night.bloomStrength >= FilamentHouseLighting.day.bloomStrength)
+    }
 }
 
 class HouseWorldTest {
