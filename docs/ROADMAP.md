@@ -6,7 +6,7 @@ story — while staying performant on Snapdragon 7s Gen 2 + Adreno 710 + 120 Hz.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher  
 **Device SoT:** `E:\MyAgent\workflow\devices\REALME-P2-PRO.md`  
-**Last updated:** 2026-07-25 (`0.16.0-assistant-character-dev` · Assistant home mode landed)
+**Last updated:** 2026-07-25 (`0.17.0-assistant-character-rigged-dev` · real rigged/animated character landed)
 
 ---
 
@@ -232,6 +232,29 @@ world. versionCode **35** · `0.16.0-assistant-character-dev` — published.
 | Tap reaction + new `WAVE` pose | ✅ |
 | Daily streak (3/7/30-day callouts) | ✅ |
 | #16 Realme E2E | PENDING — user sideloading to test directly |
+
+### Phase 3.9.1 — Rigged/animated Assistant character — v0.17.0 (landed, unverified)
+
+**Theme:** User feedback that the Assistant character was "not realistic" —
+replaced Kotlin-side per-frame pose puppeteering with a real glTF rig (7
+nodes) + 3 baked animation clips (Idle/Talk/Wave), authored by new
+`tools/generate_rigged_character.py` and played via SceneView's
+`ModelNode`/`Animator`. Falls back to the previous procedural character if
+the asset fails to load. versionCode **37** ·
+`0.17.0-assistant-character-rigged-dev` — published, **not yet
+device-confirmed** (no ADB/GPU available to the build host for this session;
+this is new Filament/glTF asset code, this app's historically most
+bug-prone area).
+
+| Item | Status |
+|------|--------|
+| Rig authoring tool (pygltflib, additive — doesn't touch house asset pipeline) | ✅ |
+| 7-joint hierarchy, ≤18-joint Adreno budget respected | ✅ |
+| Idle/Talk/Wave baked clips ported from `HouseHumanoidPose` formulas | ✅ |
+| PBR materials + embedded face texture | ✅ |
+| Independent structural validation (accessor bounds, index bounds, quaternion norms) | ✅ |
+| Kotlin `ModelNode` integration + null-instance fallback | ✅ |
+| #16 Realme E2E | PENDING — first priority: does it even render, vs. the fallback |
 
 ### Phase 4 — AI Agents & Polish — v0.4.0 “Symphony” (~6–8 weeks)
 

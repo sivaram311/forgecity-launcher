@@ -31,10 +31,18 @@ import io.github.sceneview.rememberEngine
 import io.github.sceneview.rememberEnvironment
 import io.github.sceneview.rememberEnvironmentLoader
 import io.github.sceneview.rememberMainLightNode
+import io.github.sceneview.rememberModelInstance
 import io.github.sceneview.rememberModelLoader
 import io.github.sceneview.rememberView
 
 private val TARGET_POSITION = Position(x = 0f, y = 1.0f, z = 0f)
+
+/**
+ * Real rigged/animated character (baked Idle/Talk/Wave glTF clips) — see
+ * `tools/generate_rigged_character.py`. Played via SceneView's
+ * Animator/ModelNode, not per-frame Kotlin pose math.
+ */
+private const val RIGGED_CHARACTER_ASSET = "filament/char_assistant_rigged.glb"
 
 /**
  * Assistant home mode: one full-screen animated character. Standalone — does
@@ -86,6 +94,8 @@ fun AssistantCharacterScreen(
         color = colorOf(Color(0xFFFFF2DC))
     }
 
+    val riggedInstance = rememberModelInstance(modelLoader, RIGGED_CHARACTER_ASSET)
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -122,13 +132,30 @@ fun AssistantCharacterScreen(
                 direction = Direction(0.5f, -0.3f, 0.6f),
                 color = colorOf(Color(0xFF9FD3FF)),
             )
-            val pose = HouseHumanoidPose.compute(action = action, timeSec = timeSec)
-            HouseHumanoidNode(
-                look = HouseHumanoidPose.lookFor(CharacterRole.ASSISTANT),
-                pose = pose,
-                worldPosition = Position(x = 0f, y = 0f, z = 0f),
-                nodeName = "assistant_character",
-            )
+            val instance = riggedInstance
+            if (instance != null) {
+                ModelNode(
+                    modelInstance = instance,
+                    autoAnimate = false,
+                    animationName = when (action) {
+                        HumanoidAction.WAVE -> "Wave"
+                        HumanoidAction.TALK -> "Talk"
+                        else -> "Idle"
+                    },
+                    animationLoop = action != HumanoidAction.WAVE,
+                    position = Position(x = 0f, y = 0f, z = 0f),
+                )
+            } else {
+                // Rigged asset failed to load — fall back to the proven
+                // procedural character rather than an empty/blank screen.
+                val pose = HouseHumanoidPose.compute(action = action, timeSec = timeSec)
+                HouseHumanoidNode(
+                    look = HouseHumanoidPose.lookFor(CharacterRole.ASSISTANT),
+                    pose = pose,
+                    worldPosition = Position(x = 0f, y = 0f, z = 0f),
+                    nodeName = "assistant_character_fallback",
+                )
+            }
         }
     }
 }

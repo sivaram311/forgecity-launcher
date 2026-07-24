@@ -560,3 +560,22 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | APK SHA-256 | PASS | `E39AF6AEC4CB05545BF357EF89E765A895936C4B403A6391C0EAA07CD89D969D` · `dist/forgecity-0.16.1-assistant-character-flicker-fix-dev-debug.apk` |
 | Realme E2E (#16) | PENDING | user is sideloading and confirming the fix directly — this hotfix is unverified by the build host, awaiting user confirmation |
 
+## 2026-07-25 — 0.17.0 Assistant character: real rigged/animated glTF
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| User feedback | "not realistic" | Prior character was raw Kotlin-puppeteered Filament primitives (no real skeleton, no baked clips) |
+| `tools/generate_rigged_character.py` | LANDED | New standalone script (does not modify `generate_house_assets.py`); pygltflib-based multi-node/multi-mesh/animation glTF writer |
+| Rig | LANDED | 7 nodes (body/torso/head/armR/armL/legR/legL), well under the documented ≤18-joint Adreno budget; offsets match `HouseHumanoidPose.HIP_Y` / `HouseHumanoidNode.kt` exactly |
+| Animation clips | LANDED | Idle (6s/24 samples, loop), Talk (3s/24 samples, loop), Wave (1.5s/16 samples, no loop) — keyframes ported 1:1 from `HouseHumanoidPose.compute()` sine formulas |
+| Materials | LANDED | Real PBR skin/hair/cloth-top/cloth-bottom (roughness matched to `HouseHumanoidNode.kt`'s existing values), plus a textured face material embedding the existing `faces/siva.png` |
+| Structural validation | PASS | Independent script (not just the generator's own self-check): all accessor byte-ranges in-bounds, all primitive indices within vertex-count bounds, all animation channel node references valid, all baked rotation quaternions have norm ≈ 1.0 (checked at every keyframe, every clip) |
+| Kotlin integration | LANDED | `AssistantCharacterScreen.kt`: `rememberModelInstance(modelLoader, "filament/char_assistant_rigged.glb")` → `ModelNode(animationName=..., animationLoop=...)`, driven declaratively by `action` |
+| SceneView `ModelNode` composable API | VERIFIED via bytecode inspection | Decompiled `SceneScope.ModelNode` (no sources jar available) to confirm exact parameter names (`animationName`, `animationLoop`, `animationSpeed`, `apply`, etc.) before writing Kotlin against it — confirmed correct by a clean `compileDebugKotlin` |
+| Fallback | LANDED | `riggedInstance == null` → renders the previous procedural `HouseHumanoidNode`/`HouseHumanoidPose` path unchanged, matching this app's established asset-fallback pattern (`HouseFeatureFlags.useFilamentHouse`, missing-MP4 gradient fallback) |
+| `testDebugUnitTest` / `lintDebug` / `assembleDebug` | PASS | No existing test changed; this is asset + rendering-path work |
+| New asset bundled | PASS | Confirmed `assets/filament/char_assistant_rigged.glb` (108,260 bytes) present in the built APK via `unzip -l` |
+| versionName / versionCode | PASS | `0.17.0-assistant-character-rigged-dev` · **37** |
+| APK SHA-256 | PASS | `6966693C31D32EAC160AB4E2E59127BAE9A0E9EE4CD209B3BB346013F32C00C3` · `dist/forgecity-0.17.0-assistant-character-rigged-dev-debug.apk` |
+| Realme E2E (#16) | PENDING | **Not device-tested by this build host at all** (no ADB device, no GPU renderer available here) — this is the least-verified ship yet in this app's history precisely because it's new Filament/glTF asset code, this app's worst historical bug category (white-screen, blank-scene). User must confirm whether they see the rigged character or the fallback, and whether it renders/animates correctly at all. |
+

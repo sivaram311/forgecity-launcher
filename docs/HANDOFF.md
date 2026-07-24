@@ -9,15 +9,15 @@
 
 | Field | Value |
 |-------|-------|
-| versionName | `0.16.1-assistant-character-flicker-fix-dev` · versionCode **36** |
-| Latest release | [`v0.16.1-assistant-character-flicker-fix-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.16.1-assistant-character-flicker-fix-dev) |
-| APK SHA-256 | `E39AF6AEC4CB05545BF357EF89E765A895936C4B403A6391C0EAA07CD89D969D` |
-| Prior tip | [`v0.16.0-assistant-character-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.16.0-assistant-character-dev) |
+| versionName | `0.17.0-assistant-character-rigged-dev` · versionCode **37** |
+| Latest release | [`v0.17.0-assistant-character-rigged-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.17.0-assistant-character-rigged-dev) |
+| APK SHA-256 | `6966693C31D32EAC160AB4E2E59127BAE9A0E9EE4CD209B3BB346013F32C00C3` |
+| Prior tip | [`v0.16.1-assistant-character-flicker-fix-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.16.1-assistant-character-flicker-fix-dev) |
 
 ## Now → next
 
 | Now | Next |
 |-----|------|
-| 0.16.1 flicker/duplicate-avatar hotfix (`isOpaque = true`) shipped, unverified by build host | User confirms fix on device; separately, user flagged the character as "not realistic" — visual-quality direction still open, not yet actioned |
+| 0.17.0 real rigged/animated glTF character (`tools/generate_rigged_character.py` + `ModelNode`/`Animator` playback), safe fallback to the old procedural character if the asset fails to load — **completely unverified on-device**, no ADB/GPU available to this build host | User confirms on the Realme P2 Pro: does the rigged character render at all (vs. fallback), do Idle/Talk/Wave clips play and look right, any new flicker/perf issues |
 
 Session: 2026-07-25.
