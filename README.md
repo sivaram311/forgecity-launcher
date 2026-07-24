@@ -1,14 +1,19 @@
 # ForgeCity Launcher
 
-**Latest:** [`v0.16.0-assistant-character-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.16.0-assistant-character-dev) · vc **35**
+**Latest:** [`v0.16.1-assistant-character-flicker-fix-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.16.1-assistant-character-flicker-fix-dev) · vc **36**
 
 ## Download
 ```powershell
-curl.exe -L -o forgecity-0.16.0-assistant-character-dev-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.16.0-assistant-character-dev/forgecity-0.16.0-assistant-character-dev-debug.apk
-Get-FileHash .\forgecity-0.16.0-assistant-character-dev-debug.apk -Algorithm SHA256
-# expect 7A7E8ADC721C41F50F42A2F0F20140D47AFBE9683837A18057F376F6BF76E113
+curl.exe -L -o forgecity-0.16.1-assistant-character-flicker-fix-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.16.1-assistant-character-flicker-fix-dev/forgecity-0.16.1-assistant-character-flicker-fix-dev-debug.apk
+Get-FileHash .\forgecity-0.16.1-assistant-character-flicker-fix-dev-debug.apk -Algorithm SHA256
+# expect E39AF6AEC4CB05545BF357EF89E765A895936C4B403A6391C0EAA07CD89D969D
 ```
+
+## 0.16.1 (Assistant character flicker/duplicate-avatar hotfix)
+- Reported on-device: multiple ghost copies of the character + flickering in Assistant mode
+- Root cause: `AssistantCharacterScreen`'s Filament surface was `isOpaque = false` (to blend a Compose gradient behind it) — transparent `TextureSurface` doesn't reliably clear the previous frame on some Adreno GPUs, which reads as ghosted duplicate frames of the animated character
+- Fix: surface is `isOpaque = true` (matches the proven `HouseFilamentSurface` pattern); the backdrop is now a Filament skybox color instead of a Compose blend-through
 
 ## 0.16.0 (Assistant character home mode)
 - New third **Home mode** (Settings → tap "Home mode" to cycle City → House → Assistant → City)

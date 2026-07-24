@@ -548,3 +548,15 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | APK SHA-256 | PASS | `7A7E8ADC721C41F50F42A2F0F20140D47AFBE9683837A18057F376F6BF76E113` · `dist/forgecity-0.16.0-assistant-character-dev-debug.apk` |
 | Realme E2E (#16) | PENDING | no ADB device on this build host; prerelease waiver per established pattern — user will sideload and test directly |
 
+## 2026-07-25 — 0.16.1 Assistant character flicker/duplicate-avatar hotfix
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| User-reported device bug | CONFIRMED by user | Multiple ghost avatars + flickering in Assistant mode on first real device test |
+| Root cause | DIAGNOSED (not device-reproduced by build host — no ADB device here) | `AssistantCharacterScreen` used `isOpaque = false` on the Filament `TextureSurface` to blend a Compose gradient behind it; diverges from the only proven pattern in this codebase (`HouseFilamentSurface` is always `isOpaque = true`) and matches this repo's known Adreno TextureSurface compositing history (`docs/design/GROK-WHITE-SCREEN.md`, 0.10.1, 0.10.4) |
+| Fix | LANDED | `isOpaque = true` on both `createEnvironment` and `SceneView`; backdrop now a Filament skybox color instead of a Compose blend-through |
+| versionName / versionCode | PASS | `0.16.1-assistant-character-flicker-fix-dev` · **36** |
+| `testDebugUnitTest` / `lintDebug` / `assembleDebug` | PASS | no logic changed, rendering-only fix |
+| APK SHA-256 | PASS | `E39AF6AEC4CB05545BF357EF89E765A895936C4B403A6391C0EAA07CD89D969D` · `dist/forgecity-0.16.1-assistant-character-flicker-fix-dev-debug.apk` |
+| Realme E2E (#16) | PENDING | user is sideloading and confirming the fix directly — this hotfix is unverified by the build host, awaiting user confirmation |
+

@@ -9,15 +9,15 @@
 
 | Field | Value |
 |-------|-------|
-| versionName | `0.16.0-assistant-character-dev` · versionCode **35** |
-| Latest release | [`v0.16.0-assistant-character-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.16.0-assistant-character-dev) |
-| APK SHA-256 | `7A7E8ADC721C41F50F42A2F0F20140D47AFBE9683837A18057F376F6BF76E113` |
-| Prior tip | [`v0.15.1-face-front-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.15.1-face-front-dev) |
+| versionName | `0.16.1-assistant-character-flicker-fix-dev` · versionCode **36** |
+| Latest release | [`v0.16.1-assistant-character-flicker-fix-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.16.1-assistant-character-flicker-fix-dev) |
+| APK SHA-256 | `E39AF6AEC4CB05545BF357EF89E765A895936C4B403A6391C0EAA07CD89D969D` |
+| Prior tip | [`v0.16.0-assistant-character-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.16.0-assistant-character-dev) |
 
 ## Now → next
 
 | Now | Next |
 |-----|------|
-| 0.16.0 Assistant character home mode (City/House/Assistant switch, resume greeting via device TTS, tap reaction, daily streak) | Device #16 Realme soak — user sideloading directly to test |
+| 0.16.1 flicker/duplicate-avatar hotfix (`isOpaque = true`) shipped, unverified by build host | User confirms fix on device; separately, user flagged the character as "not realistic" — visual-quality direction still open, not yet actioned |
 
 Session: 2026-07-25.

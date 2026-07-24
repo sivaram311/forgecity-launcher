@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
@@ -56,9 +57,19 @@ fun AssistantCharacterScreen(
     val environment = rememberEnvironment(
         environmentLoader = environmentLoader,
         environment = remember(environmentLoader) {
-            { createEnvironment(environmentLoader, isOpaque = false) }
+            { createEnvironment(environmentLoader, isOpaque = true) }
         },
     )
+    // Opaque skybox instead of a Compose-blended backdrop: a transparent
+    // TextureSurface doesn't reliably clear the previous frame on some Adreno
+    // drivers, which reads as ghost duplicates of the animated character
+    // (flicker/"multiple avatars"). HouseFilamentSurface never has this
+    // problem because it's always isOpaque = true.
+    SideEffect {
+        runCatching {
+            environment.skybox?.setColor(floatArrayOf(0.086f, 0.125f, 0.180f, 1f))
+        }
+    }
 
     val cameraNode = rememberCameraNode(engine) {
         position = Position(x = 0f, y = 1.15f, z = 2.3f)
@@ -94,7 +105,7 @@ fun AssistantCharacterScreen(
             renderQuality = RenderQuality.Default,
             autoCenterContent = false,
             autoFitContent = false,
-            isOpaque = false,
+            isOpaque = true,
             onFrame = { nanos ->
                 val t = nanos / 1_000_000_000f
                 if (t - timeSec >= 0.033f) timeSec = t

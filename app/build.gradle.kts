@@ -15,8 +15,8 @@ android {
         applicationId = "buzz.delena.forgecity"
         minSdk = 26
         targetSdk = 35
-        versionCode = 35
-        versionName = "0.16.0-assistant-character-dev"
+        versionCode = 36
+        versionName = "0.16.1-assistant-character-flicker-fix-dev"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
