@@ -1,6 +1,7 @@
 package buzz.delena.forgecity.assistant
 
 import android.content.Context
+import buzz.delena.forgecity.HomeMode
 import buzz.delena.forgecity.assistant.gemini.GeminiAudioTtsClient
 import buzz.delena.forgecity.assistant.gemini.AudioPromptPresets
 import buzz.delena.forgecity.assistant.gemini.PromptTemplateDefaults
@@ -302,13 +303,39 @@ class AssistantSettingsStore(context: Context) {
             .apply()
 
     /**
-     * User preference for House HOME vs City HOME.
-     * Effective house mode = [buzz.delena.forgecity.house.HouseFeatureFlags.use3dHouse] && this.
-     * Default true matches the Wave-1 house surface when the compile flag is on.
+     * User preference for which home surface to show: City, House, or the
+     * Assistant character. Effective house rendering still also depends on
+     * [buzz.delena.forgecity.house.HouseFeatureFlags.use3dHouse].
+     * Default HOUSE matches prior behavior (was `houseHomeEnabled = true`).
      */
-    var houseHomeEnabled: Boolean
-        get() = prefs.getBoolean(KEY_HOUSE_HOME_ENABLED, true)
-        set(value) = prefs.edit().putBoolean(KEY_HOUSE_HOME_ENABLED, value).apply()
+    var homeMode: HomeMode
+        get() = HomeMode.fromPersisted(prefs.getString(KEY_HOME_MODE, null)) ?: HomeMode.HOUSE
+        set(value) = prefs.edit().putString(KEY_HOME_MODE, value.name).apply()
+
+    /**
+     * Assistant-mode daily-open streak. [recordDailyOpen] is a pure function
+     * of "today" so it's unit-testable without touching prefs; callers persist
+     * the result themselves via the [lastGreetEpochDay]/[streakDays] setters.
+     */
+    var lastGreetEpochDay: Long
+        get() = prefs.getLong(KEY_LAST_GREET_EPOCH_DAY, -1L)
+        set(value) = prefs.edit().putLong(KEY_LAST_GREET_EPOCH_DAY, value).apply()
+
+    var streakDays: Int
+        get() = prefs.getInt(KEY_STREAK_DAYS, 0)
+        set(value) = prefs.edit().putInt(KEY_STREAK_DAYS, value).apply()
+
+    /**
+     * Call once per home-resume in Assistant mode. Persists and returns the
+     * resulting streak; the actual same-day/increment/reset logic is the pure
+     * [computeStreak] function so it can be unit-tested without prefs.
+     */
+    fun recordDailyOpen(todayEpochDay: Long): Int {
+        val updated = AssistantGreetings.computeStreak(lastGreetEpochDay, streakDays, todayEpochDay)
+        lastGreetEpochDay = todayEpochDay
+        streakDays = updated
+        return updated
+    }
 
     var launcherChromeVisible: Boolean
         get() = prefs.getBoolean(KEY_LAUNCHER_CHROME_VISIBLE, LauncherChromeDefaults.VISIBLE)
@@ -403,7 +430,9 @@ class AssistantSettingsStore(context: Context) {
         private const val KEY_QUIET_END = "quiet_end"
         private const val KEY_BACKGROUND_VIDEO = "background_video_enabled"
         private const val KEY_BACKGROUND_OPACITY = "background_video_opacity"
-        private const val KEY_HOUSE_HOME_ENABLED = "house_home_enabled"
+        private const val KEY_HOME_MODE = "home_mode"
+        private const val KEY_LAST_GREET_EPOCH_DAY = "assistant_last_greet_epoch_day"
+        private const val KEY_STREAK_DAYS = "assistant_streak_days"
         private const val KEY_LAUNCHER_CHROME_VISIBLE = "launcher_chrome_visible"
         private const val KEY_ASSISTANT_TOOLS_VISIBLE = "assistant_tools_visible"
         private const val KEY_ASSISTANT_PANEL_VISIBLE = "assistant_panel_visible"

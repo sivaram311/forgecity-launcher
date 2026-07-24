@@ -73,7 +73,8 @@ class MainActivity : ComponentActivity() {
             val quietLabel by viewModel.quietLabel.collectAsState()
             val backgroundVideoEnabled by viewModel.backgroundVideoEnabled.collectAsState()
             val backgroundVideoOpacity by viewModel.backgroundVideoOpacity.collectAsState()
-            val houseHomeEnabled by viewModel.houseHomeEnabled.collectAsState()
+            val homeMode by viewModel.homeMode.collectAsState()
+            val assistantCharacterAction by viewModel.assistantCharacterAction.collectAsState()
             val launcherChromeVisible by viewModel.launcherChromeVisible.collectAsState()
             val assistantPanelVisible by viewModel.assistantPanelVisible.collectAsState()
             val searchBarVisible by viewModel.searchBarVisible.collectAsState()
@@ -112,7 +113,8 @@ class MainActivity : ComponentActivity() {
                 quietLabel = quietLabel,
                 backgroundVideoEnabled = backgroundVideoEnabled,
                 backgroundVideoOpacity = backgroundVideoOpacity,
-                houseHomeEnabled = houseHomeEnabled,
+                homeMode = homeMode,
+                assistantCharacterAction = assistantCharacterAction,
                 launcherChromeVisible = launcherChromeVisible,
                 assistantPanelVisible = assistantPanelVisible,
                 searchBarVisible = searchBarVisible,
@@ -144,7 +146,8 @@ class MainActivity : ComponentActivity() {
                 onClearSpeechTestStatus = viewModel::clearSpeechTestStatus,
                 onClearDiagnosticsLog = viewModel::clearDiagnosticsLog,
                 onToggleBackgroundVideo = viewModel::toggleBackgroundVideo,
-                onToggleHouseHome = viewModel::toggleHouseHome,
+                onCycleHomeMode = viewModel::cycleHomeMode,
+                onAssistantCharacterTapped = viewModel::onCharacterTapped,
                 onBackgroundVideoOpacityChange = viewModel::setBackgroundVideoOpacity,
                 onToggleLauncherChrome = viewModel::toggleLauncherChrome,
                 onToggleAssistantPanel = viewModel::toggleAssistantPanel,
@@ -173,6 +176,7 @@ class MainActivity : ComponentActivity() {
         applyImmersiveFullscreen()
         viewModel.refreshEnvironment()
         viewModel.harvestNow()
+        viewModel.onHomeResumed()
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {

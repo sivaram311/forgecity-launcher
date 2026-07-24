@@ -532,3 +532,19 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | SHA | PASS | `ADA35CC0C54CC77C15C362675D8BE6D4FCD333F091F4A6471E4EAD699447DC78` |
 | #16 E2E | PENDING | no device soak this ship |
 
+## 2026-07-25 — 0.16.0 Assistant character home mode
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| Third Home mode (City/House/Assistant) | LANDED | `HomeMode` enum + `AssistantSettingsStore.homeMode`, cycling row in Settings replaces old house-only toggle |
+| Standalone character screen | LANDED | `ui/assistant/AssistantCharacterScreen.kt`; reuses `HouseHumanoidNode`/`HouseHumanoidPose`, own camera/light, no house-room/hotspot code pulled in |
+| Resume greeting via device TTS | LANDED | `ForgeCityViewModel.onHomeResumed()` → `AssistantTtsEngine.speakDirect` only; `MainActivity.onResume()` debounced ~20s |
+| Tap-to-interact reaction + new `WAVE` pose | LANDED | `ForgeCityViewModel.onCharacterTapped()`; `HumanoidAction.WAVE` added additively to `HouseHumanoidPose` (no change to existing IDLE/TALK/WALK/SIT math) |
+| Daily-open streak (3/7/30-day callouts) | LANDED | Pure `AssistantGreetings.computeStreak`/`streakSuffix`, persisted via `AssistantSettingsStore.recordDailyOpen` |
+| versionName / versionCode | PASS | `0.16.0-assistant-character-dev` · **35** |
+| `testDebugUnitTest` | PASS | + new `HomeModeTest`, `AssistantGreetingsTest` |
+| `lintDebug` | PASS | |
+| `assembleDebug` | PASS | |
+| APK SHA-256 | PASS | `7A7E8ADC721C41F50F42A2F0F20140D47AFBE9683837A18057F376F6BF76E113` · `dist/forgecity-0.16.0-assistant-character-dev-debug.apk` |
+| Realme E2E (#16) | PENDING | no ADB device on this build host; prerelease waiver per established pattern — user will sideload and test directly |
+

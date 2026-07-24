@@ -9,15 +9,15 @@
 
 | Field | Value |
 |-------|-------|
-| versionName | `0.15.1-face-front-dev` · versionCode **34** |
-| Latest release | [`v0.15.1-face-front-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.15.1-face-front-dev) |
-| APK SHA-256 | `977CCF820F37CC74F77282764A2FCBB849D9CBA02161A08D89E0D7B5BD96AF0E` |
-| Prior tip | [`v0.15.0-face-siva-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.15.0-face-siva-dev) |
+| versionName | `0.16.0-assistant-character-dev` · versionCode **35** |
+| Latest release | [`v0.16.0-assistant-character-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.16.0-assistant-character-dev) |
+| APK SHA-256 | `7A7E8ADC721C41F50F42A2F0F20140D47AFBE9683837A18057F376F6BF76E113` |
+| Prior tip | [`v0.15.1-face-front-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.15.1-face-front-dev) |
 
 ## Now → next
 
 | Now | Next |
 |-----|------|
-| 0.15.1 face card on front of head | Device #16 Realme soak |
+| 0.16.0 Assistant character home mode (City/House/Assistant switch, resume greeting via device TTS, tap reaction, daily streak) | Device #16 Realme soak — user sideloading directly to test |
 
-Session: 2026-07-23.
+Session: 2026-07-25.

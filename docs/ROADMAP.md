@@ -6,7 +6,7 @@ story — while staying performant on Snapdragon 7s Gen 2 + Adreno 710 + 120 Hz.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher  
 **Device SoT:** `E:\MyAgent\workflow\devices\REALME-P2-PRO.md`  
-**Last updated:** 2026-07-23 (`0.10.0-filament-house-dev` · Filament house landed)
+**Last updated:** 2026-07-25 (`0.16.0-assistant-character-dev` · Assistant home mode landed)
 
 ---
 
@@ -215,6 +215,23 @@ Gemini audio is **opt-in** (notification text sent to Google when key is set).
 | 30 prebuilt voices + Random / Random ♀ / Random ♂ | ✅ resolve each speak |
 | Named prompt template library (Save as / pick / delete) | ✅ |
 | #16 Realme E2E | PENDING |
+
+### Phase 3.9 — Assistant character home mode — v0.16.0 (landed)
+
+**Theme:** Third Home mode: one full-screen animated character that greets you
+on resume with the plain device TTS (no Gemini/Portal cascade), reacts to taps,
+and tracks a daily-open streak. Reuses house character rendering
+(`HouseHumanoidNode`/`HouseHumanoidPose`) standalone, outside the house-room
+world. versionCode **35** · `0.16.0-assistant-character-dev` — published.
+
+| Item | Status |
+|------|--------|
+| `HomeMode` (City/House/Assistant) settings cycle | ✅ |
+| `AssistantCharacterScreen` full-screen character | ✅ |
+| Resume greeting via `AssistantTtsEngine.speakDirect` | ✅ |
+| Tap reaction + new `WAVE` pose | ✅ |
+| Daily streak (3/7/30-day callouts) | ✅ |
+| #16 Realme E2E | PENDING — user sideloading to test directly |
 
 ### Phase 4 — AI Agents & Polish — v0.4.0 “Symphony” (~6–8 weeks)
 

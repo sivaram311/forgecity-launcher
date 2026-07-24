@@ -8,6 +8,8 @@ enum class HumanoidAction {
     TALK,
     WALK,
     SIT,
+    /** Brief raised-arm greeting gesture; used for tap reactions. */
+    WAVE,
 }
 
 /**
@@ -109,6 +111,12 @@ object HouseHumanoidPose {
             HumanoidAction.TALK -> Quad(
                 radToDeg(-0.4f + sin(t * 2.5f) * 0.25f),
                 radToDeg(0.15f),
+                radToDeg(sin(t * 1.1f + 1f) * 0.08f),
+                radToDeg(-0.12f),
+            )
+            HumanoidAction.WAVE -> Quad(
+                radToDeg(-2.1f + sin(t * 9f) * 0.35f),
+                radToDeg(0.5f),
                 radToDeg(sin(t * 1.1f + 1f) * 0.08f),
                 radToDeg(-0.12f),
             )

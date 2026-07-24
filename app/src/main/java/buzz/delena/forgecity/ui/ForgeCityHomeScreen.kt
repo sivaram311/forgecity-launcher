@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import buzz.delena.forgecity.assistant.AssistantSpeechMode
 import buzz.delena.forgecity.assistant.AssistantUiEvent
+import buzz.delena.forgecity.HomeMode
 import buzz.delena.forgecity.city.CityBuilding
 import buzz.delena.forgecity.city.CityState
 import buzz.delena.forgecity.city.DayNightCycle
@@ -65,6 +66,8 @@ import buzz.delena.forgecity.house.AssistantHouseBridge
 import buzz.delena.forgecity.house.HouseFeatureFlags
 import buzz.delena.forgecity.house.HouseRoom as DomainHouseRoom
 import buzz.delena.forgecity.house.PlaceableApp
+import buzz.delena.forgecity.house.character.HumanoidAction
+import buzz.delena.forgecity.ui.assistant.AssistantCharacterScreen
 import buzz.delena.forgecity.ui.background.CityBackgroundVideo
 import buzz.delena.forgecity.ui.house.HouseFilamentSurface
 import buzz.delena.forgecity.ui.house.HouseHomeSurface
@@ -101,7 +104,8 @@ fun ForgeCityHomeScreen(
     quietLabel: String,
     backgroundVideoEnabled: Boolean,
     backgroundVideoOpacity: Float,
-    houseHomeEnabled: Boolean,
+    homeMode: HomeMode,
+    assistantCharacterAction: HumanoidAction = HumanoidAction.IDLE,
     launcherChromeVisible: Boolean,
     assistantPanelVisible: Boolean,
     searchBarVisible: Boolean,
@@ -133,7 +137,8 @@ fun ForgeCityHomeScreen(
     onClearSpeechTestStatus: () -> Unit,
     onClearDiagnosticsLog: () -> Unit,
     onToggleBackgroundVideo: () -> Unit,
-    onToggleHouseHome: () -> Unit,
+    onCycleHomeMode: () -> Unit,
+    onAssistantCharacterTapped: () -> Unit = {},
     onBackgroundVideoOpacityChange: (Float) -> Unit,
     onToggleLauncherChrome: () -> Unit,
     onToggleAssistantPanel: () -> Unit,
@@ -157,7 +162,8 @@ fun ForgeCityHomeScreen(
         query.isBlank() || it.label.contains(query, ignoreCase = true)
     }
     val favorites = buildings.filter { it.isFavorite }.take(6)
-    val houseMode = HouseFeatureFlags.use3dHouse && houseHomeEnabled
+    val houseMode = HouseFeatureFlags.use3dHouse && homeMode == HomeMode.HOUSE
+    val assistantMode = homeMode == HomeMode.ASSISTANT
     val (top, mid, bottom) = DayNightCycle.skyColors(hourOfDay)
     val houseBackdrop = listOf(Color(0xFF1A1410), Color(0xFF2C2118), Color(0xFF1E1612))
 
@@ -194,6 +200,7 @@ fun ForgeCityHomeScreen(
     ) {
         // House mode must not force city video; compile flag gates the Media3 path.
         val videoOn = !houseMode &&
+            !assistantMode &&
             ambientEnabled &&
             backgroundVideoEnabled &&
             HouseFeatureFlags.useCityVideo
@@ -255,6 +262,12 @@ fun ForgeCityHomeScreen(
                     modifier = Modifier.fillMaxSize(),
                 )
             }
+        } else if (assistantMode) {
+            AssistantCharacterScreen(
+                action = assistantCharacterAction,
+                onTap = onAssistantCharacterTapped,
+                modifier = Modifier.fillMaxSize(),
+            )
         } else {
             CityCanvas(
                 buildings = filtered,
@@ -414,8 +427,7 @@ fun ForgeCityHomeScreen(
                 diagnosticsLog = diagnosticsLog,
                 backgroundVideoEnabled = backgroundVideoEnabled,
                 backgroundVideoOpacity = backgroundVideoOpacity,
-                houseHomeToggleVisible = HouseFeatureFlags.use3dHouse,
-                houseHomeEnabled = houseHomeEnabled,
+                homeMode = homeMode,
                 quietLabel = quietLabel,
                 allowCount = allowCount,
                 onOpenNotificationAccess = onOpenNotificationAccess,
@@ -436,7 +448,7 @@ fun ForgeCityHomeScreen(
                 onClearSpeechTestStatus = onClearSpeechTestStatus,
                 onClearDiagnosticsLog = onClearDiagnosticsLog,
                 onToggleBackgroundVideo = onToggleBackgroundVideo,
-                onToggleHouseHome = onToggleHouseHome,
+                onCycleHomeMode = onCycleHomeMode,
                 onBackgroundVideoOpacityChange = onBackgroundVideoOpacityChange,
                 onQuietStartEarlier = onQuietStartEarlier,
                 onQuietStartLater = onQuietStartLater,

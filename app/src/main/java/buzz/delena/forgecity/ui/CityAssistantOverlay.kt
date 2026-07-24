@@ -54,6 +54,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import buzz.delena.forgecity.HomeMode
 import buzz.delena.forgecity.assistant.AssistantSpeechMode
 import buzz.delena.forgecity.assistant.AssistantUiEvent
 import buzz.delena.forgecity.assistant.gemini.AudioPromptPresets
@@ -171,8 +172,7 @@ fun AssistantSettingsSheet(
     diagnosticsLog: String,
     backgroundVideoEnabled: Boolean,
     backgroundVideoOpacity: Float,
-    houseHomeToggleVisible: Boolean = false,
-    houseHomeEnabled: Boolean = true,
+    homeMode: HomeMode = HomeMode.HOUSE,
     quietLabel: String,
     allowCount: Int,
     onOpenNotificationAccess: () -> Unit,
@@ -193,7 +193,7 @@ fun AssistantSettingsSheet(
     onClearSpeechTestStatus: () -> Unit,
     onClearDiagnosticsLog: () -> Unit,
     onToggleBackgroundVideo: () -> Unit,
-    onToggleHouseHome: () -> Unit = {},
+    onCycleHomeMode: () -> Unit = {},
     onBackgroundVideoOpacityChange: (Float) -> Unit,
     onQuietStartEarlier: () -> Unit,
     onQuietStartLater: () -> Unit,
@@ -264,8 +264,7 @@ fun AssistantSettingsSheet(
                     diagnosticsLog = diagnosticsLog,
                     backgroundVideoEnabled = backgroundVideoEnabled,
                     backgroundVideoOpacity = backgroundVideoOpacity,
-                    houseHomeToggleVisible = houseHomeToggleVisible,
-                    houseHomeEnabled = houseHomeEnabled,
+                    homeMode = homeMode,
                     quietLabel = quietLabel,
                     allowCount = allowCount,
                     onOpenNotificationAccess = onOpenNotificationAccess,
@@ -286,7 +285,7 @@ fun AssistantSettingsSheet(
                     onClearSpeechTestStatus = onClearSpeechTestStatus,
                     onClearDiagnosticsLog = onClearDiagnosticsLog,
                     onToggleBackgroundVideo = onToggleBackgroundVideo,
-                    onToggleHouseHome = onToggleHouseHome,
+                    onCycleHomeMode = onCycleHomeMode,
                     onBackgroundVideoOpacityChange = onBackgroundVideoOpacityChange,
                     onQuietStartEarlier = onQuietStartEarlier,
                     onQuietStartLater = onQuietStartLater,
@@ -320,8 +319,7 @@ fun AssistantSettingsCard(
     diagnosticsLog: String,
     backgroundVideoEnabled: Boolean,
     backgroundVideoOpacity: Float,
-    houseHomeToggleVisible: Boolean = false,
-    houseHomeEnabled: Boolean = true,
+    homeMode: HomeMode = HomeMode.HOUSE,
     quietLabel: String,
     allowCount: Int,
     onOpenNotificationAccess: () -> Unit,
@@ -342,7 +340,7 @@ fun AssistantSettingsCard(
     onClearSpeechTestStatus: () -> Unit,
     onClearDiagnosticsLog: () -> Unit,
     onToggleBackgroundVideo: () -> Unit,
-    onToggleHouseHome: () -> Unit = {},
+    onCycleHomeMode: () -> Unit = {},
     onBackgroundVideoOpacityChange: (Float) -> Unit,
     onQuietStartEarlier: () -> Unit,
     onQuietStartLater: () -> Unit,
@@ -806,8 +804,25 @@ fun AssistantSettingsCard(
             fontSize = 11.sp,
             fontWeight = FontWeight.SemiBold,
         )
-        if (houseHomeToggleVisible) {
-            SettingRow("3D House home", houseHomeEnabled, onToggleHouseHome)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onCycleHomeMode)
+                .padding(vertical = 6.dp),
+        ) {
+            Text("Home mode", color = Color(0xFFFFF6F0), fontSize = 12.sp)
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = when (homeMode) {
+                    HomeMode.CITY -> "CITY"
+                    HomeMode.HOUSE -> "HOUSE"
+                    HomeMode.ASSISTANT -> "ASSISTANT"
+                },
+                color = Color(0xFFE8A15A),
+                fontSize = 11.sp,
+                fontWeight = FontWeight.SemiBold,
+            )
         }
         SettingRow("Background Video", backgroundVideoEnabled, onToggleBackgroundVideo)
         Row(

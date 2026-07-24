@@ -2,11 +2,15 @@ package buzz.delena.forgecity.ui
 
 import android.app.Application
 import android.content.Intent
+import android.os.SystemClock
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import buzz.delena.forgecity.HomeMode
 import buzz.delena.forgecity.assistant.AssistantEventBridge
+import buzz.delena.forgecity.assistant.AssistantGreetings
 import buzz.delena.forgecity.assistant.AssistantSpeechMode
 import buzz.delena.forgecity.assistant.AssistantSettingsStore
+import buzz.delena.forgecity.assistant.AssistantTtsEngine
 import buzz.delena.forgecity.assistant.AssistantUiEvent
 import buzz.delena.forgecity.assistant.ForgeCityTtsDiagnostics
 import buzz.delena.forgecity.assistant.NotificationAccess
@@ -16,12 +20,16 @@ import buzz.delena.forgecity.city.CityBuilding
 import buzz.delena.forgecity.city.CityState
 import buzz.delena.forgecity.data.CityRepository
 import buzz.delena.forgecity.data.ForgeCityDatabase
+import buzz.delena.forgecity.house.AssistantHouseBridge
+import buzz.delena.forgecity.house.character.HumanoidAction
 import buzz.delena.forgecity.launcher.AppCatalog
 import buzz.delena.forgecity.power.AnimationBudget
 import buzz.delena.forgecity.usage.LaunchTracker
 import buzz.delena.forgecity.usage.UsageStatsHarvester
 import java.util.Calendar
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -38,6 +46,13 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
     private val animationBudget = AnimationBudget(application)
     private val assistantSettings = AssistantSettingsStore(application)
     private val speechModeTestRunner = SpeechModeTestRunner(application)
+
+    /** Plain device TTS for Assistant home-mode greetings/reactions only — never the Gemini/Portal cascade. */
+    private var assistantCharacterTtsInstance: AssistantTtsEngine? = null
+    private val assistantCharacterTts: AssistantTtsEngine
+        get() = assistantCharacterTtsInstance ?: AssistantTtsEngine(getApplication()).also {
+            assistantCharacterTtsInstance = it
+        }
 
     private val _buildings = MutableStateFlow<List<CityBuilding>>(emptyList())
     val buildings: StateFlow<List<CityBuilding>> = _buildings.asStateFlow()
@@ -122,9 +137,13 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
         MutableStateFlow(assistantSettings.backgroundVideoOpacity)
     val backgroundVideoOpacity: StateFlow<Float> = _backgroundVideoOpacity.asStateFlow()
 
-    private val _houseHomeEnabled =
-        MutableStateFlow(assistantSettings.houseHomeEnabled)
-    val houseHomeEnabled: StateFlow<Boolean> = _houseHomeEnabled.asStateFlow()
+    private val _homeMode = MutableStateFlow(assistantSettings.homeMode)
+    val homeMode: StateFlow<HomeMode> = _homeMode.asStateFlow()
+
+    private val _assistantCharacterAction = MutableStateFlow(HumanoidAction.IDLE)
+    val assistantCharacterAction: StateFlow<HumanoidAction> = _assistantCharacterAction.asStateFlow()
+
+    private var lastAssistantGreetElapsedMs = -1L
 
     private val _launcherChromeVisible =
         MutableStateFlow(assistantSettings.launcherChromeVisible)
@@ -215,7 +234,7 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
         _quietLabel.value = formatQuietLabel()
         _backgroundVideoEnabled.value = assistantSettings.backgroundVideoEnabled
         _backgroundVideoOpacity.value = assistantSettings.backgroundVideoOpacity
-        _houseHomeEnabled.value = assistantSettings.houseHomeEnabled
+        _homeMode.value = assistantSettings.homeMode
     }
 
     fun harvestNow(force: Boolean = false) {
@@ -364,9 +383,42 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
         _backgroundVideoEnabled.value = assistantSettings.backgroundVideoEnabled
     }
 
-    fun toggleHouseHome() {
-        assistantSettings.houseHomeEnabled = !assistantSettings.houseHomeEnabled
-        _houseHomeEnabled.value = assistantSettings.houseHomeEnabled
+    fun cycleHomeMode() {
+        assistantSettings.homeMode = assistantSettings.homeMode.next()
+        _homeMode.value = assistantSettings.homeMode
+    }
+
+    /**
+     * Call from [buzz.delena.forgecity.MainActivity.onResume]. Debounced so
+     * task-switcher returns within [ASSISTANT_GREET_DEBOUNCE_MS] don't re-greet;
+     * only fires in [HomeMode.ASSISTANT]. Speaks via the plain device TTS
+     * ([AssistantTtsEngine.speakDirect]) — never the Gemini/Portal cascade.
+     */
+    fun onHomeResumed() {
+        if (_homeMode.value != HomeMode.ASSISTANT) return
+        val now = SystemClock.elapsedRealtime()
+        if (lastAssistantGreetElapsedMs >= 0 &&
+            now - lastAssistantGreetElapsedMs < ASSISTANT_GREET_DEBOUNCE_MS
+        ) {
+            return
+        }
+        lastAssistantGreetElapsedMs = now
+        val todayEpochDay = TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis())
+        val streak = assistantSettings.recordDailyOpen(todayEpochDay)
+        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        val line = AssistantGreetings.greetingForHour(hour) +
+            AssistantGreetings.streakSuffix(streak).orEmpty()
+        assistantCharacterTts.speakDirect(line)
+    }
+
+    /** Tap-to-interact reaction for Assistant home mode: a short line + brief wave pose. */
+    fun onCharacterTapped() {
+        assistantCharacterTts.speakDirect(AssistantGreetings.tapReaction())
+        _assistantCharacterAction.value = HumanoidAction.WAVE
+        viewModelScope.launch {
+            delay(1_500L)
+            _assistantCharacterAction.value = HumanoidAction.IDLE
+        }
     }
 
     fun setBackgroundVideoOpacity(opacity: Float) {
@@ -464,11 +516,13 @@ class ForgeCityViewModel(application: Application) : AndroidViewModel(applicatio
 
     override fun onCleared() {
         speechModeTestRunner.close()
+        assistantCharacterTtsInstance?.shutdown()
         super.onCleared()
     }
 
     private companion object {
         const val HARVEST_MIN_INTERVAL_MS = 60L * 60L * 1000L
+        const val ASSISTANT_GREET_DEBOUNCE_MS = 20_000L
 
         fun wrapDayMinutes(minutes: Int): Int =
             ((minutes % (24 * 60)) + (24 * 60)) % (24 * 60)
