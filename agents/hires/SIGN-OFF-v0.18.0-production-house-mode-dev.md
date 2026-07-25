@@ -3,10 +3,10 @@
 | Field | Value |
 |-------|-------|
 | Session | 2026-07-25 Production House HomeMode |
-| Reviewer | **PENDING #17** (hire readonly Reviewer before push/tag) |
-| Tip SHA | *(fill after commit)* |
+| Reviewer | **GO** (CONSCIOUS #17 readonly) |
+| Tip SHA | `011409f` |
 | Scope | versionCode **38** · `0.18.0-production-house-mode-dev` |
-| Tag | `v0.18.0-production-house-mode-dev` prerelease (after GO) |
+| Tag | `v0.18.0-production-house-mode-dev` prerelease |
 | When (IST) | 2026-07-25 |
 
 ## Checklist
@@ -22,20 +22,23 @@
 - [x] `testDebugUnitTest` / `lintDebug` / `assembleDebug` PASS
 - [x] APK SHA-256 `A7C99C2FDABE66D6C3E31A00AA40AC4B57F05C16490BA1C08A413C5032D094C1` · `dist/forgecity-0.18.0-production-house-mode-dev-debug.apk`
 - [x] Docs tip updated: README, HANDOFF, ROADMAP, VERIFICATION, OPS
+- [x] No secrets in diff
+- [x] `.tmp-aar/` untracked — not staged for push
 - [ ] **Zero on-device verification** — WebView + dock toggle await Realme user confirm
-- [ ] Reviewer #17 GO before `git push` / annotated tag / GitHub release asset
 
 ## Verdict
 
-**Ready for #17 Reviewer hire** — do **not** push or tag until GO.
+**GO** for push of `main` + annotated prerelease tag `v0.18.0-production-house-mode-dev` + GitHub debug APK asset — **strong condition** below.
 
-### Findings (author)
+### Findings (#17)
 
-- Fast path deliberately uses live WebView of Production House PROD rather than a native Filament film-lot port.
-- Requires network; offline shows “Lot offline — check network”.
-- Native Filament lot / bundled static PH assets explicitly out of scope for 0.18.0.
+- Tip `011409f` matches claimed scope exactly: `HomeMode.PRODUCTION_HOUSE`, new `ProductionHouseWebSurface` → `https://production-house.delena.buzz`, `AppsDockChip` always reachable, dock scrim/favorites `AnimatedVisibility` decoupled from `launcherChromeVisible` (dock-only hide), version bump 38, docs tip, unit tests. City/House/Assistant render branches untouched — new mode is an additive `else if (productionHouseMode)` branch; city video explicitly gated off for LOT mode.
+- APK SHA-256 verified locally via `Get-FileHash`: `A7C99C2FDABE66D6C3E31A00AA40AC4B57F05C16490BA1C08A413C5032D094C1` matches claimed hash exactly.
+- Diff scan clean: no literal API keys, tokens, or keystore material; only public PROD URL and existing Keystore plumbing passed through unchanged.
+- Working tree: `.tmp-aar/` is untracked (`??`) and nothing staged — safe for push.
+- Same prerelease waiver as 0.17: zero on-device WebView/GPU verification on this build host is a **condition**, not a blocker.
 
 ### Conditions
 
-- Not closed until user reports: lot loads in WebView, favorites launch, Apps chip hides/shows dock only.
+- **Not closed** until the user reports: lot loads in WebView, favorites launch, **Apps** chip hides/shows dock only (WebView stays visible).
 - ACTIVITY-LOG entry required after push/publish.
