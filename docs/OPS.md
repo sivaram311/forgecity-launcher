@@ -17,17 +17,17 @@ git checkout main
 
 ## Download (prerelease debug APK)
 
-Tip (**0.13.0** TTS catalog) — tag `v0.13.0-tts-catalog-dev`:
+Tip (**0.18.0** Production House home mode) — tag `v0.18.0-production-house-mode-dev`:
 
 ```powershell
-curl.exe -L -o forgecity-0.13.0-tts-catalog-dev-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.13.0-tts-catalog-dev/forgecity-0.13.0-tts-catalog-dev-debug.apk
-Get-FileHash .\forgecity-0.13.0-tts-catalog-dev-debug.apk -Algorithm SHA256
-# expect ADA35CC0C54CC77C15C362675D8BE6D4FCD333F091F4A6471E4EAD699447DC78
-adb install -r .\forgecity-0.13.0-tts-catalog-dev-debug.apk
+curl.exe -L -o forgecity-0.18.0-production-house-mode-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.18.0-production-house-mode-dev/forgecity-0.18.0-production-house-mode-dev-debug.apk
+Get-FileHash .\forgecity-0.18.0-production-house-mode-dev-debug.apk -Algorithm SHA256
+# expect A7C99C2FDABE66D6C3E31A00AA40AC4B57F05C16490BA1C08A413C5032D094C1
+adb install -r .\forgecity-0.18.0-production-house-mode-dev-debug.apk
 ```
 
-Prior house tip (**0.12.0** open-roof + patrols): tag `v0.12.0-patrol-openroof-dev` · SHA `4DDFFF4F…0E54`.
+Prior tip (**0.17.0** rigged Assistant character): tag `v0.17.0-assistant-character-rigged-dev` · SHA `6966693C…00C3`.
 
 Also grant: Home role, Usage Access, Notification Access (allowlist apps before speech).
 

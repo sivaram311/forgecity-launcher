@@ -579,3 +579,16 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | APK SHA-256 | PASS | `6966693C31D32EAC160AB4E2E59127BAE9A0E9EE4CD209B3BB346013F32C00C3` · `dist/forgecity-0.17.0-assistant-character-rigged-dev-debug.apk` |
 | Realme E2E (#16) | PENDING | **Not device-tested by this build host at all** (no ADB device, no GPU renderer available here) — this is the least-verified ship yet in this app's history precisely because it's new Filament/glTF asset code, this app's worst historical bug category (white-screen, blank-scene). User must confirm whether they see the rigged character or the fallback, and whether it renders/animates correctly at all. |
 
+## 2026-07-25 — 0.18.0 Production House home mode
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| `HomeMode.PRODUCTION_HOUSE` in settings cycle | LANDED | City → House → Assistant → Production House → City |
+| WebView surface → Production House PROD v0.1.0 | LANDED | `https://production-house.delena.buzz` |
+| Favorites dock (pin/unpin, launch) | LANDED | Same behavior as City/House/Assistant modes |
+| **Apps** chip — dock-only hide/show | LANDED | Always reachable; toggles favorites dock visibility only; WebView stays visible |
+| versionName / versionCode | PASS | `0.18.0-production-house-mode-dev` · **38** |
+| `testDebugUnitTest` / `lintDebug` / `assembleDebug` | PASS | |
+| APK SHA-256 | PASS | `A7C99C2FDABE66D6C3E31A00AA40AC4B57F05C16490BA1C08A413C5032D094C1` · `dist/forgecity-0.18.0-production-house-mode-dev-debug.apk` |
+| Realme E2E (#16) | PENDING | User must confirm WebView loads live lot + dock toggle on device |
+

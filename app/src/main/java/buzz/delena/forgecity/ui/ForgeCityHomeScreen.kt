@@ -72,6 +72,7 @@ import buzz.delena.forgecity.ui.background.CityBackgroundVideo
 import buzz.delena.forgecity.ui.house.HouseFilamentSurface
 import buzz.delena.forgecity.ui.house.HouseHomeSurface
 import buzz.delena.forgecity.ui.house.HouseLabelMarker
+import buzz.delena.forgecity.ui.lot.ProductionHouseWebSurface
 import kotlinx.coroutines.delay
 
 @Composable
@@ -164,8 +165,10 @@ fun ForgeCityHomeScreen(
     val favorites = buildings.filter { it.isFavorite }.take(6)
     val houseMode = HouseFeatureFlags.use3dHouse && homeMode == HomeMode.HOUSE
     val assistantMode = homeMode == HomeMode.ASSISTANT
+    val productionHouseMode = homeMode == HomeMode.PRODUCTION_HOUSE
     val (top, mid, bottom) = DayNightCycle.skyColors(hourOfDay)
     val houseBackdrop = listOf(Color(0xFF1A1410), Color(0xFF2C2118), Color(0xFF1E1612))
+    val lotBackdrop = listOf(Color(0xFF16202E), Color(0xFF0E1520), Color(0xFF0A1018))
 
     // Slice D2: when the query resolves to a single building, fly the camera to it.
     val focusBuildingId = if (query.isNotBlank() && filtered.size == 1) filtered.first().id else null
@@ -183,7 +186,11 @@ fun ForgeCityHomeScreen(
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    if (houseMode) houseBackdrop else listOf(Color(top), Color(mid), Color(bottom)),
+                    when {
+                        houseMode -> houseBackdrop
+                        productionHouseMode -> lotBackdrop
+                        else -> listOf(Color(top), Color(mid), Color(bottom))
+                    },
                 ),
             )
             // Draw vignette on the same node so it cannot steal pointer events from house/city.
@@ -201,6 +208,7 @@ fun ForgeCityHomeScreen(
         // House mode must not force city video; compile flag gates the Media3 path.
         val videoOn = !houseMode &&
             !assistantMode &&
+            !productionHouseMode &&
             ambientEnabled &&
             backgroundVideoEnabled &&
             HouseFeatureFlags.useCityVideo
@@ -268,6 +276,8 @@ fun ForgeCityHomeScreen(
                 onTap = onAssistantCharacterTapped,
                 modifier = Modifier.fillMaxSize(),
             )
+        } else if (productionHouseMode) {
+            ProductionHouseWebSurface(modifier = Modifier.fillMaxSize())
         } else {
             CityCanvas(
                 buildings = filtered,
@@ -303,7 +313,7 @@ fun ForgeCityHomeScreen(
 
         // Slice A1/C: local bottom scrim strip only behind the favorites dock.
         AnimatedVisibility(
-            visible = launcherChromeVisible && dockPanelVisible,
+            visible = dockPanelVisible,
             enter = fadeIn(),
             exit = fadeOut(),
             modifier = Modifier.align(Alignment.BottomCenter),
@@ -352,7 +362,7 @@ fun ForgeCityHomeScreen(
                     SearchBar(
                         query = query,
                         onQueryChange = onQueryChange,
-                        hint = if (houseMode) "Search apps" else "Search buildings",
+                        hint = if (houseMode || productionHouseMode) "Search apps" else "Search buildings",
                     )
                 }
             }
@@ -375,7 +385,7 @@ fun ForgeCityHomeScreen(
         }
 
         AnimatedVisibility(
-            visible = launcherChromeVisible && dockPanelVisible,
+            visible = dockPanelVisible,
             enter = fadeIn(),
             exit = fadeOut(),
             modifier = Modifier
@@ -467,6 +477,17 @@ fun ForgeCityHomeScreen(
             )
         }
 
+        // Always-reachable Apps chip: hide/show favorites dock without opening the
+        // overflow menu — critical for PRODUCTION_HOUSE immersion when dock is off.
+        AppsDockChip(
+            dockVisible = dockPanelVisible,
+            onToggle = onToggleDockPanel,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .navigationBarsPadding()
+                .padding(end = 12.dp, bottom = if (dockPanelVisible) 118.dp else 16.dp),
+        )
+
         ChromeMenu(
             launcherChromeVisible = launcherChromeVisible,
             assistantPanelVisible = assistantPanelVisible,
@@ -482,6 +503,32 @@ fun ForgeCityHomeScreen(
                 .padding(top = 6.dp, end = 6.dp),
         )
     }
+}
+
+/** Compact chip that toggles the favorites dock even when chrome/dock are hidden. */
+@Composable
+private fun AppsDockChip(
+    dockVisible: Boolean,
+    onToggle: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = if (dockVisible) "Apps · ON" else "Apps",
+        color = Color(0xFFFFF6F0),
+        fontSize = 12.sp,
+        fontWeight = FontWeight.SemiBold,
+        modifier = modifier
+            .background(
+                color = if (dockVisible) Color(0xCC2A4A58) else Color(0xCC201828),
+                shape = RoundedCornerShape(14.dp),
+            )
+            .semantics {
+                contentDescription = "Apps shortcuts"
+                stateDescription = if (dockVisible) "Dock shown" else "Dock hidden"
+            }
+            .clickable(role = Role.Button, onClick = onToggle)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+    )
 }
 
 /**

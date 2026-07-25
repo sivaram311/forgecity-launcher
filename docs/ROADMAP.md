@@ -6,7 +6,7 @@ story — while staying performant on Snapdragon 7s Gen 2 + Adreno 710 + 120 Hz.
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher  
 **Device SoT:** `E:\MyAgent\workflow\devices\REALME-P2-PRO.md`  
-**Last updated:** 2026-07-25 (`0.17.0-assistant-character-rigged-dev` · real rigged/animated character landed)
+**Last updated:** 2026-07-25 (`0.18.0-production-house-mode-dev` · Production House HomeMode landed)
 
 ---
 
@@ -256,6 +256,21 @@ bug-prone area).
 | Kotlin `ModelNode` integration + null-instance fallback | ✅ |
 | #16 Realme E2E | PENDING — first priority: does it even render, vs. the fallback |
 
+### Phase 3.9.2 — Production House home mode — v0.18.0 (landed, unverified)
+
+**Theme:** Fourth Home mode embeds the live Production House web app as the home
+surface — bridges the Filament house work to the full Production House PROD
+experience without duplicating its 3D stack in-launcher. versionCode **38** ·
+`0.18.0-production-house-mode-dev` — published, **not yet device-confirmed**.
+
+| Item | Status |
+|------|--------|
+| `HomeMode.PRODUCTION_HOUSE` in cycle (City → House → Assistant → Production House → City) | ✅ |
+| WebView surface → Production House PROD v0.1.0 (`https://production-house.delena.buzz`) | ✅ |
+| Favorites dock (same pin/launch behavior as other modes) | ✅ |
+| Always-reachable **Apps** chip — dock-only hide/show toggle | ✅ |
+| #16 Realme E2E | PENDING — WebView load + dock toggle on device |
+
 ### Phase 4 — AI Agents & Polish — v0.4.0 “Symphony” (~6–8 weeks)
 
 - Five in-city agents
@@ -323,10 +338,11 @@ voice, template pick, and house FPS/thermal.
 
 ## 9. Immediate next actions
 
-1. **P0 device lab:** Realme P2 Pro E2E (#16) on Filament house using
-   `docs/DEVICE-E2E-HOUSE-CHECKLIST.md` — thermal/FPS + house soak.
-2. **Tag:** publish `v0.10.0-filament-house-dev` debug APK + SHA; annotated production
-   tags only after Realme device GO.
+1. **P0 device lab:** Realme P2 Pro E2E (#16) on **0.18.0 Production House mode** —
+   confirm WebView loads `https://production-house.delena.buzz`, favorites launch,
+   and **Apps** chip toggles dock hide/show only.
+2. **Backlog:** Realme confirm 0.17.0 rigged Assistant character (render vs. fallback,
+   Idle/Talk/Wave clips, flicker/perf).
 3. **Later:** Kongu rewrite→audio two-step; weather / quest markers / in-city agents.
 
 **Rejected for launcher:** Cloudflare Workers AI / GLM remote Worker integration.

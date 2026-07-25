@@ -818,6 +818,7 @@ fun AssistantSettingsCard(
                     HomeMode.CITY -> "CITY"
                     HomeMode.HOUSE -> "HOUSE"
                     HomeMode.ASSISTANT -> "ASSISTANT"
+                    HomeMode.PRODUCTION_HOUSE -> "LOT"
                 },
                 color = Color(0xFFE8A15A),
                 fontSize = 11.sp,
