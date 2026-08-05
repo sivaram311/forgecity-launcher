@@ -2,15 +2,21 @@
 
 App display name is **Foundry** as of this commit — repo, package (`buzz.delena.forgecity`), and release filenames are unchanged; see `docs/HANDOFF.md`.
 
-**Latest:** [`v0.18.0-production-house-mode-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.18.0-production-house-mode-dev) · vc **38**
+**Latest:** [`v0.18.1-foundry-rename-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.18.1-foundry-rename-dev) · vc **39**
 
 ## Download
 ```powershell
-curl.exe -L -o forgecity-0.18.0-production-house-mode-dev-debug.apk `
-  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.18.0-production-house-mode-dev/forgecity-0.18.0-production-house-mode-dev-debug.apk
-Get-FileHash .\forgecity-0.18.0-production-house-mode-dev-debug.apk -Algorithm SHA256
-# expect A7C99C2FDABE66D6C3E31A00AA40AC4B57F05C16490BA1C08A413C5032D094C1
+curl.exe -L -o forgecity-0.18.1-foundry-rename-dev-debug.apk `
+  https://github.com/sivaram311/forgecity-launcher/releases/download/v0.18.1-foundry-rename-dev/forgecity-0.18.1-foundry-rename-dev-debug.apk
+Get-FileHash .\forgecity-0.18.1-foundry-rename-dev-debug.apk -Algorithm SHA256
+# expect 3D4F0082A92205A1D9E932C56700CBD9CB5313FFF5C3FE7C36A1ECE53F6B7802
 ```
+
+## 0.18.1 (Foundry display-name rename)
+- App display name changed **ForgeCity → Foundry** (user-directed fresh identity ahead of eventual v1.0 relaunch)
+- Display-name only: `applicationId buzz.delena.forgecity`, GitHub repo, package structure, and release-filename convention unchanged
+- Updated: `app_name` string (launcher label + HOME chooser), in-app chapter chip, TEST TTS copy
+- Not device-confirmed — same Realme #16 backlog as 0.18.0; a string-only rename doesn't re-trigger it, see `docs/VERIFICATION.md`
 
 ## 0.18.0 (Production House home mode)
 - Fourth **Home mode** — Settings → tap "Home mode" cycles City → House → Assistant → Production House → City

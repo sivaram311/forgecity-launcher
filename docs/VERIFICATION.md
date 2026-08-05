@@ -592,16 +592,18 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | APK SHA-256 | PASS | `A7C99C2FDABE66D6C3E31A00AA40AC4B57F05C16490BA1C08A413C5032D094C1` · `dist/forgecity-0.18.0-production-house-mode-dev-debug.apk` |
 | Realme E2E (#16) | PENDING | User must confirm WebView loads live lot + dock toggle on device |
 
-## 2026-08-05 — Display-name rename to "Foundry"
+## 2026-08-05 — 0.18.1 Display-name rename to "Foundry"
 
 | Check | Result | Notes |
 |-------|--------|-------|
-| Scope | PASS | Display-name only, per user decision: `applicationId buzz.delena.forgecity`, repo name, package structure, release/APK filenames unchanged |
+| Scope | PASS | Display-name only, per user decision: `applicationId buzz.delena.forgecity`, repo name, package structure, `forgecity-<version>-debug.apk` filename convention unchanged |
 | `app_name` string (launcher label + HOME chooser) | LANDED | `res/values/strings.xml`: `ForgeCity` → `Foundry`; `set_as_home` copy updated to match |
 | In-app chapter chip | LANDED | `ForgeCityHomeScreen.kt` header text `"ForgeCity"` → `"Foundry"` |
 | TEST TTS copy | LANDED | `AssistantSpeechMode.SpeechTestDefaults.TEXT` + 3× `appLabel` in `SpeechModeTestRunner.kt` |
 | Deliberately unchanged | PASS | Log tag `ForgeCityTTS` (dev-only); HTTP header `X-ForgeCity-Key` (live Agent Portal server contract — renaming needs a coordinated server change, out of scope) |
-| `testDebugUnitTest` | PASS | Full suite green |
-| `assembleDebug` | PASS | `BUILD SUCCESSFUL` |
+| versionName / versionCode | PASS | `0.18.1-foundry-rename-dev` · **39** |
+| `testDebugUnitTest` / `lintDebug` / `assembleDebug` | PASS | Full suite green, `BUILD SUCCESSFUL` |
+| APK badging | PASS | `aapt dump badging`: `package buzz.delena.forgecity versionCode 39`, `application-label:'Foundry'` confirmed in the built artifact |
+| APK SHA-256 | `3D4F0082A92205A1D9E932C56700CBD9CB5313FFF5C3FE7C36A1ECE53F6B7802` | `dist/forgecity-0.18.1-foundry-rename-dev-debug.apk` |
 | Realme E2E (#16) | PENDING | Same outstanding backlog as 0.18.0 — not re-triggered by a string-only rename |
 

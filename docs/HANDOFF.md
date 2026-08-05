@@ -1,8 +1,9 @@
 # Handoff — Foundry (formerly ForgeCity Launcher)
 
 **Naming:** display name changed to **Foundry** (`app_name` string + in-app chapter chip + TEST TTS
-copy) on 2026-08-05. Scope was deliberately display-name-only: `applicationId buzz.delena.forgecity`,
-the GitHub repo name, package structure, and release/APK filenames are unchanged. Internal identifiers
+copy) on 2026-08-05, shipped as `0.18.1-foundry-rename-dev`. Scope was deliberately display-name-only:
+`applicationId buzz.delena.forgecity`, the GitHub repo name, package structure, and the
+`forgecity-<version>-debug.apk` release-filename convention are all unchanged. Internal identifiers
 kept as-is: log tag `ForgeCityTTS`, HTTP header `X-ForgeCity-Key` (live Agent Portal contract — do not
 rename without a coordinated server-side change).
 
@@ -15,15 +16,15 @@ rename without a coordinated server-side change).
 
 | Field | Value |
 |-------|-------|
-| versionName | `0.18.0-production-house-mode-dev` · versionCode **38** |
-| Latest release | [`v0.18.0-production-house-mode-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.18.0-production-house-mode-dev) |
-| APK SHA-256 | `A7C99C2FDABE66D6C3E31A00AA40AC4B57F05C16490BA1C08A413C5032D094C1` |
-| Prior tip | [`v0.17.0-assistant-character-rigged-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.17.0-assistant-character-rigged-dev) |
+| versionName | `0.18.1-foundry-rename-dev` · versionCode **39** |
+| Latest release | [`v0.18.1-foundry-rename-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.18.1-foundry-rename-dev) |
+| APK SHA-256 | `3D4F0082A92205A1D9E932C56700CBD9CB5313FFF5C3FE7C36A1ECE53F6B7802` |
+| Prior tip | [`v0.18.0-production-house-mode-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.18.0-production-house-mode-dev) |
 
 ## Now → next
 
 | Now | Next |
 |-----|------|
-| 0.18.0 fourth Home mode **Production House** — WebView loads live Production House PROD v0.1.0 (`https://production-house.delena.buzz`); favorites dock unchanged; **Apps** chip toggles dock-only hide/show — **unverified on-device**, no ADB on this build host | User confirms on Realme P2 Pro: WebView loads the live lot, favorites launch correctly, **Apps** chip hides/shows dock only (WebView stays visible) |
+| 0.18.1 display-name rename to **Foundry** — app label + in-app chip + TEST TTS copy only; `testDebugUnitTest`/`lintDebug`/`assembleDebug` green; **not device-confirmed** (string-only change, doesn't re-trigger #16) | Still outstanding from 0.18.0: user confirms on Realme P2 Pro that Production House WebView loads the live lot, favorites launch correctly, **Apps** chip hides/shows dock only |
 
-Session: 2026-07-25.
+Session: 2026-08-05.
