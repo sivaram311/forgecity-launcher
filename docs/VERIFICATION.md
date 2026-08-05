@@ -607,3 +607,16 @@ Device lab checklist: `docs/OPS.md` → “Realme P2 Pro checklist”.
 | APK SHA-256 | `3D4F0082A92205A1D9E932C56700CBD9CB5313FFF5C3FE7C36A1ECE53F6B7802` | `dist/forgecity-0.18.1-foundry-rename-dev-debug.apk` |
 | Realme E2E (#16) | PENDING | Same outstanding backlog as 0.18.0 — not re-triggered by a string-only rename |
 
+## 2026-08-05 — v0.18.1-foundry-rename-dev push + publish
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| Reviewer #17 | GO | `agents/hires/SIGN-OFF-v0.18.1-foundry-rename-dev.md`, independent `cursor-agent --mode ask` review of `origin/main..HEAD` |
+| `git push origin main` | PASS | `b0ae8a1..657918a` |
+| Tag `v0.18.1-foundry-rename-dev` | PUBLISHED | annotated, target `657918a` |
+| GitHub prerelease | PUBLISHED | https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.18.1-foundry-rename-dev |
+| APK + `.sha256` assets | PASS | `forgecity-0.18.1-foundry-rename-dev-debug.apk` |
+| Download round-trip | PASS | re-fetched via `gh release download`; SHA-256 matched build hash exactly |
+| Public accessibility | PUBLIC | anonymous `curl` HEAD/GET on the asset URL returns 200 |
+| Realme E2E (#16) | PENDING | Unchanged — string-only rename doesn't exercise the Filament/glTF/WebView paths |
+
