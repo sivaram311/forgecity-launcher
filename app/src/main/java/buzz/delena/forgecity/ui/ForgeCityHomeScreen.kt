@@ -656,7 +656,7 @@ private fun ChapterPill(state: CityState) {
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = "ForgeCity",
+                text = "Foundry",
                 color = Color(0xFFFFF6F0),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,

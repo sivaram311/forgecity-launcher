@@ -52,5 +52,5 @@ object LauncherChromeDefaults {
 }
 
 object SpeechTestDefaults {
-    const val TEXT = "ForgeCity notification speech is working."
+    const val TEXT = "Foundry notification speech is working."
 }

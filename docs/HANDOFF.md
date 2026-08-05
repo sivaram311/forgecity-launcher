@@ -1,4 +1,10 @@
-# Handoff — ForgeCity Launcher
+# Handoff — Foundry (formerly ForgeCity Launcher)
+
+**Naming:** display name changed to **Foundry** (`app_name` string + in-app chapter chip + TEST TTS
+copy) on 2026-08-05. Scope was deliberately display-name-only: `applicationId buzz.delena.forgecity`,
+the GitHub repo name, package structure, and release/APK filenames are unchanged. Internal identifiers
+kept as-is: log tag `ForgeCityTTS`, HTTP header `X-ForgeCity-Key` (live Agent Portal contract — do not
+rename without a coordinated server-side change).
 
 **Repo:** https://github.com/sivaram311/forgecity-launcher (public)
 **Local:** `E:\MyWorkspace\sandbox\forgecity-launcher` · branch `main`

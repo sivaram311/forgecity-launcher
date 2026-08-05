@@ -1,4 +1,6 @@
-# ForgeCity Launcher
+# Foundry (formerly ForgeCity Launcher)
+
+App display name is **Foundry** as of this commit — repo, package (`buzz.delena.forgecity`), and release filenames are unchanged; see `docs/HANDOFF.md`.
 
 **Latest:** [`v0.18.0-production-house-mode-dev`](https://github.com/sivaram311/forgecity-launcher/releases/tag/v0.18.0-production-house-mode-dev) · vc **38**
 

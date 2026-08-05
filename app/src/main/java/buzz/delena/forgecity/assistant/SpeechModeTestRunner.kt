@@ -54,7 +54,7 @@ class SpeechModeTestRunner(context: Context) : AutoCloseable {
                             config.portalApiKey,
                             RewriteRequest(
                                 notificationKey = "manual-tts-test",
-                                appLabel = "ForgeCity",
+                                appLabel = "Foundry",
                                 title = "Speech test",
                                 body = body,
                             ),
@@ -99,7 +99,7 @@ class SpeechModeTestRunner(context: Context) : AutoCloseable {
                     cascadeOrchestrator.runGeminiOnly(
                         CascadeSpeechInput(
                             notificationKey = "manual-gemini-test",
-                            appLabel = "ForgeCity",
+                            appLabel = "Foundry",
                             title = "Speech test",
                             body = body,
                         ),
@@ -120,7 +120,7 @@ class SpeechModeTestRunner(context: Context) : AutoCloseable {
                     cascadeOrchestrator.run(
                         CascadeSpeechInput(
                             notificationKey = "manual-cascade-test",
-                            appLabel = "ForgeCity",
+                            appLabel = "Foundry",
                             title = "Speech test",
                             body = body,
                         ),
